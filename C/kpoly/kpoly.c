@@ -5,18 +5,26 @@
 
 
 typedef unsigned int uint;
+
 typedef struct kpoly_t kpoly_t;
-typedef struct matrix_t matrix_t;
+typedef struct mat_t mat_t;
+typedef struct mono_t mono_t;
+
+struct mono_t {
+  size_t deg;
+  double coeff;
+};
 
 struct kpoly_t {
   const size_t k;            // Max degree of the polynomial.
+        mono_t mono;         // Monomer (if applicable).
         double coeff[];      // Terms of the polynomial.
 };
 
-struct matrix_t {
+struct mat_t {
   const size_t    dim;       // Column / row number.
   const size_t    k;         // Max degree of the polynomials.
-        kpoly_t * term[];   // Terms of the matrix.
+        kpoly_t * term[];    // Terms of the matrix.
 };
 
 
@@ -37,6 +45,7 @@ void print_kpoly (kpoly_t *P) {
    fprintf(stderr, "\n");
 }
 
+
 void
 critical_error
 (
@@ -49,6 +58,20 @@ critical_error
 }
 
 
+void
+destroy_mat
+(
+   mat_t *mat
+)
+{
+
+   size_t dim = mat->dim;
+   for (int i = 0 ; i < dim*dim ; i++) free(mat->term[i]);
+   free(mat);
+
+}
+
+
 kpoly_t *
 new_zero_kpoly
 (
@@ -57,7 +80,7 @@ new_zero_kpoly
 {
 
    // Initialize to zero.
-   kpoly_t *new = calloc(1, sizeof(size_t) + (k+1) * sizeof(double));
+   kpoly_t *new = calloc(1, sizeof(kpoly_t) + (k+1) * sizeof(double));
 
    if (new == NULL) critical_error("memory error", __LINE__);
 
@@ -70,7 +93,7 @@ new_zero_kpoly
 }
 
 
-matrix_t *
+mat_t *
 new_null_matrix
 (
    size_t k,
@@ -79,7 +102,7 @@ new_null_matrix
 {
 
    // Initialize to zero.
-   matrix_t *new = calloc(1, sizeof(size_t) + dim*dim * sizeof(kpoly_t *));
+   mat_t *new = calloc(1, sizeof(mat_t) + dim*dim * sizeof(kpoly_t *));
 
    if (new == NULL) critical_error("memory error", __LINE__);
 
@@ -224,6 +247,8 @@ new_kpoly_r
 
    double thisC = pow(1-pow(1-mu,n), N);
    double thatC = pow(1-pow(1-mu,n-1), N);
+   new->mono.deg = n;
+   new->mono.coeff = (thisC - thatC) * pow(1-p,n);
    new->coeff[n] = (thisC - thatC) * pow(1-p,n);
 
    return new;
@@ -287,7 +312,7 @@ new_kpoly_tilde_F
 }
 
 
-matrix_t *
+mat_t *
 new_matrix_M
 (
    size_t k,
@@ -299,7 +324,7 @@ new_matrix_M
 {
 
    size_t dim = gamma+3;
-   matrix_t *M = new_null_matrix(k, dim);
+   mat_t *M = new_null_matrix(k, dim);
 
    // First row.
    M->term[0*dim+2] = new_zero_kpoly(k);
@@ -353,13 +378,31 @@ kpoly_mult
    if (a->k != dest->k || b->k != dest->k)
       critical_error("incongruent k-polynomials", __LINE__);
 
-   // Convolution product.
+   if (a->mono.deg) {
+      // If a is a monomial, use a shortcut.
+      bzero(dest->coeff, (dest->k+1) * sizeof(double));
+      for (int i = a->mono.deg ; i <= dest->k ; i++) {
+         dest->coeff[i] = a->mono.coeff * b->coeff[i-a->mono.deg];
+      }
+   }
+   else {
+      // Standard convolution product.
+      for (int i = 0 ; i <= dest->k ; i++) {
+         dest->coeff[i] = a->coeff[0] * b->coeff[i];
+         for (int j = 1 ; j <= i ; j++) {
+            dest->coeff[i] += a->coeff[j] * b->coeff[i-j];
+         }
+      }
+   }
+
+/*
    for (int i = 0 ; i <= dest->k ; i++) {
       dest->coeff[i] = a->coeff[0] * b->coeff[i];
       for (int j = 1 ; j <= i ; j++) {
          dest->coeff[i] += a->coeff[j] * b->coeff[i-j];
       }
    }
+*/
 
    return dest;
 
@@ -388,12 +431,12 @@ kpoly_update_add
 }
 
 
-matrix_t *
+mat_t *
 matrix_mult
 (
-         matrix_t * dest,
-   const matrix_t * a,
-   const matrix_t * b
+         mat_t * dest,
+   const mat_t * a,
+   const mat_t * b
 )
 {
 
@@ -429,23 +472,31 @@ matrix_mult
 
 int main(void) {
 
-   uint gamma = 28;
+   uint gamma = 17;
 
    uint N = 5;
 
    kpoly_t *w = new_zero_kpoly(100);
-   matrix_t *M = new_matrix_M(100, gamma, .01, .05, N);
+   mat_t *M = new_matrix_M(100, gamma, .01, .05, N);
 
-   matrix_t *tmpM = new_null_matrix(100, gamma+3);
-   matrix_t *powM = M;
+   mat_t *powM = new_null_matrix(100, gamma+3);
+   matrix_mult(powM, M, M);
 
-   for (int i = 1 ; i < 100 ; i++) {
+   kpoly_update_add(w, powM->term[gamma+2]);
+
+   for (int i = 2 ; i < 16 ; i++) {
+      mat_t *tmpM = new_null_matrix(100, gamma+3); // FIXME //
       matrix_mult(tmpM, M, powM);
       kpoly_update_add(w, tmpM->term[gamma+2]);
+      destroy_mat(powM);
       powM = tmpM;
-      tmpM = new_null_matrix(100, gamma+3); // FIXME //
    }
 
+   destroy_mat(powM);
+   destroy_mat(M);
+
    print_kpoly(w);
+
+   free(w);
 
 }
