@@ -358,6 +358,15 @@ new_matrix_M
 }
 
 
+
+void do_shortcut (kpoly_t *dest,const  kpoly_t *b, int deg, double coeff) {
+   for (int i = deg ; i <= dest->k ; i++) {
+      dest->coeff[i] = coeff * b->coeff[i-deg];
+   }   
+}
+
+
+
 kpoly_t *
 kpoly_mult
 (
@@ -381,9 +390,10 @@ kpoly_mult
    if (a->mono.deg) {
       // If a is a monomial, use a shortcut.
       bzero(dest->coeff, (dest->k+1) * sizeof(double));
-      for (int i = a->mono.deg ; i <= dest->k ; i++) {
-         dest->coeff[i] = a->mono.coeff * b->coeff[i-a->mono.deg];
-      }
+		do_shortcut(dest, b, a->mono.deg, a->mono.coeff);
+//      for (int i = a->mono.deg ; i <= dest->k ; i++) {
+//         dest->coeff[i] = a->mono.coeff * b->coeff[i-a->mono.deg];
+//      }
    }
    else {
       // Standard convolution product.
@@ -483,8 +493,9 @@ int main(void) {
    matrix_mult(powM, M, M);
 
    kpoly_update_add(w, powM->term[gamma+2]);
+   // print_kpoly(w);
 
-   for (int i = 2 ; i < 16 ; i++) {
+   for (int i = 0 ; i < 16 ; i++) {
       mat_t *tmpM = new_null_matrix(100, gamma+3); // FIXME //
       matrix_mult(tmpM, M, powM);
       kpoly_update_add(w, tmpM->term[gamma+2]);

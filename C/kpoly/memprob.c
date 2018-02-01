@@ -38,8 +38,8 @@ size_t    K;     // Max degree of the polynomials (read size).
 
 size_t    KSZ;   // Size of the 'kpoly_t' struct.
 
-kpoly_t * TEMP = NULL;  // Matrix multipliciation
-kpoly_t * ARRAY[1024];  // Store the results.
+kpoly_t * TEMP = NULL;        // Matrix multipliciation.
+kpoly_t * ARRAY[1024] = {0};  // Store the results.
 
 int       ERRNO; // Error codes.
 
@@ -62,7 +62,7 @@ memprob_init
 
    KSZ = sizeof(kpoly_t) + (K+1) * sizeof(double);
 
-   for (int i = 0 ; i < 2014 ; i++) free(ARRAY[i]);
+   for (int i = 0 ; i < 1024 ; i++) free(ARRAY[i]);
    bzero(ARRAY, 1024 * sizeof(kpoly_t *));
 
    free(TEMP);
@@ -81,17 +81,6 @@ kpoly_t *
 new_zero_kpoly (void)
 {
    return calloc(1, KSZ);
-}
-
-
-
-void
-set_kpoly_to_zero
-(
-   kpoly_t * kpoly
-)
-{
-   if (kpoly != NULL) bzero(kpoly, KSZ);
 }
 
 
@@ -455,15 +444,15 @@ kpoly_mult
    // If any of the two k-polynomials is zero,
    // set 'dest' to zero and return 'NULL'.
    if (a == NULL || b == NULL) {
-      set_kpoly_to_zero(dest);
+      bzero(dest, KSZ);
       return NULL;
    }
 
-   if (a->mono.deg) {
-      // If a is a monomial, use a shortcut.
-      set_kpoly_to_zero(dest);
-      for (int i = a->mono.deg ; i <= K ; i++) {
-         dest->coeff[i] = a->mono.coeff * b->coeff[i-a->mono.deg];
+   if (b->mono.deg) {
+      // If 'b' is a monomial, use a shortcut.
+      bzero(dest, KSZ);
+      for (int i = b->mono.deg ; i <= K ; i++) {
+         dest->coeff[i] = b->mono.coeff * a->coeff[i-b->mono.deg];
       }
    }
    else {
@@ -511,7 +500,7 @@ matrix_mult
 {
 
    if (a->dim != dest->dim || b->dim != dest->dim) {
-      ERRNO == __LINE__;
+      ERRNO = __LINE__;
       return NULL;
    }
 
@@ -519,9 +508,7 @@ matrix_mult
 
    for (int i = 0 ; i < dim ; i++) {
    for (int j = 0 ; j < dim ; j++) {
-      // Erase destination kpoly.
-      set_kpoly_to_zero(dest->term[i*dim+j]);
-      // Matrix multiplication.
+      bzero(dest->term[i*dim+j], KSZ);
       for (int m = 0 ; m < dim ; m++) {
          kpoly_update_add(dest->term[i*dim+j],
                kpoly_mult(TEMP, a->term[i*dim+m], b->term[m*dim+j]));
@@ -531,6 +518,20 @@ matrix_mult
 
    return dest;
 
+}
+
+// FIXME //
+void print_kpoly (kpoly_t *p) {
+   if (p == NULL) {
+      fprintf(stderr, "0\n");
+      return;
+   }
+   fprintf(stderr, "%f", p->coeff[0]);
+   fprintf(stderr, " + %fz", p->coeff[1]);
+   for (int i = 2 ; i <= K ; i++) {
+      fprintf(stderr, " + %fz^%d", p->coeff[i], i);
+   }
+   fprintf(stderr, "\n");
 }
 
 
@@ -555,18 +556,19 @@ int main(void) {
    matrix_mult(powM1, M, M);
    kpoly_update_add(w, powM1->term[gamma+2]);
 
-   for (int i = 2 ; i < 8 ; i++) {
+
+   for (int i = 0 ; i < 8 ; i++) {
       matrix_mult(powM2, powM1, M);
       kpoly_update_add(w, powM2->term[gamma+2]);
       matrix_mult(powM1, powM2, M);
-      kpoly_update_add(w, powM2->term[gamma+2]);
+      kpoly_update_add(w, powM1->term[gamma+2]);
    }
 
    destroy_mat(powM1);
    destroy_mat(powM2);
    destroy_mat(M);
 
-   fprintf(stderr, "%f\n", w->coeff[100]);
+   print_kpoly(w);
 
    free(w);
 
