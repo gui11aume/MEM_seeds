@@ -529,7 +529,7 @@ void print_kpoly (kpoly_t *p) {
    fprintf(stderr, "%f", p->coeff[0]);
    fprintf(stderr, " + %fz", p->coeff[1]);
    for (int i = 2 ; i <= K ; i++) {
-      fprintf(stderr, " + %fz^%d", p->coeff[i], i);
+      fprintf(stderr, " + %.10fz^%d", p->coeff[i], i);
    }
    fprintf(stderr, "\n");
 }
@@ -540,7 +540,7 @@ int main(void) {
    memprob_init(0.01, 0.05, 100);
 
    uint gamma = 17;
-   uint N = 5;
+   uint N = 2;
 
    kpoly_t *w = new_zero_kpoly();
    mat_t *M = new_matrix_M(gamma, N);
@@ -557,7 +557,7 @@ int main(void) {
    kpoly_update_add(w, powM1->term[gamma+2]);
 
 
-   for (int i = 0 ; i < 8 ; i++) {
+   for (int i = 0 ; i < 10 ; i++) {
       matrix_mult(powM2, powM1, M);
       kpoly_update_add(w, powM2->term[gamma+2]);
       matrix_mult(powM1, powM2, M);
