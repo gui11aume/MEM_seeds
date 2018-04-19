@@ -91,32 +91,33 @@ Some introduction
 
 \section{MEM seeds}
 
-We can describe reads as sequences of four possible symbols representing
-the state of the local match with the genome. The first symbol,
-represented by a black square indicates a sequencing error. This is a
-mismatch between the read and the genome so the nucleotide cannot belong
-to a correct MEM seed. It either belongs to an incorrect MEM seed, or it
-marks the end of a correct MEM seed.
+\subsection{Seeds}
+DEFINE MEM SEED AND SHARED MEM SEED.
 
-The second symbol, represented by a black square with a white cross
-indicates a sequencing error that is also a mismatch for \emph{all} the
-duplicates. The nucleotide cannot belong to any MEM seed (correct or not)
-so the next MEM seed must start at the following nucleotide. The symbol
-`resets' the seeding process, which becomes in the same state as at the
-beginning of the read.
+\subsection{The seeding alphabet}
 
-The third symbol, represented by an exclamation mark indicates that the
-target sequence is the only local match between the read and the genome.
-This means that there is at least one mismatch between the read and any
-duplicate since the beginning of the current MEM. From that nucleotide,
-the MEM will extend forward until the next sequencing error. This means
-that two exclamation marks must be separated by either a black square or a
-black square with a cross.
+By nature, reads are sequences of \texttt{A}, \texttt{T}, \texttt{G} and
+\texttt{C}, but for the purpose of the seeding process, it is more useful
+to consider them as a sequence of symbols telling if the nucleotides match
+the target and~/ or the duplicates. Here, we will consider that reads are
+sequences of the five symbols $\Downarrow$, $\downarrow$, $\uparrow$, $\sim$
+and $\square$.
 
-The last symbol, represented as a white square indicates all the other
-situations. This can mark the beginning but not the end of a MEM.
+The $\Downarrow$ symbol indicates that the nucleotide is not only a
+mismatch for the target, but also for every duplicate. The $\downarrow$
+symbol indicates that the nucleotide is a mismatch for the target, but is
+a match for at least one dupulicate. These two symbols are referred to as
+the \emph{error symbols}, because they imply the occurrence of a
+sequencing error (this is the only way the read may not match the target).
 
-\section{Some definitions etc.}
+The remaing three symbols have a more complex usage because they describe
+events of the MEM seeding process that are best explained by way of a
+concrete example. Fig.~\ref{fig:sketch_MEM} illustrates the case of a read
+of size 25 from a sequence with three duplicates. The four files of
+squares at the bottom are the target and duplicate sequences, where a
+black square means that the decoded nucleotide is a mismatch and a grey
+square means that it is a match.
+
 
 \begin{figure}[h]
 \centering
@@ -126,43 +127,41 @@ Some legend.}
 \label{fig:sketch_MEM}
 \end{figure}
 
+Now consider streaks of matches until a particular position of the read.
+At the 4-th nucleotide, the target scores 4 matches in a row versus 2, 0
+and 1 for the duplicates. The target just acquired the strictly longest
+streak, which is indicated by the $\uparrow$ symbol. This symbol also
+appears at position 17, where the target sequence acquires the strictly
+longest streak again (6 matches in a row, versus 4, 0 and 4 for the
+dupicates).
 
-We assume that the target sequence has $N$ duplicates that are potential
-false positives for the seeding process. We further assume that
-duplication was instantaenous and that all $N+1$ sequences diverge
-independently from each other at a constant rate. In other words, we
-ignore the complications due to the genealogy of the duplication events
-and we simply assume that at each position, the target and a duplicate are
-identical with probability $1-\mu$. In case they are not, we assume that
-the duplicate has any of the remaining three nucleotides with equal
-probability.
+At position 23, the target and the first duplicate both acquire the
+longest streak (2 matches in a row), which is indicated by the $\sim$
+symbol. This symbol is used only at positions where the target
+\emph{acquires} the longest streak (together with at least one duplicate).
+For instance, it is not used at position 1 nor at position 12 because the
+target already had the longest streak (0 in both cases).
 
-Each of the $N+1$ sequences of interest corresponds to a Bernoulli process
-where `success' stands for a match between the sequence and the read, and
-`failure' stands for a mismatch. To describe those processes, we will use
-the `match function' $\varphi(n)$ that gives the length of the success
-streak at position $n$. The processes are indexed such that $\varphi_0$
-describes the matches of the target sequence, whereas $\varphi_j$ $(1 \leq
-j \leq N)$ describes the matches of the duplicates. For instance,
-$\varphi_0(5) = 5$ and $\varphi_1(5) = 3$ in the example of
-Fig.~\ref{fig:sketch_MEM}.
+Finally, the $\square$ symbol is used for all the other cases,
+\textit{i.e.}, when there is no sequencing error, and when the target does
+not acquire the longest streak of matches (shared or not with a
+duplicate).
 
-For simplicity, we will refer to the Bernoulli processes as `threads', and
-we will distinguish the `target thread' from the `duplicate threads'. At
-any position $n$ of the read, a duplicate thread $j$ $(1 \leq j \leq N)$
-is said to be `strictly masking' if $\varphi_j(n) > \varphi_0(n)$,
-`potentially masking' if $\varphi_j(n) \geq \varphi_0(n)$ and
-`non-masking' if $\varphi_j(n) < \varphi_0(n)$. There can be no MEM seed
-at positions where there is a stricly masking thread. At positions where
-there is a potentially masking thread any MEM seed must be a shared MEM
-seed.
+Each sequence corresponds to a Bernoulli process where `success' stands
+for a match between the sequence and the read, and `failure' stands for a
+mismatch. For simplicity, we will refer to the Bernoulli processes as
+`threads'.
 
+\begin{definition}
+At a given position of the read, a duplicate thread is said to be
+\emph{strictly masking} if its match streak is strictly longer than the
+match streak of the target. A duplicate thread is said to be
+\emph{potentially masking} if its match streak is the same as the target.
+\end{definition}
 
-With these definitions, the decision tree for choosing the next symbol to
-insert in a read can be summarized as in Fig.~\ref{fig:decision_tree}.
-This sketch will be useful as a reference to compute the probabilities of
-the blocks and their weighted generating functions.
-
+Duplicate threads are thus classified into strictly masking, potentially
+masking and not masking, which allows us to describe the usage of the five
+symbols.
 
 \begin{figure}[h]
 \centering
@@ -173,30 +172,31 @@ Some legend.}
 \end{figure}
 
 
+We assume that the target sequence has $N$ duplicates that are potential
+false positives for the seeding process. We further assume that
+duplication was instantaenous and that all $N+1$ sequences diverge
+independently from each other at a constant rate. In other words, we
+ignore the complications due to the genealogy of the duplication events
+and we simply assume that at each position, any given duplicate has the
+same nucleotide as the target with probability $1-\mu$. If it does not,
+we assume that the duplicate has any of the remaining three
+nucleotides with equal probability.
 
-\begin{equation*}
-\begin{blockarray}{ccccccccc}
-   & \dn & \DN &\eq{1} & \ldots & \eq{\gamma-1} &
-    \up{1} & \ldots & \up{\gamma-1} \\
-\begin{block}{c[cccccccc]}
-\dn & * & * & * & \ldots & * & * & \ldots & * \\
-\DN & \tilde{A}_\infty(z) & \tilde{B}_\gamma(z) & 0 & \ldots & 0 &
-    r_1(z) & \ldots & r_{\gamma-1}(z) \\
-\eq{1} & * & * & 0 & \ldots & 0 & 0 & \ldots & G_{1,\gamma-1}(z) \\
-\eq{2} & * & * & 0 & \ldots & 0 & 0 & \ldots & G_{2,\gamma-1}(z) \\
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
-    \ddots & \vdots \\
-\eq{\gamma-1} & * & * & 0 & \ldots & 0 & 0 & \ldots & 0 \\
-\up{1} & A_{\gamma-1}(z) & B_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & 0 \\
-\up{2} & A_{\gamma-2}(z) & B_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & 0  \\
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
-    \ddots & \vdots \\
-\up{\gamma-1} & A_1(z) & B_1(z) & 0 & \ldots & 0 & 0 & \ldots & 0 \\
-\end{block}
-\end{blockarray}.
-\end{equation*}
+To describe those processes, we will
+often use the function $\varphi(n)$ that gives the length of the success
+streak at position $n$. The processes are indexed such that $\varphi_0$
+refers to the target sequence, and functions $\varphi_j$ $(1 \leq j \leq
+N)$ refer to the duplicates. For a concrete example, $\varphi_0(5) = 5$
+and $\varphi_1(5) = 3$ in Fig.~\ref{fig:sketch_MEM}.
+
+
+
+With these definitions, the decision tree for choosing the next symbol to
+insert in a read can be summarized as in Fig.~\ref{fig:decision_tree}.
+This sketch will be useful as a reference to compute the probabilities of
+the blocks and their weighted generating functions.
+
+
 
 
 \begin{definition}
@@ -206,56 +206,48 @@ co-dominant if inequality is not strict and there exists $i$ $(1\leq i
 \leq N)$ such that $\varphi_0(n) = \varphi_i(n)$.
 \end{definition}
 
-\subsection{Head vector}
 
-At the beginning of the read, the match lengths of all the threads are
-$0$. This is exactly the same as on a $\Downarrow$ symbol. We can thus
-consider that the read starts in the $\Downarrow$ state, which is
-equivalent to adding an edge labelled with the empty object $\varepsilon$
-between the head vertex and the $\Downarrow$ vertex. The head vector is
-thus
-\begin{equation}
-H(z) = (1,0, \ldots, 0).
-\end{equation}
 
+\begin{figure}[h]
+\centering
+\includegraphics[scale=1]{no_3MEM_graph.pdf}
+\caption{\textbf{Transfer graph of a read without 3-MEM}. 
+Some legend.}
+\label{fig:noMEM_graph}
+\end{figure}
+
+
+
+\section{The transfer matrix}
 
 \subsection{Transitions from $\uparrow$}
 \label{sec:trans_from_up}
 
-After a $\uparrow$ symbol, the main thread becomes dominant. It will
-remain so until the first read error, which can be a mismatch for all the
-threads ($\Downarrow$ symbol), or for only some of them ($\downarrow$
-symbol).
+On a $\uparrow$ symbol, the main thread becomes dominant. It will remain
+so until the first sequencing error, so the next block will be terminated
+by an error symbol (\textit{i.e.} $\Downarrow$ or $\downarrow$).
 
-Since the read has no MEM seed, the $\Downarrow$ symbol or the
-$\downarrow$ symbol must come before $\varphi_0(n) \geq \gamma$, which
-imposes a limit on the number of $\square$ symbols that can follow a
-$\square$ symbol. If nucleotide at position $n$ is the $\uparrow$ symbol
-and $\varphi_0(n) = j$ $(1 \leq j \leq \gamma-1)$, the state of the read
-is represented as $(\uparrow)_j$, meaning that the maximum number of
-$\square$ symbols that can follow is $\gamma-1-j$.
-
-Whether the nucleotides match the alternative threads is irrelevant until
-the end of the block. The $\square$ symbols only mean that the nucleotides
-are not error so their weighted generating function is $qz$. The
-$\Downarrow$ symbol indicates an error -- probability $p$ -- that is also
-a mismatch for the $N$ alternative threads -- probability $(1-\mu/3)^N$ --
-so its weighted generating function is $pz(1-\mu/3)^N$. Likewise, the
-weighted generating function of the $\downarrow$ symbol is seen to be
-$pz(1-(1-\mu/3)^N)$.
+\begin{definition}
+$\omega$ and $\tilde{\omega}$ are the probabilities of the $\Downarrow$
+and of the $\downarrow$ error symbols, respectively, \textit{i.e.}
+\begin{eqnarray}
+\omega &=& p \cdot (1-\mu/3)^N \\
+\tilde{\omega} &=& p \cdot \big( 1-(1-\mu/3)^N \big).
+\end{eqnarray}
+\end{definition}
 
 The weighted generating function of the transition from $(\uparrow)_j$ to
 $\Downarrow$ is
 \begin{equation}
-B_{\gamma-j}(z) = pz (1-\mu/3)^N \sum_{n=0}^{\gamma-j-1} (qz)^n.
+D_{\gamma-j}(z) = \omega z \sum_{i=0}^{\gamma-j-1} (qz)^i.
 \end{equation}
 
-And the weighted generating function of the transition from
+The weighted generating function of the transition from
 $(\uparrow)_j$ to $\downarrow$ is
 \begin{equation}
-A_{\gamma-j}(z) = pz (1-(1-\mu/3)^N) \sum_{n=0}^{\gamma-j-1} (qz)^n.
+\tilde{D}_{\gamma-j}(z) = \tilde{\omega} z
+  \sum_{i=0}^{\gamma-j-1} (qz)^i.
 \end{equation}
-
 
 
 \subsection{Transitions from $\Downarrow$}
@@ -273,24 +265,39 @@ reset ($\Downarrow$ symbol), otherwise the main read becomes dominated
 
 If the next terminator is the $\uparrow$ symbol, we need to distinguish
 the cases based on the value of $\varphi_0$ (see
-section~\ref{sec:trans_from_up}), which is just the position of
-the $\uparrow$ symbol after the $\Downarrow$ symbol in this case. A
-transition from $\Downarrow$ to $(\uparrow)_j$ consists of a succession of
-$j$ correct nucleotides -- each with probability $q$. But we must also
-make sure that no other $\uparrow$ symbol is inserted before position $j$.
-We thus introduce $\xi_j$, the probability that at least one of the $N$
-alternative threads survives at position $j$ after the $\Downarrow$ symbol. At
-any correct nucleotide, the probability of failure of an alternative thread is
-$\mu$, so
+section~\ref{sec:trans_from_up}), which is just the position of the
+$\uparrow$ symbol after the $\Downarrow$ symbol in this case. A transition
+from $\Downarrow$ to $(\uparrow)_j$ consists of a succession of $j$
+correct nucleotides -- each with probability $q$. But we must also make
+sure that no other $\uparrow$ symbol is inserted before position $j$.
+
+\begin{definition}
+$\xi_{i,m}$ is the probability that at least one of $m$ alternative
+threads does not fail in $i$ nucleotides, \textit{i.e.}
 \begin{equation}
-\xi_j = 1-(1-(1-\mu)^j)^N.
+  \xi_{i,m} = 1-(1-(1-\mu)^i)^m.
+\end{equation}
+\end{definition}
+
+The weighted generating function of the transition from $\Downarrow$ to
+$(\uparrow)_i$ is
+\begin{equation}
+u_i(z) = (\xi_{i-1,N}-\xi_{i,N})(qz)^i.
 \end{equation}
 
-The probablity of transition from $\Downarrow$ to $(\uparrow)_j$ is thus
-$(\xi_{j-1}-\xi_j)q^j$ and the associated weighted generating function is
+
+If the next terminator is $\Downarrow$, there is a limit on the
+number of $\square$ symbols. Indeed, if there are $\gamma$ or more
+nucleotides between the two $\Downarrow$ symbols, they constitute a shared
+MEM seed. As mentioned in section~\ref{sec:trans_from_up}, the weighted
+generating function of the $\Downarrow$ symbol is $pz(1-\mu/3)^N$. By the
+same rationale as above, the weighted generating function of the
+transition from $\Downarrow$ to $\Downarrow$ is
 \begin{equation}
-r_j(z) = (\xi_{j-1}-\xi_j)(qz)^j.
+A_{\gamma}(z) = \omega z
+  \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
 \end{equation}
+
 
 If the next terminator is $\downarrow$, there is no limit on the number of
 $\square$ symbols that can be inserted. Indeed, the main thread will not
@@ -300,32 +307,130 @@ $\downarrow$ symbol is $pz(1-(1-\mu/3)^N)$. The probability that it first
 occurs at position $n+1$ after the $\Downarrow$ symbol is the probability
 that the first $n$ nucleotides are correct -- each with probability $q$
 -- and that at least one alternative thread survives -- probability
-$\xi_n$. The weighted generating function of the transition from
+$\xi_{n,N}$. The weighted generating function of the transition from
 $\Downarrow$ to $\downarrow$ is thus
 \begin{equation}
-\tilde{A}_\infty(z) = pz(1-(1-\mu/3)^N)
-  \sum_{n=0}^\infty \xi_n \cdot (qz)^n.
+\tilde{A}_\infty(z) = \tilde{\omega} z
+  \sum_{i=0}^\infty \xi_{i,N} \cdot (qz)^i.
 \end{equation}
 
+\subsection{Transitions from $\downarrow$}
+\label{sec:trans_from_down}
 
-Finally, if the next terminator is $\Downarrow$, there is a limit on the
-number of $\square$ symbols. Indeed, if there are $\gamma$ or more
-nucleotides between the two $\Downarrow$ symbols, they constitute a shared
-MEM seed. As mentioned in section~\ref{sec:trans_from_up}, the weighted
-generating function of the $\Downarrow$ symbol is $pz(1-\mu/3)^N$. By the
-same rationale as above, the weighted generating function of the
-transition from $\Downarrow$ to $\Downarrow$ is
+At a $\downarrow$ symbol, the main thread fails and at least one duplicate
+thread does not (othwerwise the symbol would be $\Downarrow$). By
+definition, the duplicate threads that do not fail are strictly masking,
+and those that fail are potentially masking. A $\downarrow$ symbol implies
+the presence of a sequencing error, so duplicate threads fail with
+probability $1-\mu/3$. The probability that $m$ duplicate threads fail and
+$N-m$ do not $(0 \leq m \leq N-1)$ is thus
 \begin{equation}
-\tilde{B}_{\gamma}(z) = pz(1-\mu/3)^N
-  \sum_{n=0}^{\gamma-1} \xi_n \cdot (qz)^n.
+  Q_m = \frac{1}{1-(1-\mu/3)^N}{N \choose m} (1-\mu/3)^m(\mu/3)^{N-m}.
 \end{equation}
 
+The $\downarrow$ symbol can be followed by all the terminators. We need to
+start with the case of the $\sim$ terminator, because it will be required
+for the other ones. Referring to the decision tree of
+Fig.~\ref{fig:decision_tree}, we see that the $\sim$ symbol occurs in an
+error-free stretch, if all the strictly masking threads fail before the
+potentially masking threads. In section~\ref{sec:trans_from_sim} it will
+be important to distinguish different cases based on the value of
+$\varphi_0$ at the position of the $\sim$ symbol, so as in
+section~\ref{sec:trans_from_up}, we introduce the states $(\sim)_j$ $(1
+\leq j \leq \gamma-1)$ such that $\varphi_0(n) = j$ if the nucleotide at
+position $n$ is $(\sim)_j$. In this case, the value of $\varphi_0(n) = j$
+is simply the position of the $\sim$ symbol relative to the preceding
+$\downarrow$ symbol.
+
+If there are $m = 0$ potentially masking threads, the next terminator
+cannot be $\sim$. Assuming that there are $m > 0$ potentially masking
+threads at the $\downarrow$ symbol, the probability that the have not all
+faied at position $i$ is $\xi_{i,m}$. Similarly, the probability that the
+last strictly masking thread fails at position $i$ is
+$\xi_{i-1,N-m}-\xi_{i,N-m}$. So the probability that the next terminator
+is $(\sim)_i$ is $q^j V_i$, where
+\begin{eqnarray}
+\label{eq:Si}
+V_i &=& \sum_{m=0}^{N-1} Q_m \cdot \xi_{i,m} \cdot
+  (\xi_{i-1,N-m}-\xi_{i,N-m}) \notag \\
+  &=& \frac{\alpha_i^N-\alpha_{i-1}^N-\gamma_i^N+\delta_{i-1}^N}
+{1-(1-\mu/3)^N} \text{, where}
+\end{eqnarray}
+
+\begin{eqnarray}
+\alpha_i &=& 1-(1-\mu)^i\mu/3 \\
+\gamma_i &=& 1-(1-\mu)^i \\
+\delta_i &=& 1-(1-\mu+\mu^2/3)(1-\mu)^i.
+\end{eqnarray}
+
+We have assumed $m>0$, but the sum above can start at $m=0$ because
+$\xi_{i,0}=0$. So the weighted generating function of the transition from
+$\downarrow$ to $(\sim)_i$ is
+\begin{equation}
+v_i(z) = \frac{\alpha_i^N-\alpha_{i-1}^N-
+  \gamma_i^N+\delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
+\end{equation}
+
+Referring again to the decision of Fig.~\ref{fig:decision_tree}, we see
+that the $\uparrow$ symbol occurs in an error-free stretch, if all the
+potentially masking threads fail before or at the same nucleotide as the
+strictly masking threads. Assuming that there are $m \geq 0$ potentially
+masking threads at the $\downarrow$ symbol, the probability that they have
+all failed at position $i$ is $1-\xi_{i,m}$. As we have seen above, the
+probability that the last strictly masking thread fails at position $j$ is
+$\xi_{i-1,N-m}-\xi_{i,N-m}$. So the probability that the next terminator
+is the $\uparrow$ symbol at position $i$ is $q^i W_i$, where
+\begin{eqnarray}
+  W_i &=& \sum_{m=0}^{N-1} Q_m \cdot (1-\xi_{i,m}) \cdot
+  (\xi_{i-1,N-m}-\xi_{i,N-m}) \notag \\
+    &=& \frac{\gamma_i^N-\delta_{i-1}^N}{1-(1-\mu/3)^N}.
+\end{eqnarray}
+
+The weighted generating function of the transition from $\downarrow$ to
+$(\uparrow)_i$ is
+\begin{equation}
+w_i(z) = \frac{\gamma_i^N- \delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
+\end{equation}
+
+In order to compute the weighted generating functions of the other
+transitions, first observe that
+\begin{equation}
+V_j+W_j = \frac{\alpha_j^N - \alpha_{j-1}^N}{1-(1-\mu/3)^N}.
+\end{equation}
+So the probability that an error-free stretch of length $i \geq 1$
+following a $\downarrow$ symbol contains neither a $\sim$ symbol nor a
+$\uparrow$ symbol is
+\begin{equation}
+\sum_{j=1}^i V_j+W_j = \frac{\alpha_i^N -
+\alpha_0^N}{1-(1-\mu/3)^N}.
+\end{equation}
+
+The probability that the next terminator after a $\downarrow$ symbol is a
+$\Downarrow$ symbol at position $j$ is the probability of an error-free
+stretch of size $j-1$ that contains neither the $\sim$ symbol nor the
+$\uparrow$ symbol -- probability as above multiplied by $q^j$ -- followed
+by a $\Downarrow$ symbol -- probability $pz(1-\mu/3)^N$. Thus, the
+weighted generating function of the transition from $\downarrow$ to
+$\Downarrow$ is
+\begin{equation}
+B_\infty(z) = \omega z \cdot \Big(1 + \sum_{i=1}^\infty
+\frac{\alpha_i^N - \alpha_0^N}{1-(1-\mu/3)^N} (qz)^i \Big).
+\end{equation}
+
+By the same rationale, we see that the weighted generating function of the
+transition from $\downarrow$ to $\downarrow$ is
+\begin{equation}
+\tilde{B}_\infty(z) = \tilde{\omega} z \cdot \Big(1 + \sum_{i=1}^\infty
+\frac{\alpha_i^N - \alpha_0^N}{1-(1-\mu/3)^N} (qz)^i \Big).
+\end{equation}
 
 \subsection{Transitions from $\sim$}
+\label{sec:trans_from_sim}
 
 At a $\sim$ symbol, the main thread becomes co-dominant, together with $1$
-to $N-1$ alternative threads. As in section~\ref{sec:trans_from_Down}, the
-next terminator symbol depends on whether all the alternative co-dominant
+to $N-1$ alternative threads (if there were $N$, the symbol would be
+$\Downarrow$). As in section~\ref{sec:trans_from_Down}, the next
+terminator symbol depends on whether all the alternative co-dominant
 threads fail before the main thread. If this is the case, the main thread
 will become dominant ($\uparrow$ symbol), otherwise we again need to
 distinguish the case that the read is reset ($\Downarrow$ symbol) from the
@@ -337,169 +442,245 @@ marginalize the probabilities of interest over this number. The first
 thing to note is that a $\sim$ terminator can only follow a $\downarrow$
 terminator. Indeed, after a $\Downarrow$ symbol the threads are already
 co-dominant, and after a $\uparrow$ symbol the alternative threads cannot
-`catch up' with the main thread until a read error occurs, \textit{i.e.}
-until a $\Downarrow$ symbol or a $\downarrow$ symbol is inserted. The
-number of surviving threads depends on the position of the $\sim$ symbol
-relative to the preceding $\downarrow$ symbol, so as in
-section~\ref{sec:trans_from_up} we need to distinguish states based on the
-value of $\varphi_0$ at the position of the $\sim$ symbol.
+`catch up' with the main thread until a sequencing error occurs,
+\textit{i.e.} until a $\Downarrow$ symbol or a $\downarrow$ symbol is
+inserted. The number of surviving threads depends on the position of the
+$\sim$ symbol relative to the preceding $\downarrow$ symbol, so we need
+to treat the states $(\sim)_j$ separately.
 
-If nucleotide at position $n$ is $\sim$ and $\varphi_0(n) = j$ $(1 \leq j
-\leq \gamma-1)$, the state of the read is represented as $(\sim)_j$.
+We first establish an equality that will turn out to be useful in the
+subsequent calculations.
 
-
-\subsection{Transitions from $\downarrow$}
-
-Like... more complicated.
-
-
-By conditioning on how many duplicate threads fail at the $\dn$ symbol, we
-can compute the probability that a $\eqg$ symbol occurs at position $k$
-after an error as $q^kE_k / (1-(1-\mu/3)^N)$, where
-
-\begin{equation*}
-\begin{split}
-E_k = \sum_{m=1}^{N-1} {N \choose m} (1-\mu/3)^m (\mu/3)^{N-m} \times
-\Big( 1 - (1-(1-\mu)^k)^m \Big) \times \\
-\Big( (1-(1-\mu)^k)^{N-m} - (1-(1-\mu)^{k-1})^{N-m} \Big).
-\end{split}
-\end{equation*}
-
-\begin{equation*}
-\begin{split}
-E_k = [1-\mu/3(1-\mu)^k]^N - [1-\mu/3(1-\mu)^{k-1}]^N
--[1-(1-\mu)^k]^N + \\
-[1-(1-\mu+\mu^2/3)(1-\mu)^{k-1}]^N.
-\end{split}
-\end{equation*}
-
-The calculation above says that $m$ threads fail at the $\dn$ symbol, that
-they do not all fail in the following $k$ nucleotides, and that the last
-survivor of the $\dn$ symbol fails at nucleotide $k$. Note that $E_k=0$
-for $N=0$ and $N=1$, as expected. To find the probability, we need to
-multiply by $q^k$ to account for the fact that there is no error in $k$
-nucleotides, and we need to divide by $(1-(1-\mu/3)^N)$ to account for the
-fact that not all threads can fail at symbol $\dn$ (otherwise it would be
-symbol $\DN$). The sum does not include the case $m=0$ because in this
-case, none of the duplicate threads can have the same length as the main
-thread, so there cannot be a $\eqg$ symbol.
-
+\begin{lemma}
+For any real numbers $x$ and $y$,
 \begin{eqnarray*}
-\sum_{m=n}^N {N \choose m} {m \choose n} x^m y^{N-m}
-&=& x^n \sum_{r=0}^{N-n} {N \choose n+r} {n+r \choose n}a^r y^{N-n-r} \\
-&=& {N \choose n} x^n \sum_{r=0}^{N-n} {N-n \choose r}x^r y^{N-n-r} \\
-&=& {N \choose n} x^n (x+y)^{N-n}.
+\sum_{n=m}^N {N \choose n} {n \choose m} x^n y^{N-n}
+&=& x^m \sum_{r=0}^{N-m} {N \choose m+r} {m+r \choose m}a^r y^{N-m-r} \\
+&=& {N \choose m} x^m \sum_{r=0}^{N-m} {N-m \choose r}x^r y^{N-m-r} \\
+&=& {N \choose m} x^m (x+y)^{N-m}.
 \end{eqnarray*}
 
+The equality above implies
+\begin{equation}
+\label{eq:double_binom}
+\sum_{n=m}^{N-1} {N \choose n} {n \choose m} x^n y^{N-n} =
+{N \choose m} x^m \Big[ (x+y)^{N-m} - x^{N-m} \Big].
+\end{equation}
+\end{lemma}
 
-\begin{equation*}
-\sum_{m=n}^{N-1} {N \choose m} {m \choose n} x^m y^{N-m} =
-{N \choose n} x^n \Big[ (x+y)^{N-n} - x^{N-n} \Big].
-\end{equation*}
+The probability that there are $m>1$ potentially masking threads upon
+entering state $(\sim)_j$ is the probability that there were $n \geq m$
+potentially masking threads at the $\downarrow$ symbol -- probability
+$Q_n$ --, that exactly $m$ have survived until position $j$ -- probability
+${n \choose m} (1-\mu)^{jm} (1-(1-\mu)^j)^{n-m}$ -- and that the last of
+the $N-n$ strictly masking threads fails at position $j$ -- probability
+$\xi_{j-1,N-n}-\xi_{j,N-n}$. Summing over $n = m, \ldots, N-1$, the
+probability is seen to be
+\begin{equation}
+\label{eq:miscprob}
+\sum_{n=m}^{N-1} Q_n \cdot {n \choose m} (1-\mu)^{jm} (1-(1-\mu)^j)^{n-m}
+\cdot (\xi_{j-1,N-n}-\xi_{j,N-n}).
+\end{equation}
 
-The probability of symbol $\eqg$ with $n$ surviving threads after
-$\scriptstyle{\blacksquare}$ in $k$ steps is
+We write $\xi_{j-1,N-n}-\xi_{j,N-n}$ as $(1-\xi_{j,N-n}) -
+(1-\xi_{j-1,N-n})$ and split the sum of equation (\ref{eq:miscprob}) into
+two parts. The first term is equal to
 \begin{equation*}
 \begin{split}
-\sum_{m=n}^{N-1} {N \choose m} (1-\mu/3)^m (\mu/3)^{N-m} \times
-{m \choose n} (1-\mu)^{kn} \big(1-(1-\mu)^k\big)^{m-n} \times \\
-\Big( (1-(1-\mu)^k)^{N-m} - (1-(1-\mu)^{k-1})^{N-m} \Big).
+\sum_{n=m}^{N-1} & Q_n \cdot {n \choose m} (1-\mu)^{jm} (1-(1-\mu)^j)^{n-m}
+\cdot (1 - \xi_{j,N-n}) = \\
+& \frac{(1-\mu)^{jm} (1-(1-\mu)^j)^{N-m}}{1-(1-\mu/3)^N}
+\sum_{n=m}^{N-1} {N \choose n} {n \choose m} (1-\mu/3)^n (\mu/3)^{N-n}.
 \end{split}
 \end{equation*}
 
-We obtain a first term equal to
+Using formula (\ref{eq:double_binom}) with $x=1-\mu/3$ and $y=\mu/3$, we
+see that this term is equal to
 \begin{equation*}
-(1-\mu)^{kn} (1-(1-\mu)^k)^{N-n}
-\sum_{m=n}^{N-1} {N \choose m} {m \choose n} (1-\mu/3)^m (\mu/3)^{N-m}.
+\frac{(1-\mu)^{jm} (1-\mu/3)^m}{1-(1-\mu/3)^N} {N \choose m} 
+\bigg( \gamma_j^{N-m}
+-\big[ (1-(1-\mu)^j)(1-\mu/3)\big]^{N-m} \bigg).
 \end{equation*}
 
-Using the formula above with $x=1-\mu/3$ and $y=\mu/3$, we see that this
-first term is equal to
+The second term of equation (\ref{eq:miscprob}) is equal to
+\begin{multline*}
+\sum_{n=m}^{N-1} Q_n \cdot {n \choose m} (1-\mu)^{jm} (1-(1-\mu)^j)^{n-m}
+\cdot (1 - \xi_{j-1,N-n}) = \\
+\frac{1}{1-(1-\mu/3)^N}
+\left(\frac{(1-\mu)^j}{1-(1-\mu)^j}\right)^m
+\; \sum_{n=m}^{N-1} {N \choose n} {n \choose m} \times \\
+(1-\mu/3)^n (\mu/3)^{N-n}
+(1-(1-\mu)^j)^n (1-(1-\mu)^{j-1})^{N-n}.
+\end{multline*}
+
+Formula (\ref{eq:double_binom}) with $x=(1-(1-\mu)^j)(1-\mu/3)$ and
+$y = (1-(1-\mu)^{j-1})\mu/3$ yields
 \begin{equation*}
-{N \choose n} (1-\mu)^{kn} (1-\mu/3)^n \bigg( \big[ 1-(1-\mu)^k \big]^{N-n}
--\big[ (1-(1-\mu)^k)(1-\mu/3)\big]^{N-n} \bigg)
+\frac{(1-\mu)^{jm} (1-\mu/3)^m}{1-(1-\mu/3)^N} {N \choose m}
+\bigg( \delta_{j-1}^{N-m}
+-\big[ (1-(1-\mu)^j)(1-\mu/3)\big]^{N-m} \bigg).
 \end{equation*}
 
-The second term is
+Computing the difference between the terms, we see that the probability
+that there are $m$ potentially masking threads upon entering state
+$(\sim)_j$ is
 \begin{equation*}
-\begin{split}
-\left(\frac{(1-\mu)^k}{1-(1-\mu)^k}\right)^n \cdot
-\sum_{m=n}^{N-1} {N \choose m} {m \choose n} (1-\mu/3)^m (\mu/3)^{N-m}
-\times \\
-(1-(1-\mu)^k)^m (1-(1-\mu)^{k-1})^{N-m}.
-\end{split}
-\end{equation*}
-
-Using the formula with $x=(1-(1-\mu)^k)(1-\mu/3)$ and
-$y = (1-(1-\mu)^{k-1})\mu/3$, we obtain
-\begin{equation*}
-{N \choose n} (1-\mu)^{kn} (1-\mu/3)^n
-\bigg( \big[ x+y \big]^{N-n}
--\big[ (1-(1-\mu)^k)(1-\mu/3)\big]^{N-n} \bigg).
-\end{equation*}
-
-Computing the difference between the terms, the probability we are
-looking for comes out as
-\begin{equation*}
-{N \choose n} (1-\mu)^{kn} (1-\mu/3)^n \bigg(
-\big[ 1-(1-\mu)^k \big]^{N-n} -
-\big[1-(1-\mu+\mu^2/3)(1-\mu)^{k-1} \big]^{N-n} \bigg).
+P_{m,j} = \frac{(1-\mu)^{jm} (1-\mu/3)^m}{1-(1-\mu/3)^N} {N \choose m} 
+\big( \gamma_j^{N-m} - \delta_{j-1}^{N-m} \big).
 \end{equation*}
 
 
-One can verify that the sum of the terms above for $n=1, 2, \ldots, N-1$
-is equal to $E_k$.
+The sum of the terms above for $m = 1, \ldots, N-1$ is $V_j$ from equation
+(\ref{eq:Si}), which is the probability of the $(\sim)_j$ terminator.
 
-To find the probabilities of interest, it is useful to precompute the
-terms
+Now, referring to the decision tree of Fig.~\ref{fig:decision_tree}, we
+see that if the $m$ potentially masking threads fail before the main
+thread, the next terminator will be the $\uparrow$ symbol, otherwise it
+will be either the $\Downarrow$ symbol or the $\downarrow$ symbol.
+
+The probability that the last of the $m$ potentially masking threads fails
+at position $i$ after entering state $(\sim)_j$ is
+$\xi_{i-1,m}-\xi_{i,m}$. Dividing by $V_j$ and summing over $m = 1,
+\ldots, N-1$, we find that the weighted generating function of the
+transition from $(\sim)_j$ to $(\uparrow)_{j+i}$ is
+\begin{eqnarray}
+y_{j,j+i}(z) &=& \sum_{m=1}^{N-1} \frac{P_{m,j}}{V_j}
+\big( \xi_{i-1,m}-\xi_{i,m} \big) (qz)^i \notag \\
+&=& \frac{\beta_{j,i+j}^N - \beta_{j,i+j-1}^N
+-\beta_{j-1,i+j}^N + \beta_{j-1,i+j-1}^N}
+  {\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^i,
+\end{eqnarray}
+where $\alpha_j$, $\delta_j$, $\gamma_j$ are as above, and where
+\begin{equation}
+\beta_{j,i} = 1 - (1-\mu)^j\mu/3 + (1-\mu)^i(1-\mu/3).
+\end{equation}
+
+The probability that the next terminator is a $\Downarrow$ symbol or a
+$\downarrow$ symbol at position $i$ is the probability that at least one
+of the potentially masking threads survives until position $i-1$ --
+probability $\xi_{i-1,m}$ -- and that the next nucleotide is a sequencing
+error -- probability $p$. Dividing by $V_j$ and summing over $m = 1,
+\ldots, N-1$, we find that the weighted generating function of the
+transtion from $(\sim)_j$ to
+$\Downarrow$ is
+\begin{eqnarray}
+C_{\gamma-j}(z) &=& \omega z \sum_{i=1}^{\gamma-j-1} \sum_{m=1}^{N-1}
+  \frac{P_{m,j}}{V_j} \xi_{i-1,m} \cdot (qz)^{i-1} \notag \\
+  &=& \omega z \sum_{i=1}^{\gamma-j-1}
+\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j-1}^N
+  +\beta_{j-1,i+j-1}^N }
+{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^{i-1}.
+\end{eqnarray}
+
+With the same notations, the weighted generating function from $(\sim)_j$
+to $\downarrow$ is seen to be 
+\begin{equation}
+\tilde{C}_{\gamma-j}(z) = \tilde{\omega} z \sum_{i=1}^{\gamma-j-1}
+\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j-1}^N
+  +\beta_{j-1,i+j-1}^N }
+{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^{i-1}.
+\end{equation}
+
+\subsection{Head and tail vectors}
+
+At the beginning of the read, the match lengths of all the threads are
+$0$. This is exactly the same as on a $\Downarrow$ symbol. We can thus
+consider that the read starts in the $\Downarrow$ state, which is
+equivalent to adding an edge labelled with the empty object $\varepsilon$
+between the head vertex and the $\Downarrow$ vertex. The head vector is
+thus
 \begin{equation*}
-\begin{split}
-E_{k,m} = \sum_{n-1}^{N-1}{N \choose n} (1-\mu)^{kn} (1-\mu/3)^n \times \\
-\bigg( \big[ 1-(1-\mu)^k \big]^{N-n} -
-\big[1-(1-\mu+\mu^2/3)(1-\mu)^{k-1} \big]^{N-n} \bigg) \times
-(1-(1-\mu)^m)^n.
-\end{split}
+H(z) = 
+\begin{blockarray}{cccccccc}
+   \;\; \DN & \dn &\eq{1} & \ldots & \eq{\gamma-1} &
+    \up{1} & \ldots & \up{\gamma-1} \\
+\begin{block}{[cccccccc]}
+\;\; 1 & 0 & 0 & \ldots & 0 & 0 & \ldots & 0 \\
+\end{block}
+\end{blockarray}.
+\end{equation*}
+The tail vector contains the weighted generating functions of
+non-terminated stretches of $\square$ symbols. Referring to the decision
+tree of Fig.~\ref{fig:decision_tree}, we see that the probability of
+occurrence of $\square$ symbols depends on whether there are potentially
+masking and / or strictly masking threads. All the symbols except
+$\downarrow$ impose a maximum on the number of $\square$ symbols at the
+end of the reads.
+
+For the $\downarrow$ symbol, the weighted generating function is simply
+\begin{equation}
+T_{\downarrow}(z) = \sum_{i=0}^\infty (qz)^i = \frac{1}{1-qz}.
+\end{equation}
+
+For the $(\uparrow)_j$ state, the weighted generating function is
+\begin{equation}
+T_{(\uparrow)_j}(z) = \sum_{i=0}^{\gamma-j-1} (qz)^i.
+\end{equation}
+
+For the other symbols, we must take care that the potentially masking
+threads do not all fail (otherwise this would imply the presence of a
+$\uparrow$ terminator in the tail). For the $\Downarrow$ symbol, the
+weighted generating function is
+\begin{equation}
+T_{\Downarrow}(z) = \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
+\end{equation}
+
+For the $(\sim)_j$ state, the weighted generating function is
+\begin{equation}
+T_{(\sim)_j}(z) = \sum_{i=0}^{\gamma-j-1}
+\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j}^N +\beta_{j-1,i+j}^N }
+{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^i.
+\end{equation}
+
+In summary,
+\begin{equation*}
+T(z) = 
+\begin{blockarray}{cc}
+\begin{block}{c[c]}
+\dn & T_\downarrow(z) \\
+\DN & T_\Downarrow(z) \\
+\eq{1} & T_{(\sim)_1}(z) \\
+\vdots & \vdots \\
+\eq{\gamma-1} & T_{(\sim)_{\gamma-1}}(z) \\
+\up{1} & T_{(\uparrow)_1}(z) \\
+\vdots & \vdots \\
+\up{\gamma-1} & \; T_{(\uparrow)_{\gamma-1}}(z) \; \\
+\end{block}
+\end{blockarray}.
 \end{equation*}
 
-Using Newton's binomial formula we find
-\begin{equation*}
-\begin{split}
-E_{k,m} = \big[ (1-\mu)^k(1-\mu/3)(1-(1-\mu)^m) + 1-(1-\mu)^k \big]^N
-- \big[1-(1-\mu)^k \big]^N + \\
-\big[ 1-(1-\mu+\mu^2/3)(1-\mu)^{k-1} \big]^N - \\
-\big[(1-\mu)^k(1-\mu/3)(1-(1-\mu)^m) +
-1-(1-\mu+\mu^2/3)(1-\mu)^{k-1} \big]^N.
-\end{split}
-\end{equation*}
-
-Note that $E_{k,0} = 0$.
-
-The probability that there is a $\eqg$ symbol among the first $k$
-nucleotides after a $\dn$ symbol is $q^k H_k / (1-(1-\mu/3)^N)$, where
-\begin{eqnarray*}
-H_k &=&
-\sum_{m=1}^{N-1}{N \choose m}
-(1-\mu/3)^m(\mu/3)^{N-m} \big(1-(1-\mu)^k\big)^{N-m}
-\big(1 - \big( 1-(1-\mu)^k \big)^m\big) \\
-&=& [1-\mu/3(1-\mu)^k]^N - [1-\mu/3]^N - [1-(1-\mu)^k]^N +
-[(1-\mu/3)(1-(1-\mu)^k)]^N.
-\end{eqnarray*}
-
-The probability that the $k$-th symbol after a $\dn$ symbol is also $\dn$
-is
-\begin{equation*}
-\big( 1-q^kH_k/(1-(1-\mu/3)^N) \big) \cdot p(1-(1-\mu/3)^N) =
-p(1-(1-\mu/3)^N) - pq^kH_k.
-\end{equation*}
-
-The probability that the $k$-th symbol is $\DN$ is
-\begin{equation*}
-\big( 1-q^kH_k/(1-(1-\mu/3)^N) \big) \cdot p(1-\mu/3)^N =
-p(1-\mu/3)^N - pq^kH_k \frac{(1-\mu/3)^N}{1-(1-\mu/3)^N}.
-\end{equation*}
 
 \section{Conclusion}
-Some conclusion.
+
+\begin{equation*}
+\begin{blockarray}{ccccccccc}
+   & \DN & \dn &\eq{1} & \ldots & \eq{\gamma-1} &
+    \up{1} & \ldots & \up{\gamma-1} \\
+\begin{block}{c[cccccccc]}
+\DN & A_\gamma(z) & \tilde{A}_\infty(z) & 0 & \ldots & 0 & u_1(z)
+    & \ldots & u_{\gamma-1}(z) \\
+\dn & B_\infty(z) & \tilde{B}_\infty(z) & v_1(z) & \ldots &
+    v_{\gamma-1}(z) & w_1(z) & \ldots & w_{\gamma-1}(z) \\
+\eq{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
+    \ldots & y_{1,\gamma-1}(z) \\
+\eq{2} & C_{\gamma-2}(z) & \tilde{C}_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
+    \ldots & y_{2,\gamma-1}(z) \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
+    \ddots & \vdots \\
+\eq{\gamma-1} & C_1(z) & \tilde{C}_1(z) & 0 & 
+    \ldots & 0 & 0 & \ldots & 0 \\
+\up{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
+    \ldots & 0 \\
+\up{2} & D_{\gamma-2}(z) & \tilde{D}_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
+    \ldots & 0  \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
+    \ddots & \vdots \\
+\up{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & \ldots & 0 & 0 &
+    \ldots & 0 \\
+\end{block}
+\end{blockarray}
+\end{equation*}
+
 
 \section*{Acknowledgements}
 
