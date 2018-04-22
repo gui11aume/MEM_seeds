@@ -14,9 +14,8 @@ profile: CFLAGS += -g -pg -O3 -fprofile-arcs -ftest-coverage
 profile: $(P)
 
 
-$(P): memprob.c
-	gcc $(CFLAGS) memprob.c -lm -o $@
-	gcc $(CFLAGS) kpoly.c -lm -o kpoly
+$(P): memmatrix.c
+	gcc $(CFLAGS) memmatrix.c -lm -o $@
 
 clean:
 	rm do

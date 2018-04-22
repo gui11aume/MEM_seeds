@@ -1,0 +1,37 @@
+vpath %.c ..
+vpath %.c lib
+vpath %.h ..
+vpath %.h lib
+
+P= runtests
+
+OBJECTS= libunittest.so unittests_dunno.o
+SOURCES= memmatrix.c
+
+CC= gcc
+INCLUDES= -I.. -Ilib
+COVERAGE= -fprofile-arcs -ftest-coverage
+CFLAGS= -std=gnu99 -g -Wall -O0 $(INCLUDES) $(COVERAGE)
+LDLIBS= -L`pwd` -Wl,-rpath=`pwd` -lunittest -lz -lm -lpthread
+
+$(P): $(OBJECTS) $(SOURCES) runtests.c
+	$(CC) $(CFLAGS) runtests.c $(OBJECTS) $(LDLIBS) -o $@
+
+clean:
+	rm -f $(P) $(OBJECTS) *.gcda *.gcno *.gcov gmon.out .inspect.gdb
+
+libunittest.so: unittest.c
+	$(CC) -fPIC -shared $(CFLAGS) -o libunittest.so lib/unittest.c
+
+test: $(P)
+	./$(P)
+
+inspect: $(P)
+	gdb --command=.inspect.gdb --args $(P)
+
+debug: $(P)
+	gdb --command=.debug.gdb --args $(P)
+
+valgrind: $(P)
+	#valgrind --vgdb=yes --vgdb-error=0 ./$(P) --debug
+	valgrind --leak-check=full --show-leak-kinds=all ./$(P) --debug
