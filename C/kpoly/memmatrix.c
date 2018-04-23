@@ -71,7 +71,7 @@ int       ERRNO; // Error codes.
                            pow(1-U,(i))*(1-U/3.0), N)
 
 
-void print_kpoly (kpoly_t *p);
+void print_kpoly (kpoly_t *p, size_t);
 
 
 // FUNCTION DEFINITIONS //
@@ -280,6 +280,7 @@ new_kpoly_u
       // See definition of polynomial u.
       new->mono.deg = deg;
       new->mono.coeff = (xi(deg-1,N) - xi(deg,N)) * pow(1.0-P,deg);
+      new->coeff[deg] = new->mono.coeff;
    }
 
    return new; // NULL in case of failure.
@@ -310,6 +311,7 @@ new_kpoly_v
       double numer =  aN(deg) - aN(deg-1) - gN(deg) + dN(deg-1);
       double denom = 1.0 - pow(1-U/3.0, N);
       new->mono.coeff = numer / denom * pow(1.0-P, deg);
+      new->coeff[deg] = new->mono.coeff;
    }
 
    return new; // NULL in case of failure.
@@ -340,6 +342,7 @@ new_kpoly_w
       double numer = gN(deg) - dN(deg-1);
       double denom = 1.0 - pow(1-U/3.0, N);
       new->mono.coeff = numer / denom * pow(1.0-P, deg);
+      new->coeff[deg] = new->mono.coeff;
    }
 
    return new; // NULL in case of failure.
@@ -374,6 +377,7 @@ new_kpoly_y
       double numer = bN(j,j+i) - bN(j,j+i-1) - bN(j-1,i+j) + bN(j-1,j+i-1);
       double denom_j = aN(j) - aN(j-1) - gN(j) + dN(j-1);
       new->mono.coeff = numer / denom_j * pow(1.0-P, deg);
+      new->coeff[deg] = new->mono.coeff;
    }
 
    return new; // NULL in case of failure.
@@ -573,12 +577,13 @@ new_matrix_M
       // First row.
       M->term[0*dim+1] = new_zero_kpoly();
       M->term[0*dim+1]->coeff[0] = 1.0;
+      M->term[0*dim+1]->mono.coeff = 1.0;
 
       // Second row.
       M->term[1*dim+1] = new_kpoly_A(G, NO);
       M->term[1*dim+2] = new_kpoly_A(HIGH, YES);
       for (int j = 1 ; j <= G-1 ; j++)
-         M->term[1*dim+j+G+1] = new_kpoly_u(j);
+         M->term[1*dim+(j+G+1)] = new_kpoly_u(j);
       M->term[1*dim+dim-1] = new_kpoly_T_double_down();
 
       // Third row.
@@ -588,7 +593,7 @@ new_matrix_M
          M->term[2*dim+j+2] = new_kpoly_v(j);
       for (int j = 1 ; j <= G-1 ; j++)
          M->term[2*dim+j+G+1] = new_kpoly_w(j);
-      M->term[1*dim+dim-1] = new_kpoly_T_down();
+      M->term[2*dim+dim-1] = new_kpoly_T_down();
 
       // First series of middle rows.
       for (int j = 1 ; j <= G-1 ; j++) {
@@ -603,7 +608,7 @@ new_matrix_M
       for (int j = 1 ; j <= G-1 ; j++) {
          M->term[(j+G+1)*dim+1] = new_kpoly_D(G-j, NO);
          M->term[(j+G+1)*dim+2] = new_kpoly_D(G-j, YES);
-         M->term[j*dim+dim-1] = new_kpoly_T_up(G-j-1);
+         M->term[(j+G+1)*dim+dim-1] = new_kpoly_T_up(G-j-1);
       }
 
       // Last row is null.
@@ -632,12 +637,28 @@ kpoly_mult
       return NULL;
    }
 
-   if (b->mono.deg || b->mono.coeff) {
-      // If 'b' is a monomial, use a shortcut.
+   if (a->mono.coeff && b->mono.coeff) {
+      // Both are monomials, just do one multiplication.
       bzero(dest, KSZ);
-      for (int i = b->mono.deg ; i <= K ; i++) {
+      // If degree is too high, all coefficients are zero.
+      if (a->mono.deg + b->mono.deg > K)
+         return NULL;
+      // Otherwise do the multiplication.
+      dest->mono.deg = a->mono.deg + b->mono.deg;
+      dest->mono.coeff = a->mono.coeff * b->mono.coeff;
+      dest->coeff[dest->mono.deg] = dest->mono.coeff;
+   }
+   else if (a->mono.coeff) {
+      // 'a' is a monomial, do one "row" of multiplications.
+      bzero(dest, KSZ);
+      for (int i = a->mono.deg ; i <= K ; i++)
+         dest->coeff[i] = a->mono.coeff * b->coeff[i-a->mono.deg];
+   }
+   else if (b->mono.coeff) {
+      // 'b' is a monomial, do one "row" of multiplications.
+      bzero(dest, KSZ);
+      for (int i = b->mono.deg ; i <= K ; i++)
          dest->coeff[i] = b->mono.coeff * a->coeff[i-b->mono.deg];
-      }
    }
    else {
       // Standard convolution product.
@@ -692,6 +713,7 @@ matrix_mult
 
    for (int i = 0 ; i < dim ; i++) {
    for (int j = 0 ; j < dim ; j++) {
+      // Erase destination entry.
       bzero(dest->term[i*dim+j], KSZ);
       for (int m = 0 ; m < dim ; m++) {
          kpoly_update_add(dest->term[i*dim+j],
@@ -704,15 +726,16 @@ matrix_mult
 
 }
 
+
 // FIXME //
-void print_kpoly (kpoly_t *p) {
+void print_kpoly (kpoly_t *p, size_t upto) {
    if (p == NULL) {
       fprintf(stderr, "0\n");
       return;
    }
    fprintf(stderr, "%f", p->coeff[0]);
    fprintf(stderr, " + %fz", p->coeff[1]);
-   for (int i = 2 ; i <= K ; i++) {
+   for (int i = 2 ; i <= upto ; i++) {
       fprintf(stderr, " + %.10fz^%d", p->coeff[i], i);
    }
    fprintf(stderr, "\n");
@@ -736,8 +759,9 @@ int main(void) {
 
    matrix_mult(powM1, M, M);
    kpoly_update_add(w, powM1->term[2*G+1]);
+   print_kpoly(w, 4);
 
-   for (int i = 0 ; i < 2 ; i++) {
+   for (int i = 0 ; i < 10 ; i++) {
       matrix_mult(powM2, powM1, M);
       kpoly_update_add(w, powM2->term[2*G+1]);
       matrix_mult(powM1, powM2, M);
@@ -748,7 +772,7 @@ int main(void) {
    destroy_mat(powM2);
    destroy_mat(M);
 
-   print_kpoly(w);
+   print_kpoly(w, 4);
 
    free(w);
 
