@@ -6,27 +6,27 @@
 
 //  TYPE DECLARATIONS  //
 
-typedef unsigned int  uint;   // Just a shortcut.
-
 // Struct declarations and definitions //
 
-typedef struct kpoly_t  kpoly_t;
-typedef struct mat_t    mat_t;
-typedef struct mono_t   mono_t;
+typedef struct trunc_pol_t  trunc_pol_t;
+typedef struct matrix_t     matrix_t;
+typedef struct monomial_t   monomial_t;
 
-struct mono_t {
-   size_t deg;
-   double coeff;
+// TODO : explain that monomials must not be just deg and coeff //
+
+struct monomial_t {
+   size_t deg;           // Degree of the coefficent.
+   double coeff;         // Value of the coefficient
 };
 
-struct kpoly_t {
-   mono_t mono;              // Monomer (if applicable).
-   double coeff[];           // Terms of the polynomial.
+struct trunc_pol_t {
+   monomial_t mono;      // Monomial (if applicable).
+   double coeff[];       // Terms of the polynomial.
 };
 
-struct mat_t {
-   const size_t    dim;      // Column / row number.
-         kpoly_t * term[];   // Terms of the matrix.
+struct matrix_t {
+   const size_t    dim;  // Column / row number.
+   trunc_pol_t * term[]; // Terms of the matrix.
 };
 
 
@@ -40,13 +40,11 @@ size_t    HIGH;    // Proxy for infinite degree polynomials.
 
 double    P;       // Probability of a read error.
 double    U;       // Divergence rate between duplicates.
-double    OMEGA;   // Probability of double-down arrow.
-double   _OMEGA;   // Probability of down arrow.
 
-size_t    KSZ;     // Size of the 'kpoly_t' struct.
+size_t    KSZ;     // Size of the 'trunc_pol_t' struct.
 
-kpoly_t * TEMP = NULL;        // Matrix multipliciation.
-kpoly_t * ARRAY[1024] = {0};  // Store the results (indexed by N).
+trunc_pol_t * TEMP = NULL;        // For matrix multipliciation.
+trunc_pol_t * ARRAY[1024] = {0};  // Store the results (indexed by N).
 
 int       ERRNO; // Error codes.
 
@@ -55,10 +53,14 @@ int       ERRNO; // Error codes.
 #define YES 1
 #define NO  0
 
-// Creation of a new 'kpoly_t' is just a call to 'calloc()'.
-#define new_zero_kpoly() calloc(1, KSZ)
+// Compute omega and tilde-omega.
+#define  OMEGA ( P*pow(1.0-U/3, N) )
+#define _OMEGA ( P*(1-pow(1.0-U/3, N)) )
 
-// Prob one of m altnerative threads survives i steps.
+// Creation of a new 'trunc_pol_t' is just a call to 'calloc()'.
+#define new_zero_trunc_pol() calloc(1, KSZ)
+
+// Prob that one of m altnerative threads survives i steps.
 #define xi(i,m) ( 1.0 - pow( 1.0 - pow(1.0-U,(i)), (m) ))
 
 // Calculation intermediates (one index).
@@ -71,16 +73,15 @@ int       ERRNO; // Error codes.
                            pow(1.0-U,(i))*(1.0-U/3.0), N)
 
 
-void print_kpoly (kpoly_t *p, size_t);
+void print_trunc_pol (trunc_pol_t *p, size_t);
 
 
 // FUNCTION DEFINITIONS //
 
 int
-memp_init
+set_params_mem_prob
 (
    size_t g,
-   size_t n,
    size_t k,
    double p,
    double u
@@ -89,7 +90,6 @@ memp_init
 {
 
    G = g;  // MEM size.
-   N = n;  // Number duplicates.
    K = k;  // Read size.
    P = p;  // Sequencing error.
    U = u;  // Divergence rate.
@@ -97,16 +97,12 @@ memp_init
    // Set 'HIGH' to the greater of 'K' or 'G'.
    HIGH = K > G ? K : G;
 
-   // All 'kpoly_t' must be congruent.
-   KSZ = sizeof(kpoly_t) + (K+1) * sizeof(double);
-
-   // Initialize symbolic constants.
-    OMEGA = P*pow(1.0-U/3, N);
-   _OMEGA = P*(1-pow(1.0-U/3, N));
+   // All 'trunc_pol_t' must be congruent.
+   KSZ = sizeof(trunc_pol_t) + (K+1) * sizeof(double);
 
    // Clean previous values (if any).
    for (int i = 0 ; i < 1024 ; i++) free(ARRAY[i]);
-   bzero(ARRAY, 1024 * sizeof(kpoly_t *));
+   bzero(ARRAY, 1024 * sizeof(trunc_pol_t *));
 
    // Allocate or reallocate 'TEMP'.
    free(TEMP);
@@ -121,10 +117,11 @@ memp_init
 }
 
 
-kpoly_t *
-new_kpoly_A
+trunc_pol_t *
+new_trunc_pol_A
 (
    const size_t deg,  // Degree of polynomial D.
+   const size_t N,    // Number of duplicates.
    const int    tilde // Return D or tilde D.
 )
 {
@@ -134,7 +131,7 @@ new_kpoly_A
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -160,10 +157,11 @@ new_kpoly_A
 }
 
 
-kpoly_t *
-new_kpoly_B
+trunc_pol_t *
+new_trunc_pol_B
 (
    const size_t deg,  // Degree of polynomial B.
+   const size_t N,    // Number of duplicates.
    const int    tilde // Return D or tilde B.
 )
 {
@@ -173,7 +171,7 @@ new_kpoly_B
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -195,15 +193,16 @@ new_kpoly_B
 }
 
 
-kpoly_t *
-new_kpoly_C
+trunc_pol_t *
+new_trunc_pol_C
 (
    const size_t deg,  // Degree of polynomial C.
+   const size_t N,    // Number of duplicates.
    const int    tilde // Return C or tilde C.
 )
 {
 
-   // FIXME //
+   // Avoid division by zero when N = 1.
    if (N == 1) return NULL;
 
    if (deg > K || deg == 0) {
@@ -211,7 +210,7 @@ new_kpoly_C
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -234,10 +233,11 @@ new_kpoly_C
 }
 
 
-kpoly_t *
-new_kpoly_D
+trunc_pol_t *
+new_trunc_pol_D
 (
    const size_t deg,  // Degree of polynomial D.
+   const size_t N,    // Number of duplicates.
    const int    tilde // Return D or tilde D.
 )
 {
@@ -247,7 +247,7 @@ new_kpoly_D
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -267,10 +267,11 @@ new_kpoly_D
 }
 
 
-kpoly_t *
-new_kpoly_u
+trunc_pol_t *
+new_trunc_pol_u
 (
-   const size_t deg  // Degree of polynomial u.
+   const size_t deg,  // Degree of polynomial u.
+   const size_t N     // Number of duplicates.
 )
 {
 
@@ -279,7 +280,7 @@ new_kpoly_u
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -296,10 +297,11 @@ new_kpoly_u
 }
 
 
-kpoly_t *
-new_kpoly_v
+trunc_pol_t *
+new_trunc_pol_v
 (
-   const size_t deg  // Degree of polynomial v.
+   const size_t deg,  // Degree of polynomial v.
+   const size_t N     // Number of duplicates.
 )
 {
 
@@ -308,7 +310,7 @@ new_kpoly_v
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -327,10 +329,11 @@ new_kpoly_v
 }
 
 
-kpoly_t *
-new_kpoly_w
+trunc_pol_t *
+new_trunc_pol_w
 (
-   const size_t deg  // Degree of polynomial w.
+   const size_t deg,  // Degree of polynomial w.
+   const size_t N     // Number of duplicates.
 )
 {
 
@@ -339,7 +342,7 @@ new_kpoly_w
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -359,15 +362,16 @@ new_kpoly_w
 
 
 
-kpoly_t *
-new_kpoly_y
+trunc_pol_t *
+new_trunc_pol_y
 (
-   const int j, 
-   const int i
+   const int j,      // Initial state.
+   const int i,      // Degree of the polynomial.
+   const size_t N    // Number of duplicates.
 )
 {
 
-   // FIXME //
+   // Avoid division by zero when N = 1.
    if (N == 1) return NULL;
 
    if (i > K || i >= G || i == 0) {
@@ -375,7 +379,7 @@ new_kpoly_y
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -394,14 +398,14 @@ new_kpoly_y
 }
 
 
-kpoly_t *
-new_kpoly_T_down
+trunc_pol_t *
+new_trunc_pol_T_down
 (
-   void
+   const size_t N    // Number of duplicates.
 )
 {
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
    if (new == NULL) {
       ERRNO = __LINE__;
    }
@@ -415,19 +419,19 @@ new_kpoly_T_down
       }
    }
 
-   return new;
+   return new; // NULL in case of failure.
 
 }
 
 
-kpoly_t *
-new_kpoly_T_double_down
+trunc_pol_t *
+new_trunc_pol_T_double_down
 (
-   void
+   const size_t N    // Number of duplicates.
 )
 {
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
    if (new == NULL) {
       ERRNO = __LINE__;
    }
@@ -439,15 +443,16 @@ new_kpoly_T_double_down
       }
    }
 
-   return new;
+   return new; // NULL in case of failure.
 
 }
 
 
-kpoly_t *
-new_kpoly_T_up
+trunc_pol_t *
+new_trunc_pol_T_up
 (
-   size_t deg
+   size_t deg,       // Degree of the polynomial.
+   const size_t N    // Number of duplicates.
 )
 {
 
@@ -456,7 +461,7 @@ new_kpoly_T_up
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
    if (new == NULL) {
       ERRNO = __LINE__;
    }
@@ -468,19 +473,20 @@ new_kpoly_T_up
       }
    }
 
-   return new;
+   return new; // NULL in case of failure.
 
 }
 
 
-kpoly_t *
-new_kpoly_T_sim
+trunc_pol_t *
+new_trunc_pol_T_sim
 (
-   size_t deg
+   size_t deg,       // Degree of the polynomial.
+   const size_t N    // Number of duplicates.
 )
 {
 
-   // FIXME //
+   // Avoid division by zero when N = 1.
    if (N == 1) return NULL;
 
    if (deg > K || deg >= G) {
@@ -488,7 +494,7 @@ new_kpoly_T_sim
       return NULL;
    }
 
-   kpoly_t *new = new_zero_kpoly();
+   trunc_pol_t *new = new_zero_trunc_pol();
    if (new == NULL) {
       ERRNO = __LINE__;
    }
@@ -509,16 +515,17 @@ new_kpoly_T_sim
 
 
 
-mat_t *
+matrix_t *
 new_null_matrix
 (
-   size_t dim
+   const size_t dim
 )
-// Create a matrix where all kpoly are NULL.
+// Create a matrix where all trunc_pol are NULL.
 {
 
    // Initialize to zero.
-   mat_t *new = calloc(1, sizeof(mat_t) + dim*dim * sizeof(kpoly_t *));
+   size_t sz = sizeof(matrix_t) + dim*dim * sizeof(trunc_pol_t *);
+   matrix_t *new = calloc(1, sz);
 
    // The dimension is set upon creation
    // and must never change afterwards.
@@ -532,27 +539,29 @@ new_null_matrix
 void
 destroy_mat
 (
-   mat_t *mat
+   matrix_t * mat
 )
 {
 
-   for (int i = 0 ; i < (mat->dim)*(mat->dim) ; i++) free(mat->term[i]);
+   size_t nterms = (mat->dim)*(mat->dim);
+   for (size_t i = 0 ; i < nterms ; i++)
+      free(mat->term[i]);
    free(mat);
 
 }
 
 
 
-mat_t *
+matrix_t *
 new_zero_matrix
 (
-   size_t dim
+   const size_t dim
 )
 // Create a matrix where all terms
-// are 'kpoly_t' struct set to zero.
+// are 'trunc_pol_t' struct set to zero.
 {
 
-   mat_t *new = new_null_matrix(dim);
+   matrix_t *new = new_null_matrix(dim);
 
    if (new == NULL) {
       ERRNO = __LINE__;
@@ -560,8 +569,9 @@ new_zero_matrix
    }
 
    for (int i = 0 ; i < dim*dim ; i++) {
-      new->term[i] = new_zero_kpoly();
+      new->term[i] = new_zero_trunc_pol();
       if (new->term[i] == NULL) {
+         // Unroll.
          ERRNO = __LINE__;
          destroy_mat(new);
          return NULL;
@@ -573,56 +583,55 @@ new_zero_matrix
 }
 
 
-
-mat_t *
+matrix_t *
 new_matrix_M
 (
-   void
+   const size_t N    // Number of duplicates.
 )
 {
 
-   size_t dim = 2*G+2;
-   mat_t *M = new_null_matrix(dim);
+   const size_t dim = 2*G+2;
+   matrix_t *M = new_null_matrix(dim);
 
    if (M == NULL) {
       ERRNO = __LINE__;
    }
    else {
       // First row.
-      M->term[0*dim+1] = new_zero_kpoly();
+      M->term[0*dim+1] = new_zero_trunc_pol();
       M->term[0*dim+1]->coeff[0] = 1.0;
       M->term[0*dim+1]->mono.coeff = 1.0;
 
       // Second row.
-      M->term[1*dim+1] = new_kpoly_A(G, NO);
-      M->term[1*dim+2] = new_kpoly_A(HIGH, YES);
+      M->term[1*dim+1] = new_trunc_pol_A(G, N, NO);
+      M->term[1*dim+2] = new_trunc_pol_A(HIGH, N, YES);
       for (int j = 1 ; j <= G-1 ; j++)
-         M->term[1*dim+(j+G+1)] = new_kpoly_u(j);
-      M->term[1*dim+dim-1] = new_kpoly_T_double_down();
+         M->term[1*dim+(j+G+1)] = new_trunc_pol_u(j, N);
+      M->term[1*dim+dim-1] = new_trunc_pol_T_double_down(N);
 
       // Third row.
-      M->term[2*dim+1] = new_kpoly_B(HIGH, NO);
-      M->term[2*dim+2] = new_kpoly_B(HIGH, YES);
+      M->term[2*dim+1] = new_trunc_pol_B(HIGH, N, NO);
+      M->term[2*dim+2] = new_trunc_pol_B(HIGH, N, YES);
       for (int j = 1 ; j <= G-1 ; j++)
-         M->term[2*dim+j+2] = new_kpoly_v(j);
+         M->term[2*dim+j+2] = new_trunc_pol_v(j, N);
       for (int j = 1 ; j <= G-1 ; j++)
-         M->term[2*dim+j+G+1] = new_kpoly_w(j);
-      M->term[2*dim+dim-1] = new_kpoly_T_down();
+         M->term[2*dim+j+G+1] = new_trunc_pol_w(j, N);
+      M->term[2*dim+dim-1] = new_trunc_pol_T_down(N);
 
       // First series of middle rows.
       for (int j = 1 ; j <= G-1 ; j++) {
-         M->term[(j+2)*dim+1] = new_kpoly_C(G-j, NO);
-         M->term[(j+2)*dim+2] = new_kpoly_C(G-j, YES);
+         M->term[(j+2)*dim+1] = new_trunc_pol_C(G-j, N, NO);
+         M->term[(j+2)*dim+2] = new_trunc_pol_C(G-j, N, YES);
          for (int i = 1 ; i <= G-j-1 ; i++)
-            M->term[(j+2)*dim+G+j+i+1] = new_kpoly_y(j,i);
-         M->term[(j+2)*dim+dim-1] = new_kpoly_T_sim(G-j-1);
+            M->term[(j+2)*dim+G+j+i+1] = new_trunc_pol_y(j, i ,N);
+         M->term[(j+2)*dim+dim-1] = new_trunc_pol_T_sim(G-j-1, N);
       }
 
       // Second series of middle rows.
       for (int j = 1 ; j <= G-1 ; j++) {
-         M->term[(j+G+1)*dim+1] = new_kpoly_D(G-j, NO);
-         M->term[(j+G+1)*dim+2] = new_kpoly_D(G-j, YES);
-         M->term[(j+G+1)*dim+dim-1] = new_kpoly_T_up(G-j-1);
+         M->term[(j+G+1)*dim+1] = new_trunc_pol_D(G-j, N, NO);
+         M->term[(j+G+1)*dim+2] = new_trunc_pol_D(G-j, N, YES);
+         M->term[(j+G+1)*dim+dim-1] = new_trunc_pol_T_up(G-j-1, N);
       }
 
       // Last row is null.
@@ -634,12 +643,12 @@ new_matrix_M
 
 
 
-kpoly_t *
-kpoly_mult
+trunc_pol_t *
+trunc_pol_mult
 (
-         kpoly_t * dest,
-   const kpoly_t * a,
-   const kpoly_t * b
+         trunc_pol_t * dest,
+   const trunc_pol_t * a,
+   const trunc_pol_t * b
 )
 {
 
@@ -691,10 +700,10 @@ kpoly_mult
 
 
 void
-kpoly_update_add
+trunc_pol_update_add
 (
-         kpoly_t * dest,
-   const kpoly_t * a
+         trunc_pol_t * dest,
+   const trunc_pol_t * a
 )
 {
 
@@ -709,12 +718,12 @@ kpoly_update_add
 
 
 
-mat_t *
+matrix_t *
 matrix_mult
 (
-         mat_t * dest,
-   const mat_t * a,
-   const mat_t * b
+         matrix_t * dest,
+   const matrix_t * a,
+   const matrix_t * b
 )
 {
 
@@ -730,8 +739,8 @@ matrix_mult
       // Erase destination entry.
       bzero(dest->term[i*dim+j], KSZ);
       for (int m = 0 ; m < dim ; m++) {
-         kpoly_update_add(dest->term[i*dim+j],
-               kpoly_mult(TEMP, a->term[i*dim+m], b->term[m*dim+j]));
+         trunc_pol_update_add(dest->term[i*dim+j],
+            trunc_pol_mult(TEMP, a->term[i*dim+m], b->term[m*dim+j]));
       }
    }
    }
@@ -742,7 +751,7 @@ matrix_mult
 
 
 // FIXME //
-void print_kpoly (kpoly_t *p, size_t upto) {
+void print_trunc_pol (trunc_pol_t *p, size_t upto) {
    if (p == NULL) {
       fprintf(stderr, "0\n");
       return;
@@ -758,13 +767,14 @@ void print_kpoly (kpoly_t *p, size_t upto) {
 
 int main(void) {
 
-   memp_init(17, 2, 50, 0.01, 0.05);
+   size_t N = 2;
+   set_params_mem_prob(17, 50, 0.01, 0.05);
 
-   kpoly_t *w = new_zero_kpoly();
-   mat_t *M = new_matrix_M();
+   trunc_pol_t *w = new_zero_trunc_pol();
+   matrix_t *M = new_matrix_M(N);
 
-   mat_t *powM1 = new_zero_matrix(2*G+2);
-   mat_t *powM2 = new_zero_matrix(2*G+2);
+   matrix_t *powM1 = new_zero_matrix(2*G+2);
+   matrix_t *powM2 = new_zero_matrix(2*G+2);
 
    if (powM1 == NULL || powM2 == NULL) {
       ERRNO = __LINE__;
@@ -772,20 +782,20 @@ int main(void) {
    }
 
    matrix_mult(powM1, M, M);
-   kpoly_update_add(w, powM1->term[2*G+1]);
+   trunc_pol_update_add(w, powM1->term[2*G+1]);
 
    for (int i = 0 ; i < 10 ; i++) {
       matrix_mult(powM2, powM1, M);
-      kpoly_update_add(w, powM2->term[2*G+1]);
+      trunc_pol_update_add(w, powM2->term[2*G+1]);
       matrix_mult(powM1, powM2, M);
-      kpoly_update_add(w, powM1->term[2*G+1]);
+      trunc_pol_update_add(w, powM1->term[2*G+1]);
    }
 
    destroy_mat(powM1);
    destroy_mat(powM2);
    destroy_mat(M);
 
-   print_kpoly(w, HIGH);
+   print_trunc_pol(w, HIGH);
 
    free(w);
 
