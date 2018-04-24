@@ -273,7 +273,7 @@ sure that no other $\uparrow$ symbol is inserted before position $j$.
 
 \begin{definition}
 $\xi_{i,m}$ is the probability that at least one of $m$ alternative
-threads does not fail in $i$ nucleotides, \textit{i.e.}
+threads does not fail in $i$ error-free nucleotides, \textit{i.e.}
 \begin{equation}
   \xi_{i,m} = 1-(1-(1-\mu)^i)^m.
 \end{equation}
@@ -294,24 +294,45 @@ generating function of the $\Downarrow$ symbol is $pz(1-\mu/3)^N$. By the
 same rationale as above, the weighted generating function of the
 transition from $\Downarrow$ to $\Downarrow$ is
 \begin{equation}
-A_{\gamma}(z) = \omega z
+A_\gamma(z) = \omega z
   \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
 \end{equation}
 
 
-If the next terminator is $\downarrow$, there is no limit on the number of
-$\square$ symbols that can be inserted. Indeed, the main thread will not
-be part of the MEM in this case. As mentioned in
-section~\ref{sec:trans_from_up}, the weighted generating function of the
-$\downarrow$ symbol is $pz(1-(1-\mu/3)^N)$. The probability that it first
-occurs at position $n+1$ after the $\Downarrow$ symbol is the probability
-that the first $n$ nucleotides are correct -- each with probability $q$
--- and that at least one alternative thread survives -- probability
-$\xi_{n,N}$. The weighted generating function of the transition from
-$\Downarrow$ to $\downarrow$ is thus
+If the next terminator is $\downarrow$ we have to dinstinguish two cases.
+If there are $\gamma-1$ or fewer error-free nucleotides, we must only make
+sure that there is no $\uparrow$ symbol among them. The weighted
+generating function is
 \begin{equation}
-\tilde{A}_\infty(z) = \tilde{\omega} z
-  \sum_{i=0}^\infty \xi_{i,N} \cdot (qz)^i.
+\tilde{\omega} z \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
+\end{equation}
+
+There can also be more than $\gamma-1$ error-free nucleotides, but in this
+case, we must make sure that at least one potentially masking thread masks
+the main thread.
+
+\begin{definition}
+$\alpha_i$ is the probability that the first thread has at least one
+failure in $i$ error-free nucleotides, followed by a sequencing error,
+\textit{i.e.}
+\begin{equation}
+\alpha_i = 1 - (1-\mu)^i\mu/3
+\end{equation}
+\end{definition}
+
+The probability that at least one duplicate thread masks the main thread
+if the first error occurs at position $i$ is thus $1 - \alpha_{i-1}^N$.
+The weighted generatin function is
+\begin{equation}
+pz\sum_{i=\gamma}^\infty (1 - \alpha_i^N) \cdot (qz)^i.
+\end{equation}
+
+Finally, the weighted generating function of the transition from
+$\Downarrow$ to $\downarrow$ is
+\begin{equation}
+\tilde{A}_\infty(z) =
+\tilde{\omega} z \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i +
+pz\sum_{i=\gamma}^\infty (1 - \alpha_i^N) \cdot (qz)^i.
 \end{equation}
 
 \subsection{Transitions from $\downarrow$}
@@ -358,18 +379,22 @@ V_i &=& \sum_{m=0}^{N-1} Q_m \cdot \xi_{i,m} \cdot
 \end{eqnarray}
 
 \begin{eqnarray}
-\alpha_i &=& 1-(1-\mu)^i\mu/3 \\
 \gamma_i &=& 1-(1-\mu)^i \\
 \delta_i &=& 1-(1-\mu+\mu^2/3)(1-\mu)^i.
 \end{eqnarray}
 
 We have assumed $m>0$, but the sum above can start at $m=0$ because
-$\xi_{i,0}=0$. So the weighted generating function of the transition from
+$\xi_{i,0}=0$. The weighted generating function of the transition from
 $\downarrow$ to $(\sim)_i$ is
 \begin{equation}
 v_i(z) = \frac{\alpha_i^N-\alpha_{i-1}^N-
   \gamma_i^N+\delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
 \end{equation}
+
+\begin{remark}
+When $N = 1$, $V_i = 0$ and none of the states $(\sim)_i$ is accessible.
+The symbol $\sim$ can exist only if there is more than one duplicate.
+\end{remark}
 
 Referring again to the decision of Fig.~\ref{fig:decision_tree}, we see
 that the $\uparrow$ symbol occurs in an error-free stretch, if all the
@@ -392,36 +417,49 @@ $(\uparrow)_i$ is
 w_i(z) = \frac{\gamma_i^N- \delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
 \end{equation}
 
-In order to compute the weighted generating functions of the other
-transitions, first observe that
+%In order to compute the weighted generating functions of the other
+%transitions, first observe that
+%\begin{equation}
+%V_j+W_j = \frac{\alpha_j^N - \alpha_{j-1}^N}{1-(1-\mu/3)^N}.
+%\end{equation}
+%So the probability that an error-free stretch of length $i \geq 1$
+%following a $\downarrow$ symbol contains neither a $\sim$ symbol nor a
+%$\uparrow$ symbol is
+%\begin{equation}
+%1 - \sum_{j=1}^i V_j+W_j = 1 - \frac{\alpha_i^N -
+%\alpha_0^N}{1-(1-\mu/3)^N}.
+%\end{equation}
+%
+%The probability that the next terminator after a $\downarrow$ symbol is a
+%$\Downarrow$ symbol at position $j$ is the probability of an error-free
+%stretch of size $j-1$ that contains neither the $\sim$ symbol nor the
+%$\uparrow$ symbol -- probability as above multiplied by $q^j$ -- followed
+%by a $\Downarrow$ symbol -- probability $pz(1-\mu/3)^N$. Thus, the
+%weighted generating function of the transition from $\downarrow$ to
+%$\Downarrow$ is
+%\begin{equation}
+%B_\infty(z) = \omega z \sum_{i=0}^\infty
+%\Big(1 - \frac{\alpha_i^N - \alpha_0^N}{1-(1-\mu/3)^N} \Big) (qz)^i.
+%\end{equation}
+
+The probability that there is neither $\sim$ nor $\uparrow$ symbol is just
+the probability that at least one stricty masking thread is still alive
 \begin{equation}
-V_j+W_j = \frac{\alpha_j^N - \alpha_{j-1}^N}{1-(1-\mu/3)^N}.
-\end{equation}
-So the probability that an error-free stretch of length $i \geq 1$
-following a $\downarrow$ symbol contains neither a $\sim$ symbol nor a
-$\uparrow$ symbol is
-\begin{equation}
-\sum_{j=1}^i V_j+W_j = \frac{\alpha_i^N -
-\alpha_0^N}{1-(1-\mu/3)^N}.
+\sum_{m=0}^{N-1}Q_m \cdot \xi_{i,N-m} = \frac{1-\alpha_i^N}{1-(1-\mu/3)^N}
 \end{equation}
 
-The probability that the next terminator after a $\downarrow$ symbol is a
-$\Downarrow$ symbol at position $j$ is the probability of an error-free
-stretch of size $j-1$ that contains neither the $\sim$ symbol nor the
-$\uparrow$ symbol -- probability as above multiplied by $q^j$ -- followed
-by a $\Downarrow$ symbol -- probability $pz(1-\mu/3)^N$. Thus, the
-weighted generating function of the transition from $\downarrow$ to
+So the weighted generating function of the transition from $\downarrow$ to
 $\Downarrow$ is
 \begin{equation}
-B_\infty(z) = \omega z \cdot \Big(1 + \sum_{i=1}^\infty
-\frac{\alpha_i^N - \alpha_0^N}{1-(1-\mu/3)^N} (qz)^i \Big).
+B_\infty(z) = \omega z\sum_{i=0}^\infty
+\frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i.
 \end{equation}
 
 By the same rationale, we see that the weighted generating function of the
 transition from $\downarrow$ to $\downarrow$ is
 \begin{equation}
-\tilde{B}_\infty(z) = \tilde{\omega} z \cdot \Big(1 + \sum_{i=1}^\infty
-\frac{\alpha_i^N - \alpha_0^N}{1-(1-\mu/3)^N} (qz)^i \Big).
+\tilde{B}_\infty(z) = \tilde{\omega} z\sum_{i=0}^\infty
+\frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i.
 \end{equation}
 
 \subsection{Transitions from $\sim$}
@@ -478,8 +516,8 @@ $\xi_{j-1,N-n}-\xi_{j,N-n}$. Summing over $n = m, \ldots, N-1$, the
 probability is seen to be
 \begin{equation}
 \label{eq:miscprob}
-\sum_{n=m}^{N-1} Q_n \cdot {n \choose m} (1-\mu)^{jm} (1-(1-\mu)^j)^{n-m}
-\cdot (\xi_{j-1,N-n}-\xi_{j,N-n}).
+P_{m,j} = \sum_{n=m}^{N-1} Q_n \cdot {n \choose m} (1-\mu)^{jm}
+(1-(1-\mu)^j)^{n-m} \cdot (\xi_{j-1,N-n}-\xi_{j,N-n}).
 \end{equation}
 
 We write $\xi_{j-1,N-n}-\xi_{j,N-n}$ as $(1-\xi_{j,N-n}) -
@@ -544,7 +582,7 @@ $\xi_{i-1,m}-\xi_{i,m}$. Dividing by $V_j$ and summing over $m = 1,
 \ldots, N-1$, we find that the weighted generating function of the
 transition from $(\sim)_j$ to $(\uparrow)_{j+i}$ is
 \begin{eqnarray}
-y_{j,j+i}(z) &=& \sum_{m=1}^{N-1} \frac{P_{m,j}}{V_j}
+y_{j,i}(z) &=& \sum_{m=1}^{N-1} \frac{P_{m,j}}{V_j}
 \big( \xi_{i-1,m}-\xi_{i,m} \big) (qz)^i \notag \\
 &=& \frac{\beta_{j,i+j}^N - \beta_{j,i+j-1}^N
 -\beta_{j-1,i+j}^N + \beta_{j-1,i+j-1}^N}
@@ -552,7 +590,7 @@ y_{j,j+i}(z) &=& \sum_{m=1}^{N-1} \frac{P_{m,j}}{V_j}
 \end{eqnarray}
 where $\alpha_j$, $\delta_j$, $\gamma_j$ are as above, and where
 \begin{equation}
-\beta_{j,i} = 1 - (1-\mu)^j\mu/3 + (1-\mu)^i(1-\mu/3).
+\beta_{j,i} = 1 - (1-\mu)^j\mu/3 - (1-\mu)^i(1-\mu/3).
 \end{equation}
 
 The probability that the next terminator is a $\Downarrow$ symbol or a
@@ -607,9 +645,10 @@ masking and / or strictly masking threads. All the symbols except
 $\downarrow$ impose a maximum on the number of $\square$ symbols at the
 end of the reads.
 
-For the $\downarrow$ symbol, the weighted generating function is simply
+For the $\downarrow$ symbol, the weighted generating function is
 \begin{equation}
-T_{\downarrow}(z) = \sum_{i=0}^\infty (qz)^i = \frac{1}{1-qz}.
+T_{\downarrow}(z) = \sum_{i=0}^\infty
+\frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i.
 \end{equation}
 
 For the $(\uparrow)_j$ state, the weighted generating function is
@@ -637,8 +676,8 @@ In summary,
 T(z) = 
 \begin{blockarray}{cc}
 \begin{block}{c[c]}
-\dn & T_\downarrow(z) \\
 \DN & T_\Downarrow(z) \\
+\dn & T_\downarrow(z) \\
 \eq{1} & T_{(\sim)_1}(z) \\
 \vdots & \vdots \\
 \eq{\gamma-1} & T_{(\sim)_{\gamma-1}}(z) \\
@@ -662,9 +701,9 @@ T(z) =
 \dn & B_\infty(z) & \tilde{B}_\infty(z) & v_1(z) & \ldots &
     v_{\gamma-1}(z) & w_1(z) & \ldots & w_{\gamma-1}(z) \\
 \eq{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & y_{1,\gamma-1}(z) \\
+    \ldots & y_{1,\gamma-2}(z) \\
 \eq{2} & C_{\gamma-2}(z) & \tilde{C}_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & y_{2,\gamma-1}(z) \\
+    \ldots & y_{2,\gamma-3}(z) \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
     \ddots & \vdots \\
 \eq{\gamma-1} & C_1(z) & \tilde{C}_1(z) & 0 & 
