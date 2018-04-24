@@ -67,8 +67,8 @@ int       ERRNO; // Error codes.
 #define dN(i) pow( 1.0 - (1.0 - U + U*U/3.0) * pow(1.0-U,(i)), N )
 
 // Calculation intermediates (two indices).
-#define bN(j,i) pow( 1.0 - pow(1.0-U,(j))*U/3.0 + \
-                           pow(1-U,(i))*(1-U/3.0), N)
+#define bN(j,i) pow( 1.0 - pow(1.0-U,(j))*U/3.0 - \
+                           pow(1.0-U,(i))*(1.0-U/3.0), N)
 
 
 void print_kpoly (kpoly_t *p, size_t);
@@ -141,10 +141,16 @@ new_kpoly_A
    }
    else {
       // See definition of polynomial A.
+      const int d = deg <= G ? deg : G;
       const double cst = tilde ? _OMEGA : OMEGA;
       double pow_of_q = 1.0;
-      for (int i = 1 ; i <= deg ; i++) {
+      for (int i = 1 ; i <= d ; i++) {
          new->coeff[i] = cst * (xi(i-1,N)) * pow_of_q;
+         pow_of_q *= (1.0-P);
+      }
+      // Terms of the polynomials with degree higher than 'G' (if any).
+      for (int i = d+1 ; i <= deg ; i++) {
+         new->coeff[i] = P * (1-aN(i-1)) * pow_of_q;
          pow_of_q *= (1.0-P);
       }
    }
@@ -176,10 +182,9 @@ new_kpoly_B
       // See definition of polynomial B.
       const double cst = tilde ? _OMEGA : OMEGA;
       const double denom = 1.0 - pow(1-U/3.0, N);
-      double pow_of_q = 1.0-P;
-      new->coeff[1] = cst;
-      for (int i = 2 ; i <= deg ; i++) {
-         double numer = aN(i-1) - aN(0);
+      double pow_of_q = 1.0;
+      for (int i = 1 ; i <= deg ; i++) {
+         double numer = 1.0 - aN(i-1);
          new->coeff[i] = cst * numer / denom * pow_of_q;
          pow_of_q *= (1.0-P);
       }
@@ -198,6 +203,9 @@ new_kpoly_C
 )
 {
 
+   // FIXME //
+   if (N == 1) return NULL;
+
    if (deg > K || deg == 0) {
       ERRNO = __LINE__;
       return NULL;
@@ -211,12 +219,12 @@ new_kpoly_C
    else {
       // See definition of polynomial C.
       const int j = G - deg;
-      const double denom_j = aN(j) - aN(j-1) - gN(j) + dN(j-1);
+      const double denom = aN(j) - aN(j-1) - gN(j) + dN(j-1);
       const double cst = tilde ? _OMEGA : OMEGA;
       double pow_of_q = 1.0;
       for (int i = 1 ; i <= deg ; i++) {
          double numer = aN(j) - aN(j-1) - bN(j,i+j-1) + bN(j-1,i+j-1);
-         new->coeff[i] = cst * numer / denom_j * pow_of_q;
+         new->coeff[i] = cst * numer / denom * pow_of_q;
          pow_of_q *= (1.0-P);
       }
    }
@@ -340,7 +348,7 @@ new_kpoly_w
       // See definition of polynomial w.
       new->mono.deg = deg;
       double numer = gN(deg) - dN(deg-1);
-      double denom = 1.0 - pow(1-U/3.0, N);
+      double denom = 1.0 - pow(1.0-U/3.0, N);
       new->mono.coeff = numer / denom * pow(1.0-P, deg);
       new->coeff[deg] = new->mono.coeff;
    }
@@ -359,9 +367,10 @@ new_kpoly_y
 )
 {
 
-   const size_t deg = i;
+   // FIXME //
+   if (N == 1) return NULL;
 
-   if (deg > K || deg >= G || deg == 0) {
+   if (i > K || i >= G || i == 0) {
       ERRNO = __LINE__;
       return NULL;
    }
@@ -373,11 +382,11 @@ new_kpoly_y
    }
    else {
       // See definition of polynomial y.
-      new->mono.deg = deg;
+      new->mono.deg = i;
       double numer = bN(j,j+i) - bN(j,j+i-1) - bN(j-1,i+j) + bN(j-1,j+i-1);
-      double denom_j = aN(j) - aN(j-1) - gN(j) + dN(j-1);
-      new->mono.coeff = numer / denom_j * pow(1.0-P, deg);
-      new->coeff[deg] = new->mono.coeff;
+      double denom = aN(j) - aN(j-1) - gN(j) + dN(j-1);
+      new->mono.coeff = numer / denom * pow(1.0-P, i);
+      new->coeff[i] = new->mono.coeff;
    }
 
    return new; // NULL in case of failure.
@@ -397,10 +406,12 @@ new_kpoly_T_down
       ERRNO = __LINE__;
    }
    else {
+      const double denom = 1.0 - pow(1-U/3.0, N);
       double pow_of_q = 1.0;
-      for (int i = 0 ; i <= K ; i++) {
-         new->coeff[i] = pow_of_q;
-         pow_of_q *= (1-P);
+      for (int i = 0 ; i <= HIGH ; i++) {
+         double numer = 1.0 - aN(i);
+         new->coeff[i] = numer / denom * pow_of_q;
+         pow_of_q *= (1.0-P);
       }
    }
 
@@ -440,7 +451,7 @@ new_kpoly_T_up
 )
 {
 
-   if (deg > K || deg >= G || deg == 0) {
+   if (deg > K || deg >= G) {
       ERRNO = __LINE__;
       return NULL;
    }
@@ -469,7 +480,10 @@ new_kpoly_T_sim
 )
 {
 
-   if (deg > K || deg >= G || deg == 0) {
+   // FIXME //
+   if (N == 1) return NULL;
+
+   if (deg > K || deg >= G) {
       ERRNO = __LINE__;
       return NULL;
    }
@@ -480,11 +494,11 @@ new_kpoly_T_sim
    }
    else {
       const int j = G-1 - deg;
-      const double denom_j = aN(j) - aN(j-1) - gN(j) + dN(j-1);
+      const double denom = aN(j) - aN(j-1) - gN(j) + dN(j-1);
       double pow_of_q = 1.0;
       for (int i = 0 ; i <= deg ; i++) {
          double numer = aN(j) - aN(j-1) - bN(j,i+j) + bN(j-1,i+j);
-         new->coeff[i] = numer / denom_j * pow_of_q;
+         new->coeff[i] = numer / denom * pow_of_q;
          pow_of_q *= (1.0-P);
       }
    }
@@ -600,7 +614,7 @@ new_matrix_M
          M->term[(j+2)*dim+1] = new_kpoly_C(G-j, NO);
          M->term[(j+2)*dim+2] = new_kpoly_C(G-j, YES);
          for (int i = 1 ; i <= G-j-1 ; i++)
-            M->term[(j+2)*dim+G+2+i] = new_kpoly_y(j,i);
+            M->term[(j+2)*dim+G+j+i+1] = new_kpoly_y(j,i);
          M->term[(j+2)*dim+dim-1] = new_kpoly_T_sim(G-j-1);
       }
 
@@ -744,7 +758,7 @@ void print_kpoly (kpoly_t *p, size_t upto) {
 
 int main(void) {
 
-   memp_init(17, 2, 100, 0.01, 0.05);
+   memp_init(17, 2, 50, 0.01, 0.05);
 
    kpoly_t *w = new_zero_kpoly();
    mat_t *M = new_matrix_M();
@@ -759,7 +773,6 @@ int main(void) {
 
    matrix_mult(powM1, M, M);
    kpoly_update_add(w, powM1->term[2*G+1]);
-   print_kpoly(w, 4);
 
    for (int i = 0 ; i < 10 ; i++) {
       matrix_mult(powM2, powM1, M);
@@ -772,7 +785,7 @@ int main(void) {
    destroy_mat(powM2);
    destroy_mat(M);
 
-   print_kpoly(w, 4);
+   print_kpoly(w, HIGH);
 
    free(w);
 
