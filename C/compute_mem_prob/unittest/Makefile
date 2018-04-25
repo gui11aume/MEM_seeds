@@ -5,8 +5,8 @@ vpath %.h lib
 
 P= runtests
 
-OBJECTS= libunittest.so unittests_dunno.o
-SOURCES= memmatrix.c
+OBJECTS= libunittest.so unittests_compute_mem_prob.o
+SOURCES= compute_mem_prob.c
 
 CC= gcc
 INCLUDES= -I.. -Ilib
