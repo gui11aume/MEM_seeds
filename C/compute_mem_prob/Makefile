@@ -1,4 +1,6 @@
-P= do
+P= main
+
+OBJECTS= compute_mem_prob.o
 
 CC= gcc
 CFLAGS= -std=gnu99 -Wall
@@ -14,8 +16,8 @@ profile: CFLAGS += -g -pg -O3 -fprofile-arcs -ftest-coverage
 profile: $(P)
 
 
-$(P): compute_mem_prob.c
-	gcc $(CFLAGS) compute_mem_prob.c -lm -o $@
+$(P): $(OBJECTS) main.c
+	gcc $(CFLAGS) main.c $< -lm -o $@
 
 clean:
-	rm do
+	rm -f $(P) $(OBJECTS)

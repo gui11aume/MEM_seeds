@@ -12,7 +12,13 @@ CC= gcc
 INCLUDES= -I.. -Ilib
 COVERAGE= -fprofile-arcs -ftest-coverage
 CFLAGS= -std=gnu99 -g -Wall -O0 $(INCLUDES) $(COVERAGE)
-LDLIBS= -L`pwd` -Wl,-rpath=`pwd` -lunittest -lz -lm -lpthread
+LDLIBS= -L. -lunittest -lz -lm -lpthread
+# Use different flags on Linux and MacOS.
+ifeq ($(shell uname -s),Darwin)
+	libflag= -dynamiclib
+else
+	libflag= -shared
+endif
 
 $(P): $(OBJECTS) $(SOURCES) runtests.c
 	$(CC) $(CFLAGS) runtests.c $(OBJECTS) $(LDLIBS) -o $@
@@ -21,7 +27,7 @@ clean:
 	rm -f $(P) $(OBJECTS) *.gcda *.gcno *.gcov gmon.out .inspect.gdb
 
 libunittest.so: unittest.c
-	$(CC) -fPIC -shared $(CFLAGS) -o libunittest.so lib/unittest.c
+	$(CC) -fPIC $(libflag) $(CFLAGS) -o libunittest.so lib/unittest.c
 
 test: $(P)
 	./$(P)

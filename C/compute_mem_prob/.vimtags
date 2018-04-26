@@ -1,0 +1,80 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+aN	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	32;"	d	language:C++	file:
+ARRAY	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^trunc_pol_t * ARRAY[MAXN] = {0};  \/\/ Store the results (indexed by N).$/;"	v	language:C++
+bN	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	37;"	d	language:C++	file:
+CC	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/Makefile	/^CC= gcc$/;"	m	language:Make
+CFLAGS	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/Makefile	/^CFLAGS= -std=gnu99 -Wall$/;"	m	language:Make
+clean_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^clean_mem_prob \/\/ VISIBLE \/\/$/;"	f	language:C++
+clean_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	/^void   clean_mem_prob (void);$/;"	p	language:C++
+coeff	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^   double coeff;         \/\/ Value of the coefficient$/;"	m	language:C++	struct:monomial_t	file:
+coeff	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^   double coeff[];       \/\/ Terms of the polynomial.$/;"	m	language:C++	struct:trunc_pol_t	file:
+compute_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^compute_mem_prob \/\/ VISIBLE \/\/$/;"	f	language:C++
+compute_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	/^double compute_mem_prob(size_t, size_t);$/;"	p	language:C++
+deg	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^   size_t deg;           \/\/ Degree of the coefficent.$/;"	m	language:C++	struct:monomial_t	file:
+destroy_mat	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^destroy_mat$/;"	f	language:C++
+dim	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^   const size_t    dim;  \/\/ Column \/ row number.$/;"	m	language:C++	struct:matrix_t	file:
+dN	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	34;"	d	language:C++	file:
+ERRMSG	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^char      ERRMSG[1024] = {0};$/;"	v	language:C++
+ERRNO	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^int       ERRNO = 0;$/;"	v	language:C++
+FAILURE	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	16;"	d	language:C++	file:
+G	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^size_t    G;       \/\/ Minimum size of MEM seeds.$/;"	v	language:C++
+get_mem_prob_error_code	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^int    get_mem_prob_error_code (void) { return ERRNO; }$/;"	f	language:C++
+get_mem_prob_error_code	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	/^int    get_mem_prob_error_code (void);$/;"	p	language:C++
+get_mem_prob_error_msg	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^char * get_mem_prob_error_msg (void) { return ERRMSG; }$/;"	f	language:C++
+get_mem_prob_error_msg	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	/^char * get_mem_prob_error_msg (void);$/;"	p	language:C++
+gN	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	33;"	d	language:C++	file:
+handle_memory_error	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	42;"	d	language:C++	file:
+HIGH	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^size_t    HIGH;    \/\/ Proxy for infinite degree polynomials.$/;"	v	language:C++
+internal_error	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^const char internal_error[] =$/;"	v	language:C++
+K	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^size_t    K;       \/\/ Max degree of the polynomials (read size).$/;"	v	language:C++
+KSZ	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^size_t    KSZ;     \/\/ Size of the 'trunc_pol_t' struct.$/;"	v	language:C++
+LDLIBS	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/Makefile	/^LDLIBS= -lm$/;"	m	language:Make
+LIBNAME	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	9;"	d	language:C++	file:
+main	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/main.c	/^int main(void) {$/;"	f	language:C++
+matrix_mult	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^matrix_mult$/;"	f	language:C++
+matrix_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^struct matrix_t {$/;"	s	language:C++	file:
+matrix_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^typedef struct matrix_t     matrix_t;$/;"	t	language:C++	typeref:struct:matrix_t	file:
+MAXN	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	19;"	d	language:C++	file:
+mono	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^   monomial_t mono;      \/\/ Monomial (if applicable).$/;"	m	language:C++	struct:trunc_pol_t	file:
+monomial_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^struct monomial_t {$/;"	s	language:C++	file:
+monomial_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^typedef struct monomial_t   monomial_t;$/;"	t	language:C++	typeref:struct:monomial_t	file:
+N	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^size_t    N;       \/\/ Number of duplicate sequences.$/;"	v	language:C++
+new_matrix_M	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_matrix_M$/;"	f	language:C++
+new_null_matrix	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_null_matrix$/;"	f	language:C++
+new_trunc_pol_A	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_A$/;"	f	language:C++
+new_trunc_pol_B	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_B$/;"	f	language:C++
+new_trunc_pol_C	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_C$/;"	f	language:C++
+new_trunc_pol_D	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_D$/;"	f	language:C++
+new_trunc_pol_T_double_down	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_T_double_down$/;"	f	language:C++
+new_trunc_pol_T_down	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_T_down$/;"	f	language:C++
+new_trunc_pol_T_sim	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_T_sim$/;"	f	language:C++
+new_trunc_pol_T_up	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_T_up$/;"	f	language:C++
+new_trunc_pol_u	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_u$/;"	f	language:C++
+new_trunc_pol_v	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_v$/;"	f	language:C++
+new_trunc_pol_w	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_w$/;"	f	language:C++
+new_trunc_pol_y	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_trunc_pol_y$/;"	f	language:C++
+new_zero_matrix	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^new_zero_matrix$/;"	f	language:C++
+new_zero_trunc_pol	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	26;"	d	language:C++	file:
+NO	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	13;"	d	language:C++	file:
+OBJECTS	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/Makefile	/^OBJECTS= compute_mem_prob.o$/;"	m	language:Make
+OMEGA	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	22;"	d	language:C++	file:
+P	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^double    P;       \/\/ Probability of a read error.$/;"	v	language:C++
+P	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/Makefile	/^P= main$/;"	m	language:Make
+reset_mem_prob_error	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^void   reset_mem_prob_error (void) { ERRNO = 0; }$/;"	f	language:C++
+reset_mem_prob_error	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	/^void   reset_mem_prob_error (void);$/;"	p	language:C++
+set_params_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^set_params_mem_prob \/\/ VISIBLE \/\/$/;"	f	language:C++
+set_params_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	/^int    set_params_mem_prob (size_t, size_t, double, double);$/;"	p	language:C++
+SUCCESS	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	15;"	d	language:C++	file:
+TEMP	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^trunc_pol_t * TEMP = NULL;        \/\/ For matrix multipliciation.$/;"	v	language:C++
+term	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^   trunc_pol_t * term[]; \/\/ Terms of the matrix.$/;"	m	language:C++	struct:matrix_t	file:
+trunc_pol_mult	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^trunc_pol_mult$/;"	f	language:C++
+trunc_pol_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^struct trunc_pol_t {$/;"	s	language:C++	file:
+trunc_pol_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^typedef struct trunc_pol_t  trunc_pol_t;$/;"	t	language:C++	typeref:struct:trunc_pol_t	file:
+trunc_pol_update_add	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^trunc_pol_update_add$/;"	f	language:C++
+U	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^double    U;       \/\/ Divergence rate between duplicates.$/;"	v	language:C++
+VERSION	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	10;"	d	language:C++	file:
+warning	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	/^warning$/;"	f	language:C++
+xi	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	29;"	d	language:C++	file:
+YES	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	12;"	d	language:C++	file:
+_OMEGA	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.c	23;"	d	language:C++	file:
+__COMPUTE_MEM_PROB_HEADER	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/compute_mem_prob.h	2;"	d	language:C++

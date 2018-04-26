@@ -12,4 +12,6 @@ open_banner	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/
 P	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/Makefile	/^P= runtests$/;"	m	language:Make
 SOURCES	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/Makefile	/^SOURCES= compute_mem_prob.c$/;"	m	language:Make
 test_cases_compute_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/unittests_compute_mem_prob.c	/^const test_case_t test_cases_compute_mem_prob[] = {$/;"	v	language:C++
+test_error_set_params_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/unittests_compute_mem_prob.c	/^test_error_set_params_mem_prob$/;"	f	language:C++
+test_set_params_mem_prob	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/unittests_compute_mem_prob.c	/^test_set_params_mem_prob$/;"	f	language:C++
 test_trunc_pol_mult	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/unittests_compute_mem_prob.c	/^test_trunc_pol_mult$/;"	f	language:C++
