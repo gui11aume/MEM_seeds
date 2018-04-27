@@ -1,57 +1,66 @@
 !_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
 ALLOC_ERR_PROB	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static double ALLOC_ERR_PROB;$/;"	v	language:C++	file:
 ALLOC_FAIL_COUNTER	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static int    ALLOC_FAIL_COUNTER;$/;"	v	language:C++	file:
-calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^calloc$/;"	f	language:C++
+calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * calloc (size_t nitems, size_t size) {$/;"	f	language:C++
 calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void * calloc (size_t nitems, size_t size);$/;"	p	language:C++
 CALLOC_CALL	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void *(*CALLOC_CALL)(size_t, size_t) = __libc_calloc;$/;"	v	language:C++
 caught_in_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^caught_in_stderr$/;"	f	language:C++
 caught_in_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^char * caught_in_stderr (void);$/;"	p	language:C++
 DEBUG_DUMP_FILE	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static FILE * DEBUG_DUMP_FILE;$/;"	v	language:C++	file:
-debug_fail_dump	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^debug_fail_dump$/;"	f	language:C++
 debug_fail_dump	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^debug_fail_dump$/;"	p	language:C++
+fail_countdown_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_countdown_calloc(malloc_zone_t *zone, size_t nitems, size_t size)$/;"	f	language:C++
 fail_countdown_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_countdown_calloc(size_t nitems, size_t size)$/;"	f	language:C++
-fail_countdown_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * fail_countdown_calloc (size_t, size_t);$/;"	p	language:C++	file:
+fail_countdown_malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_countdown_malloc(malloc_zone_t *zone, size_t size)$/;"	f	language:C++
 fail_countdown_malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_countdown_malloc(size_t size)$/;"	f	language:C++
-fail_countdown_malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * fail_countdown_malloc (size_t);$/;"	p	language:C++	file:
+fail_countdown_realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_countdown_realloc(malloc_zone_t *zone, void *ptr, size_t size)$/;"	f	language:C++
 fail_countdown_realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_countdown_realloc(void *ptr, size_t size)$/;"	f	language:C++
-fail_countdown_realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * fail_countdown_realloc (void *, size_t);$/;"	p	language:C++	file:
 fail_critical	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_critical$/;"	f	language:C++
 fail_critical	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^fail_critical$/;"	p	language:C++
+fail_debug_dump	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_debug_dump$/;"	f	language:C++
 fail_non_critical	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_non_critical$/;"	f	language:C++
 fail_non_critical	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^fail_non_critical$/;"	p	language:C++
+fail_prone_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_prone_calloc(malloc_zone_t *zone, size_t nitems, size_t size)$/;"	f	language:C++
 fail_prone_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_prone_calloc(size_t nitems, size_t size)$/;"	f	language:C++
-fail_prone_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * fail_prone_calloc (size_t, size_t);$/;"	p	language:C++	file:
+fail_prone_malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_prone_malloc(malloc_zone_t *zone, size_t size)$/;"	f	language:C++
 fail_prone_malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_prone_malloc(size_t size)$/;"	f	language:C++
-fail_prone_malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * fail_prone_malloc (size_t);$/;"	p	language:C++	file:
+fail_prone_realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_prone_realloc(malloc_zone_t *zone, void *ptr, size_t size)$/;"	f	language:C++
 fail_prone_realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^fail_prone_realloc(void *ptr, size_t size)$/;"	f	language:C++
-fail_prone_realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * fail_prone_realloc (void *, size_t);$/;"	p	language:C++	file:
 fixture	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^   fixture_t   fixture;$/;"	m	language:C++	struct:test_case_t
 fixture_t	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^typedef void (*fixture_t)(void);$/;"	t	language:C++
-malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^malloc$/;"	f	language:C++
+mac_specific_initialization	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^mac_specific_initialization$/;"	f	language:C++
+malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * malloc (size_t size) {$/;"	f	language:C++
 malloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void * malloc (size_t size);$/;"	p	language:C++
 MALLOC_CALL	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void *(*MALLOC_CALL)(size_t) = __libc_malloc;$/;"	v	language:C++
 MAX_N_ERROR_MESSAGES	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	17;"	d	language:C++
-N_ERROR_MESSAGES	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static int    N_ERROR_MESSAGES;$/;"	v	language:C++	file:
+MAX_N_ERROR_MSG	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	5;"	d	language:C++	file:
+N_ERROR_MSG	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static int    N_ERROR_MSG;$/;"	v	language:C++	file:
 ORIG_STDERR_DESCRIPTOR	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static int    ORIG_STDERR_DESCRIPTOR;$/;"	v	language:C++	file:
-realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^realloc$/;"	f	language:C++
+realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * realloc (void *ptr, size_t size) {$/;"	f	language:C++
 realloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void * realloc (void *ptr, size_t size);$/;"	p	language:C++
 REALLOC_CALL	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void *(*REALLOC_CALL)(void *, size_t) = __libc_realloc;$/;"	v	language:C++
 redirect_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^redirect_stderr$/;"	f	language:C++
 redirect_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void   redirect_stderr (void);$/;"	p	language:C++	file:
 redirect_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void   redirect_stderr (void);$/;"	p	language:C++
 reset_alloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^reset_alloc$/;"	f	language:C++
+reset_alloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^reset_alloc$/;"	f	language:C++
 reset_alloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void   reset_alloc (void);$/;"	p	language:C++
-run_testset	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^run_testset$/;"	f	language:C++
-run_testset	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * run_testset (void *); $/;"	p	language:C++	file:
+run_test	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^run_test$/;"	f	language:C++
+run_test	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void * run_test (void *); $/;"	p	language:C++	file:
 run_unittest	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^run_unittest$/;"	f	language:C++
 run_unittest	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^run_unittest$/;"	p	language:C++
 sent_to_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^char * sent_to_stderr (void);$/;"	p	language:C++	file:
 set_alloc_failure_countdown_to	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^set_alloc_failure_countdown_to(int count)$/;"	f	language:C++
+set_alloc_failure_countdown_to	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^set_alloc_failure_countdown_to(int count)$/;"	f	language:C++
 set_alloc_failure_countdown_to	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void   set_alloc_failure_countdown_to (int);$/;"	p	language:C++
 set_alloc_failure_rate_to	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^set_alloc_failure_rate_to(double p)$/;"	f	language:C++
+set_alloc_failure_rate_to	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^set_alloc_failure_rate_to(double p)$/;"	f	language:C++
 set_alloc_failure_rate_to	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void   set_alloc_failure_rate_to (double);$/;"	p	language:C++
+SHOWALL	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static int    SHOWALL = 0;$/;"	v	language:C++	file:
 STDERR_BUFFER	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static char * STDERR_BUFFER;$/;"	v	language:C++	file:
 STDERR_OFF	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^static int    STDERR_OFF;$/;"	v	language:C++	file:
+SYSTEM_CALLOC	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void *(*SYSTEM_CALLOC) (malloc_zone_t *, size_t, size_t);$/;"	v	language:C++
+SYSTEM_MALLOC	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void *(*SYSTEM_MALLOC) (malloc_zone_t *, size_t);$/;"	v	language:C++
+SYSTEM_REALLOC	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^void *(*SYSTEM_REALLOC) (malloc_zone_t *, void *, size_t);$/;"	v	language:C++
 terminate_thread	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^terminate_thread$/;"	f	language:C++
 test_assert	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	83;"	d	language:C++
 test_assert_critical	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	90;"	d	language:C++
@@ -73,6 +82,7 @@ unredirect_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem
 unredirect_stderr	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	/^void   unredirect_stderr (void);$/;"	p	language:C++
 update_display_failed	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^update_display_failed$/;"	f	language:C++
 update_display_success	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^update_display_success$/;"	f	language:C++
+UTEST_BUFFER_SIZE	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	4;"	d	language:C++	file:
 UTEST_BUFFER_SIZE	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	16;"	d	language:C++
 _UNITTEST_HEADER	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.h	13;"	d	language:C++
 __libc_calloc	/home/gfilion/Dropbox/Work/Manuscripts/MEM_seeds/C/compute_mem_prob/unittest/lib/unittest.c	/^extern void *__libc_calloc(size_t, size_t);$/;"	p	language:C++	file:

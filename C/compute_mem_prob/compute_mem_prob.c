@@ -22,9 +22,6 @@
 #define  OMEGA ( P*pow(1.0-U/3, N) )
 #define _OMEGA ( P*(1-pow(1.0-U/3, N)) )
 
-// Creation of a new 'trunc_pol_t' is just a call to 'calloc()'.
-#define new_zero_trunc_pol() calloc(1, KSZ)
-
 // Prob that one of m altnerative threads survives i steps.
 #define xi(i,m) ( 1.0 - pow( 1.0 - pow(1.0-U,(i)), (m) ))
 
@@ -74,22 +71,20 @@ struct matrix_t {
 
 // GLOBAL VARIABLES / CONSTANTS //
 
-size_t    G;       // Minimum size of MEM seeds.
-size_t    N;       // Number of duplicate sequences.
-size_t    K;       // Max degree of the polynomials (read size).
+static size_t    G = 0;       // Minimum size of MEM seeds.
+static size_t    K = 0;       // Max degree of the polynomials (read size).
 
-size_t    HIGH;    // Proxy for infinite degree polynomials.
+static size_t    HIGH = 0;    // Proxy for infinite degree polynomials.
 
-double    P;       // Probability of a read error.
-double    U;       // Divergence rate between duplicates.
+static double    P = 0.0;     // Probability of a read error.
+static double    U = 0.0;     // Divergence rate between duplicates.
 
-size_t    KSZ;     // Size of the 'trunc_pol_t' struct.
+static size_t    KSZ = 0;     // Size of the 'trunc_pol_t' struct.
 
-trunc_pol_t * TEMP = NULL;        // For matrix multipliciation.
-trunc_pol_t * ARRAY[MAXN] = {0};  // Store the results (indexed by N).
+static trunc_pol_t * TEMP = NULL;        // For matrix multipliciation.
+static trunc_pol_t * ARRAY[MAXN] = {0};  // Store the results (indexed by N).
 
-int       ERRNO = 0;
-char      ERRMSG[1024] = {0};
+static int       ERRNO = 0;
 
 // Error message.
 const char internal_error[] =
@@ -101,7 +96,6 @@ const char internal_error[] =
 
 // VISLBLE IO and error report functions.
 int    get_mem_prob_error_code (void) { return ERRNO; }
-char * get_mem_prob_error_msg (void) { return ERRMSG; }
 void   reset_mem_prob_error (void) { ERRNO = 0; }
 
 
@@ -112,11 +106,37 @@ warning
    const char * function,
    const int    line
 )
-// Print warning message to stderr or copy it to internal
-// variable ERRMSG for the user to consult later.
+// Print warning message to stderr.
 {
    fprintf(stderr, "[%s] error in function `%s' (line %d): %s\n",
          LIBNAME, function, line, msg);
+}
+
+
+void
+clean_mem_prob // VISIBLE //
+(void)
+{
+
+   // Set global variables to "fail" values.
+   G = 0;
+   K = 0;
+   P = 0.0;
+   U = 0.0;
+   HIGH = 0;
+   KSZ = 0;
+
+   // Free everything.
+   free(TEMP);
+   TEMP = NULL;
+
+   for (int i = 0 ; i < MAXN ; i++) free(ARRAY[i]);
+   bzero(ARRAY, MAXN * sizeof(trunc_pol_t *));
+
+   ERRNO = 0;
+
+   return;
+
 }
 
 
@@ -132,6 +152,13 @@ set_params_mem_prob // VISIBLE //
 {
 
    // Check input
+   if (g == 0 || k == 0) {
+      ERRNO = __LINE__;
+      warning("parameters g and k must greater than 0",
+            __func__, __LINE__); 
+      goto in_case_of_failure;
+   }
+
    if (p <= 0.0 || p >= 1.0) {
       ERRNO = __LINE__;
       warning("parameter p must be between 0 and 1",
@@ -169,29 +196,26 @@ set_params_mem_prob // VISIBLE //
    return SUCCESS;
 
 in_case_of_failure:
+   clean_mem_prob();
    return FAILURE;
 
 }
 
 
-void
-clean_mem_prob // VISIBLE //
+trunc_pol_t *
+new_zero_trunc_pol
 (void)
 {
 
-   free(TEMP);
-   TEMP = NULL;
+   trunc_pol_t *new = calloc(1, KSZ);
+   handle_memory_error(new);
 
-   for (int i = 0 ; i < MAXN ; i++) free(ARRAY[i]);
-   bzero(ARRAY, MAXN * sizeof(trunc_pol_t *));
+   return new;
 
-   ERRNO = 0;
-   bzero(ERRMSG, 1024);
-
-   return;
+in_case_of_failure:
+   return NULL;
 
 }
-
 
 
 trunc_pol_t *
@@ -767,8 +791,7 @@ trunc_pol_mult
       // Both are monomials, just do one multiplication.
       bzero(dest, KSZ);
       // If degree is too high, all coefficients are zero.
-      if (a->mono.deg + b->mono.deg > K)
-         return NULL;
+      if (a->mono.deg + b->mono.deg > K) return NULL;
       // Otherwise do the multiplication.
       dest->mono.deg = a->mono.deg + b->mono.deg;
       dest->mono.coeff = a->mono.coeff * b->mono.coeff;
@@ -861,13 +884,19 @@ compute_mem_prob // VISIBLE //
    const size_t k     // Segment or read size.
 )
 {
-
+   
    // Those variables must be declared here so that
    // they can be cleaned in case of failure.
    trunc_pol_t  *w = NULL;
    matrix_t     *M = NULL;
    matrix_t *powM1 = NULL;
    matrix_t *powM2 = NULL;
+
+   if (G == 0 || K == 0 || P == 0 || U == 0) {
+      warning("parameters unset: call `set_params_mem_prob'",
+            __func__, __LINE__);
+      goto in_case_of_failure;
+   }
 
    // Check input.
    if (N > MAXN-1) {
@@ -926,7 +955,6 @@ in_case_of_failure:
    destroy_mat(powM1);
    destroy_mat(powM2);
    destroy_mat(M);
-   // Return 'nan'.
-   return 0.0/0.0;
+   return 0.0/0.0;  //  nan
 
 }

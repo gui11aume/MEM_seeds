@@ -40,6 +40,8 @@ test_set_params_mem_prob
       test_assert(ARRAY[i] == NULL);
    }
 
+   clean_mem_prob();
+
    return;
 
 }
@@ -80,6 +82,20 @@ test_error_set_params_mem_prob
    test_assert(!success);
    test_assert_stderr("[compute_mem_prob] error in function `set_");
 
+   // Case 5. //
+   redirect_stderr();
+   success = set_params_mem_prob(0, 50, 0.01, 1.00);
+   unredirect_stderr();
+   test_assert(!success);
+   test_assert_stderr("[compute_mem_prob] error in function `set_");
+
+   // Case 6. //
+   redirect_stderr();
+   success = set_params_mem_prob(17, 0, 0.01, 1.00);
+   unredirect_stderr();
+   test_assert(!success);
+   test_assert_stderr("[compute_mem_prob] error in function `set_");
+
    // Test memory error //
    set_alloc_failure_rate_to(1.0);
    redirect_stderr();
@@ -93,20 +109,184 @@ test_error_set_params_mem_prob
 
 
 void
-test_trunc_pol_mult
+test_uninitialized_error
 (void)
 {
 
-   test_assert(0);
+   // Do not call 'set_params_mem_prob()'.
+   redirect_stderr();
+   double x = compute_mem_prob(5, 20);
+   unredirect_stderr();
+   test_assert_stderr("[compute_mem_prob] error in function `comp");
+   test_assert(x != x);
 
    return;
 
 }
 
+
+void
+test_new_zero_trunc_pol
+(void)
+{
+
+   size_t ksz = 50;
+   int success = set_params_mem_prob(17, ksz, 0.01, 0.05);
+   test_assert(success);
+
+   trunc_pol_t *a = new_zero_trunc_pol();
+   test_assert_critical(a);
+
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      test_assert(a->coeff[i] == 0);
+   }
+
+   free(a);
+   clean_mem_prob();
+
+   return;
+
+}
+
+
+void
+test_trunc_pol_mult
+(void)
+{
+   
+   // Test multiplications between zero polynomials.
+
+   size_t ksz = 50;
+   set_params_mem_prob(17, ksz, 0.01, 0.05);
+   trunc_pol_t *a = new_zero_trunc_pol();
+
+   test_assert_critical(a != NULL);
+
+   test_assert(trunc_pol_mult(a, NULL, NULL) == NULL);
+
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      test_assert(a->coeff[i] == 0);
+   }
+
+   trunc_pol_t *b = new_zero_trunc_pol();
+   test_assert_critical(b != NULL);
+
+   test_assert(trunc_pol_mult(a, b, NULL) == NULL);
+
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      test_assert(a->coeff[i] == 0);
+   }
+
+   test_assert(trunc_pol_mult(a, NULL, b) == NULL);
+
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      test_assert(a->coeff[i] == 0);
+   }
+
+   trunc_pol_t *c = new_zero_trunc_pol();
+   test_assert_critical(c != NULL);
+
+   // Returns 'a' if arguments are not NULL.
+   test_assert(trunc_pol_mult(a, b, c) == a);
+
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      test_assert(a->coeff[i] == 0);
+   }
+
+
+   // Test multiplications between monomials (b = 5z and c = z^2).
+   b->mono.deg = 1; b->mono.coeff = 5; b->coeff[1] = 5;
+   c->mono.deg = 2; c->mono.coeff = 1; c->coeff[2] = 1;
+
+   test_assert(trunc_pol_mult(a, b, c) == a);
+   test_assert(a->mono.deg == 3);
+   test_assert(a->mono.coeff == 5);
+   for (int i = 0 ; i <= ksz ; i++) {
+      double target = i == 3 ? 5 : 0;
+      test_assert(a->coeff[i] == target);
+   }
+
+
+   // Test multiplications between a monomial and a
+   // polynomial (b = 5z and c = z^2 + 2z^3).
+   b->mono.deg = 1; b->mono.coeff = 5; b->coeff[1] = 5;
+   c->mono.deg = 0; c->mono.coeff = 0; c->coeff[2] = 1; c->coeff[3] = 2;
+
+   test_assert(trunc_pol_mult(a, b, c) == a);
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      double target = 0;
+      if (i == 3) target = 5;
+      if (i == 4) target = 10;
+      test_assert(a->coeff[i] == target);
+   }
+
+   // Test symmetry.
+   test_assert(trunc_pol_mult(a, c, b) == a);
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      double target = 0;
+      if (i == 3) target = 5;
+      if (i == 4) target = 10;
+      test_assert(a->coeff[i] == target);
+   }
+
+   // Test multiplications between two polynomials
+   // (b = 5z + 3z^2 and c = z^2 + 2z^3).
+   b->mono.deg = 0; b->mono.coeff = 0; b->coeff[1] = 5; b->coeff[2] = 3;
+   c->mono.deg = 0; c->mono.coeff = 0; c->coeff[2] = 1; c->coeff[3] = 2;
+
+   test_assert(trunc_pol_mult(a, b, c) == a);
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      double target = 0;
+      if (i == 3) target = 5;
+      if (i == 4) target = 13;
+      if (i == 5) target = 6;
+      test_assert(a->coeff[i] == target);
+   }
+
+   // Test symmetry.
+   test_assert(trunc_pol_mult(a, c, b) == a);
+   test_assert(a->mono.deg == 0);
+   test_assert(a->mono.coeff == 0);
+   for (int i = 0 ; i <= ksz ; i++) {
+      double target = 0;
+      if (i == 3) target = 5;
+      if (i == 4) target = 13;
+      if (i == 5) target = 6;
+      test_assert(a->coeff[i] == target);
+   }
+
+   free(a);
+   free(b);
+   free(c);
+   clean_mem_prob();
+
+   return;
+
+}
+
+
 // Test cases for export.
 const test_case_t test_cases_compute_mem_prob[] = {
    {"set_params_mem_prob",       test_set_params_mem_prob},
    {"error_set_params_mem_prob", test_error_set_params_mem_prob},
+   {"uninitialized_error",       test_uninitialized_error},
+   {"new_zero_trunc_pol",        test_new_zero_trunc_pol},
    {"trunc_pol_mult",            test_trunc_pol_mult},
    {NULL, NULL},
 };

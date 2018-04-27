@@ -1,2 +1,3 @@
-b unittests_parse.c:701
-run --debug
+b unittests_compute_mem_prob.c:237
+b run_unittest
+run

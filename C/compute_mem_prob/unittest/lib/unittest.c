@@ -304,11 +304,9 @@ fail_debug_dump
    const char * function
 )
 // When a test fails, write a gdb file with a breakpoint at
-// the function that failed, and another one at the line
-// where the failured happened.
+// the line where the failured happened.
 {
    fprintf(DEBUG_DUMP_FILE, "b %s:%d\n", file, lineno);
-   fprintf(DEBUG_DUMP_FILE, "b %s\n", function);
    fflush(DEBUG_DUMP_FILE);
 }
 
