@@ -40,4 +40,4 @@ debug: $(P)
 
 valgrind: $(P)
 	#valgrind --vgdb=yes --vgdb-error=0 ./$(P) --debug
-	valgrind --leak-check=full --show-leak-kinds=all ./$(P) --debug
+	valgrind --leak-check=full --show-leak-kinds=all ./$(P)

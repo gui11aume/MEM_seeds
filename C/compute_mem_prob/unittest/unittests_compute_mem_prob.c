@@ -281,6 +281,77 @@ test_trunc_pol_mult
 }
 
 
+void
+test_new_trunc_pol_A
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert(success);
+
+   trunc_pol_t *A = new_trunc_pol_A(17, 2, NO);
+   test_assert_critical(A != NULL);
+   test_assert(A->mono.deg == 0);
+   test_assert(A->mono.coeff == 0);
+   test_assert(A->coeff[0] == 0);
+   double omega = .01 * pow(1-.05/3,2);
+   for (int i = 1 ; i <= 17 ; i++) {
+      double target = omega * pow(.99, i-1) * (1-pow(1-pow(.95,i-1),2)); 
+      test_assert(fabs(A->coeff[i]-target) < 1e-9);
+   }
+   for (int i = 18 ; i <= 50 ; i++) {
+      test_assert(A->coeff[i] == 0);
+   }
+
+   trunc_pol_t *_A = new_trunc_pol_A(50, 2, YES);
+   test_assert_critical(_A != NULL);
+   test_assert(_A->mono.deg == 0);
+   test_assert(_A->mono.coeff == 0);
+   test_assert(_A->coeff[0] == 0);
+   double _omega = .01 * (1-pow(1-.05/3,2));
+   for (int i = 1 ; i <= 17 ; i++) {
+      double target = _omega * pow(.99, i-1) * (1-pow(1-pow(.95,i-1),2)); 
+      test_assert(fabs(_A->coeff[i]-target) < 1e-9);
+   }
+   for (int i = 18 ; i <= 50 ; i++) {
+      double alpha_i_sq = pow(1-pow(.95,i-1) * .05/3,2);
+      double target = 0.01 * pow(.99, i-1) * (1-alpha_i_sq);
+      test_assert(fabs(_A->coeff[i]-target) < 1e-9);
+   }
+
+   free(A);
+   free(_A);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_A
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   redirect_stderr();
+   new_trunc_pol_A(0, 2, YES);
+   unredirect_stderr();
+
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   new_trunc_pol_A(51, 2, YES);
+   unredirect_stderr();
+
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   clean_mem_prob();
+
+}
+
+
+
 // Test cases for export.
 const test_case_t test_cases_compute_mem_prob[] = {
    {"set_params_mem_prob",       test_set_params_mem_prob},
@@ -288,5 +359,7 @@ const test_case_t test_cases_compute_mem_prob[] = {
    {"uninitialized_error",       test_uninitialized_error},
    {"new_zero_trunc_pol",        test_new_zero_trunc_pol},
    {"trunc_pol_mult",            test_trunc_pol_mult},
+   {"new_trunc_pol_A",           test_new_trunc_pol_A},
+   {"error_new_trunc_pol_A",     test_error_new_trunc_pol_A},
    {NULL, NULL},
 };
