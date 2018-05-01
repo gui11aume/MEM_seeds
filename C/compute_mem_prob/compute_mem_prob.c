@@ -232,9 +232,20 @@ new_trunc_pol_A
       ERRNO = __LINE__;
       goto in_case_of_failure;
    }
-
+   
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   if (N == 0) {
+      // In the special case N = 0, A(z) = pz and ~A(z) = 0.
+      if (!tilde) {
+         new->mono.deg = 1;
+         new->mono.coeff = P;
+         new->coeff[1] = P;
+         return new;
+      }
+      return new;
+   }
 
    // See definition of polynomial A.
    const int d = deg <= G ? deg : G;
@@ -276,6 +287,9 @@ new_trunc_pol_B
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
 
+   // Polynomial B is null when N = 0.
+   if (N == 0) return new;
+
    // See definition of polynomial B.
    const double cst = tilde ? _OMEGA : OMEGA;
    const double denom = 1.0 - pow(1-U/3.0, N);
@@ -303,9 +317,6 @@ new_trunc_pol_C
 )
 {
 
-   // Avoid division by zero when N = 1 (not a failure).
-   if (N == 1) return NULL;
-
    if (deg > K || deg == 0) {
       warning(internal_error, __func__, __LINE__);
       ERRNO = __LINE__;
@@ -314,6 +325,9 @@ new_trunc_pol_C
 
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // Avoid division by zero when N < 2 (not a failure).
+   if (N < 2) return new;
 
    // See definition of polynomial C.
    const int j = G - deg;
@@ -349,6 +363,9 @@ new_trunc_pol_D
       goto in_case_of_failure;
    }
 
+   // NB: The special case N = 0 is implicit for the
+   // polynomial D (it implies omega = p and ~omega = 0).
+   
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
 
@@ -387,7 +404,11 @@ new_trunc_pol_u
 
    // See definition of polynomial u.
    new->mono.deg = deg;
-   new->mono.coeff = (xi(deg-1,N) - xi(deg,N)) * pow(1.0-P,deg);
+   // The case N = 0 involves the term 'xi(0,0)', which should be
+   // equal to 0 but is equal to 1 because 'pow(0,0)' is 1 as per
+   // IEEE 854. So we need to return a special value for this case.
+   new->mono.coeff = (N == 0 && deg == 1) ? 1.0-P : 
+      (xi(deg-1,N) - xi(deg,N)) * pow(1.0-P,deg);
    new->coeff[deg] = new->mono.coeff;
 
    return new;
@@ -414,6 +435,10 @@ new_trunc_pol_v
 
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // In the special case N = 0, the polynomial v is
+   // undefined, but we return a zero polynomial.
+   if (N == 0) return new;
 
    // See definition of polynomial v.
    new->mono.deg = deg;
@@ -444,6 +469,8 @@ new_trunc_pol_w
       goto in_case_of_failure;
    }
 
+   // TODO: treat special case N = 0. //
+
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
 
@@ -472,14 +499,16 @@ new_trunc_pol_y
 )
 {
 
-   // Avoid division by zero when N = 1 (not a failure).
-   if (N == 1) return NULL;
-
    if (i > K || i >= G || i == 0) {
       warning(internal_error, __func__, __LINE__);
       ERRNO = __LINE__;
       goto in_case_of_failure;
    }
+
+   // Avoid division by zero when N = 1 (not a failure).
+   if (N == 1) return NULL;
+
+   // TODO: treat special case N = 0. //
 
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
@@ -588,14 +617,14 @@ new_trunc_pol_T_sim
 )
 {
 
-   // Avoid division by zero when N = 1 (not a failure).
-   if (N == 1) return NULL;
-
    if (deg > K || deg >= G) {
       warning(internal_error, __func__, __LINE__);
       ERRNO = __LINE__;
       goto in_case_of_failure;
    }
+
+   // Avoid division by zero when N = 1 (not a failure).
+   if (N == 1) return NULL;
 
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
