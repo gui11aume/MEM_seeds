@@ -469,10 +469,12 @@ new_trunc_pol_w
       goto in_case_of_failure;
    }
 
-   // TODO: treat special case N = 0. //
-
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // In the special case N = 0, the polynomial w is
+   // undefined, but we return a zero polynomial.
+   if (N == 0) return new;
 
    // See definition of polynomial w.
    new->mono.deg = deg;
@@ -493,25 +495,23 @@ in_case_of_failure:
 trunc_pol_t *
 new_trunc_pol_y
 (
-   const int j,      // Initial state.
-   const int i,      // Degree of the polynomial.
+   const size_t j,      // Initial state.
+   const size_t i,      // Degree of the polynomial.
    const size_t N    // Number of duplicates.
 )
 {
 
-   if (i > K || i >= G || i == 0) {
+   if (j == 0 || j >= G-1 || i > K || i >= G-1 || i == 0 || i+j > G-1) {
       warning(internal_error, __func__, __LINE__);
       ERRNO = __LINE__;
       goto in_case_of_failure;
    }
 
-   // Avoid division by zero when N = 1 (not a failure).
-   if (N == 1) return NULL;
-
-   // TODO: treat special case N = 0. //
-
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // Avoid division by zero when N < 2 (not a failure).
+   if (N < 2) return new;
 
    // See definition of polynomial y.
    new->mono.deg = i;
@@ -537,6 +537,10 @@ new_trunc_pol_T_down
 
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // In the special case N = 0, the polynomial T is
+   // undefined, but we return a zero polynomial.
+   if (N == 0) return new;
 
    const double denom = 1.0 - pow(1-U/3.0, N);
    double pow_of_q = 1.0;
@@ -564,10 +568,17 @@ new_trunc_pol_T_double_down
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
 
-   double pow_of_q = 1.0;
-   for (int i = 0 ; i <= G-1 ; i++) {
-      new->coeff[i] = xi(i,N) * pow_of_q;
-      pow_of_q *= (1-P);
+   if (N == 0) {
+      // Special case N = 0.
+      new->mono.coeff = 1.0;
+      new->coeff[new->mono.deg] = new->mono.coeff;
+   }
+   else {
+      double pow_of_q = 1.0;
+      for (int i = 0 ; i <= G-1 ; i++) {
+         new->coeff[i] = xi(i,N) * pow_of_q;
+         pow_of_q *= (1-P);
+      }
    }
 
    return new;
@@ -594,6 +605,8 @@ new_trunc_pol_T_up
 
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // The special case N = 0 is implicit.
 
    double pow_of_q = 1.0;
    for (int i = 0 ; i <= deg ; i++) {
@@ -623,11 +636,11 @@ new_trunc_pol_T_sim
       goto in_case_of_failure;
    }
 
-   // Avoid division by zero when N = 1 (not a failure).
-   if (N == 1) return NULL;
-
    trunc_pol_t *new = new_zero_trunc_pol();
    handle_memory_error(new);
+
+   // Avoid division by zero when N < 2 (not a failure).
+   if (N < 2) return new;
 
    const int j = G-1 - deg;
    const double denom = aN(j) - aN(j-1) - gN(j) + dN(j-1);

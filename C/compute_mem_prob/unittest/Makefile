@@ -39,5 +39,12 @@ debug: $(P)
 	gdb --command=.debug.gdb --args $(P)
 
 valgrind: $(P)
-	#valgrind --vgdb=yes --vgdb-error=0 ./$(P) --debug
+	#valgrind --vgdb=yes --vgdb-error=0 ./$(P)
 	valgrind --leak-check=full --show-leak-kinds=all ./$(P)
+
+unittests_compute_mem_prob.gcda: $(P)
+	-./$(P)
+
+cov: unittests_compute_mem_prob.gcda
+	gcov unittests_compute_mem_prob.c
+	cat compute_mem_prob.c.gcov

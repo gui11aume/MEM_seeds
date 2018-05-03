@@ -283,6 +283,22 @@ test_trunc_pol_mult
 
 
 void
+test_matrix_mult
+(void)
+{
+   test_assert(0);
+}
+
+
+void
+test_error_matrix_mult
+(void)
+{
+   test_assert(0);
+}
+
+
+void
 test_new_trunc_pol_A
 (void)
 {
@@ -379,7 +395,7 @@ test_error_new_trunc_pol_A
 
    set_alloc_failure_rate_to(1);
    redirect_stderr();
-   new_trunc_pol_A(18, 2, NO);
+   A = new_trunc_pol_A(18, 2, NO);
    unredirect_stderr();
    reset_alloc();
 
@@ -483,7 +499,7 @@ test_error_new_trunc_pol_B
 
    set_alloc_failure_rate_to(1);
    redirect_stderr();
-   new_trunc_pol_B(18, 2, NO);
+   B = new_trunc_pol_B(18, 2, NO);
    unredirect_stderr();
    reset_alloc();
 
@@ -612,7 +628,7 @@ test_error_new_trunc_pol_C
 
    set_alloc_failure_rate_to(1);
    redirect_stderr();
-   new_trunc_pol_C(18, 2, NO);
+   C = new_trunc_pol_C(18, 2, NO);
    unredirect_stderr();
    reset_alloc();
 
@@ -721,7 +737,7 @@ test_error_new_trunc_pol_D
 
    set_alloc_failure_rate_to(1);
    redirect_stderr();
-   new_trunc_pol_D(18, 2, NO);
+   D = new_trunc_pol_D(18, 2, NO);
    unredirect_stderr();
    reset_alloc();
 
@@ -808,7 +824,7 @@ test_error_new_trunc_pol_u
 
    set_alloc_failure_rate_to(1);
    redirect_stderr();
-   new_trunc_pol_u(10, 2);
+   u = new_trunc_pol_u(10, 2);
    unredirect_stderr();
    reset_alloc();
 
@@ -828,7 +844,7 @@ test_new_trunc_pol_v
    int success = set_params_mem_prob(17, 50, 0.01, 0.05);
    test_assert_critical(success);
 
-   // Test a u polynomial of degree 10 with N = 2.
+   // Test a v polynomial of degree 10 with N = 2.
    trunc_pol_t *v = new_trunc_pol_v(10, 2);
    test_assert_critical(v != NULL);
 
@@ -895,7 +911,7 @@ test_error_new_trunc_pol_v
 
    set_alloc_failure_rate_to(1);
    redirect_stderr();
-   new_trunc_pol_v(10, 2);
+   v = new_trunc_pol_v(10, 2);
    unredirect_stderr();
    reset_alloc();
 
@@ -903,6 +919,602 @@ test_error_new_trunc_pol_v
    test_assert_stderr("[compute_mem_prob] error in function `new_z");
 
    clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_w
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a w polynomial of degree 10 with N = 2.
+   trunc_pol_t *w = new_trunc_pol_w(10, 2);
+   test_assert_critical(w != NULL);
+
+   const double num = pow(1-pow(1-.05,10),2) - \
+      pow(1-(1-.05+.05*.05/3)*pow(1-.05,9),2);
+   const double denom = 1-pow(1-.05/3,2);
+   const double target = num / denom * pow(1-.01,10);
+   test_assert(w->mono.deg == 10);
+   test_assert(fabs(w->mono.coeff-target) < 1e-9);
+   for (int i = 0 ; i <= 50 ; i++) {
+      if (i == 10)
+         test_assert(fabs(w->coeff[i]-target) < 1e-9);
+      else
+         test_assert(w->coeff[i] == 0);
+   }
+
+   // Test the special case N = 0.
+   trunc_pol_t *w0 = new_trunc_pol_w(1, 0);
+   test_assert_critical(w0 != NULL);
+   test_assert(w0->mono.deg == 0);
+   test_assert(w0->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(w0->coeff[i] == 0);
+   }
+   
+   free(w);
+   free(w0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_w
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *w;
+
+   redirect_stderr();
+   w = new_trunc_pol_w(0, 0);
+   unredirect_stderr();
+
+   test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   w = new_trunc_pol_w(0, 2);
+   unredirect_stderr();
+
+   test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   new_trunc_pol_w(51, 2);
+   unredirect_stderr();
+
+   test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   w = new_trunc_pol_w(10, 2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_y
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a y polynomial of degree 5 with N = 2.
+   trunc_pol_t *y = new_trunc_pol_y(4, 5, 2);
+   test_assert_critical(y != NULL);
+
+   const double denom =
+      pow(1-pow(1-.05,4)*.05/3,2) - \
+      pow(1-pow(1-.05,3)*.05/3,2) - \
+      pow(1-pow(1-.05,4),2) + \
+      pow(1-(1-.05+.05*.05/3)*pow(1-.05,3),2);
+   const double num = \
+      pow(1-pow(1-.05,4)*.05/3-pow(1-.05,9)*(1-.05/3),2) - \
+      pow(1-pow(1-.05,4)*.05/3-pow(1-.05,8)*(1-.05/3),2) - \
+      pow(1-pow(1-.05,3)*.05/3-pow(1-.05,9)*(1-.05/3),2) + \
+      pow(1-pow(1-.05,3)*.05/3-pow(1-.05,8)*(1-.05/3),2);
+   const double target = num / denom * pow(1-.01,5);
+   test_assert(y->mono.deg == 5);
+   test_assert(fabs(y->mono.coeff-target) < 1e-9);
+   for (int i = 0 ; i <= 50 ; i++) {
+      if (i == 5)
+         test_assert(fabs(y->coeff[i]-target) < 1e-9);
+      else
+         test_assert(y->coeff[i] == 0);
+   }
+
+   // Test the special cases N = 0 and N = 1.
+   trunc_pol_t *y0 = new_trunc_pol_y(4, 5, 0);
+   test_assert_critical(y0 != NULL);
+   test_assert(y0->mono.deg == 0);
+   test_assert(y0->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(y0->coeff[i] == 0);
+   }
+   trunc_pol_t *y1 = new_trunc_pol_y(4, 5, 1);
+   test_assert_critical(y1 != NULL);
+   test_assert(y1->mono.deg == 0);
+   test_assert(y1->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(y1->coeff[i] == 0);
+   }
+   
+   free(y);
+   free(y0);
+   free(y1);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_y
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *y;
+
+   redirect_stderr();
+   y = new_trunc_pol_y(10, 0, 2);
+   unredirect_stderr();
+
+   test_assert(y == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   y = new_trunc_pol_y(16, 0, 2);
+   unredirect_stderr();
+
+   test_assert(y == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   y = new_trunc_pol_y(0, 10, 2);
+   unredirect_stderr();
+
+   test_assert(y == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   y = new_trunc_pol_y(0, 16, 2);
+   unredirect_stderr();
+
+   test_assert(y == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   y = new_trunc_pol_y(10, 10, 2);
+   unredirect_stderr();
+
+   test_assert(y == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   y = new_trunc_pol_y(4, 5, 2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(y == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_T_down
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a T_down polynomial with N = 2.
+   trunc_pol_t *T_down = new_trunc_pol_T_down(2);
+   test_assert_critical(T_down != NULL);
+
+   const double denom = 1-pow(1-.05/3,2);
+   test_assert(T_down->mono.deg == 0);
+   test_assert(T_down->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      double target = (1-pow(1-pow(1-.05,i)*.05/3,2)) / \
+               denom * pow(1-.01,i);
+      test_assert(fabs(T_down->coeff[i]-target) < 1e-9);
+   }
+
+   // Test the special cases N = 0.
+   trunc_pol_t *T_down0 = new_trunc_pol_T_down(0);
+   test_assert_critical(T_down0 != NULL);
+   test_assert(T_down0->mono.deg == 0);
+   test_assert(T_down0->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(T_down0->coeff[i] == 0);
+   }
+   
+   free(T_down);
+   free(T_down0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_T_down
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *T_down;
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   T_down = new_trunc_pol_T_down(2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(T_down == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_T_ddown
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a T_double_down polynomial with N = 2.
+   trunc_pol_t *T_ddown = new_trunc_pol_T_double_down(2);
+   test_assert_critical(T_ddown != NULL);
+
+   test_assert(T_ddown->mono.deg == 0);
+   test_assert(T_ddown->mono.coeff == 0);
+   for (int i = 0 ; i <= 16 ; i++) {
+      double target = (1-pow(1-pow(1-.05,i),2)) * pow(1-.01,i);
+      test_assert(fabs(T_ddown->coeff[i]-target) < 1e-9);
+   }
+   for (int i = 17 ; i <= 50 ; i++) {
+      test_assert(T_ddown->coeff[i] == 0);
+   }
+
+   // Test the special cases N = 0.
+   trunc_pol_t *T_ddown0 = new_trunc_pol_T_double_down(0);
+   test_assert_critical(T_ddown0 != NULL);
+   test_assert(T_ddown0->mono.deg == 0);
+   test_assert(T_ddown0->mono.coeff == 1);
+   test_assert(T_ddown0->coeff[0] == 1);
+   for (int i = 1 ; i <= 50 ; i++) {
+      test_assert(T_ddown0->coeff[i] == 0);
+   }
+   
+   free(T_ddown);
+   free(T_ddown0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_T_ddown
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *T_ddown;
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   T_ddown = new_trunc_pol_T_double_down(2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(T_ddown == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_T_up
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a T_up polynomial of degree 10 with N = 2.
+   trunc_pol_t *T_up = new_trunc_pol_T_up(10, 2);
+   test_assert_critical(T_up != NULL);
+
+   test_assert(T_up->mono.deg == 0);
+   test_assert(T_up->mono.coeff == 0);
+   for (int i = 0 ; i <= 10 ; i++) {
+      double target = pow(1-.01,i);
+      test_assert(fabs(T_up->coeff[i]-target) < 1e-9);
+   }
+   for (int i = 11 ; i <= 50 ; i++) {
+      test_assert(T_up->coeff[i] == 0);
+   }
+
+   // Test the special cases N = 0.
+   trunc_pol_t *T_up0 = new_trunc_pol_T_up(10, 0);
+   test_assert_critical(T_up0 != NULL);
+   test_assert(T_up0->mono.deg == 0);
+   test_assert(T_up0->mono.coeff == 0);
+   for (int i = 0 ; i <= 10 ; i++) {
+      double target = pow(1-.01,i);
+      test_assert(fabs(T_up0->coeff[i]-target) < 1e-9);
+   }
+   for (int i = 11 ; i <= 50 ; i++) {
+      test_assert(T_up0->coeff[i] == 0);
+   }
+   
+   free(T_up);
+   free(T_up0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_T_up
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *T_up;
+
+   redirect_stderr();
+   T_up = new_trunc_pol_T_up(17, 2);
+   unredirect_stderr();
+
+   test_assert(T_up == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   T_up = new_trunc_pol_T_up(10, 2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(T_up == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_T_sim
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a T_sim polynomial of degree 10 with N = 2.
+   trunc_pol_t *T_sim = new_trunc_pol_T_sim(10, 2);
+   test_assert_critical(T_sim != NULL);
+
+   test_assert(T_sim->mono.deg == 0);
+   test_assert(T_sim->mono.coeff == 0);
+   // j = G-10-1 = 6
+   const double denom = \
+      pow(1-pow(1-.05,6)*.05/3,2) - \
+      pow(1-pow(1-.05,5)*.05/3,2) - \
+      pow(1-pow(1-.05,6),2) + \
+      pow(1-(1-.05+.05*.05/3)*pow(1-.05,5),2);
+   for (int i = 0 ; i <= 10 ; i++) {
+      double num = \
+         pow(1-pow(1-.05,6)*.05/3,2) - \
+         pow(1-pow(1-.05,5)*.05/3,2) - \
+         pow(1-pow(1-.05,6)*.05/3-pow(1-.05,6+i)*(1-.05/3),2) + \
+         pow(1-pow(1-.05,5)*.05/3-pow(1-.05,6+i)*(1-.05/3),2);
+      double target = num / denom * pow(1-.01,i);
+      test_assert(fabs(T_sim->coeff[i]-target) < 1e-9);
+   }
+   for (int i = 11 ; i <= 50 ; i++) {
+      test_assert(T_sim->coeff[i] == 0);
+   }
+
+   // Test the special cases N = 0.
+   trunc_pol_t *T_sim0 = new_trunc_pol_T_sim(10, 0);
+   test_assert_critical(T_sim0 != NULL);
+   test_assert(T_sim0->mono.deg == 0);
+   test_assert(T_sim0->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(T_sim0->coeff[i] == 0);
+   }
+   
+   free(T_sim);
+   free(T_sim0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_T_sim
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *T_sim;
+
+   redirect_stderr();
+   T_sim = new_trunc_pol_T_sim(17, 2);
+   unredirect_stderr();
+
+   test_assert(T_sim == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   T_sim = new_trunc_pol_T_sim(10, 2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(T_sim == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_null_matrix
+(void)
+{
+
+   // Test a matrix of dimension 50.
+   matrix_t *matrix = new_null_matrix(50);
+
+   test_assert_critical(matrix != NULL);
+   for (int i = 0 ; i < 50*50 ; i++) {
+      test_assert(matrix->term[i] == NULL);
+   }
+
+   destroy_mat(matrix);
+
+}
+
+
+void
+test_error_new_null_matrix
+(void)
+{
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   matrix_t *matrix = new_null_matrix(50);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(matrix == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_n");
+
+}
+
+
+void
+test_new_zero_matrix
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a matrix of dimension 50.
+   matrix_t *matrix = new_zero_matrix(50);
+
+   test_assert_critical(matrix != NULL);
+   for (int i = 0 ; i < 50*50 ; i++) {
+      trunc_pol_t *w = matrix->term[i];
+      test_assert_critical(w != NULL);
+      test_assert(w->mono.deg == 0);
+      test_assert(w->mono.coeff == 0);
+      for (int j = 0 ; j <= 50 ; j++) {
+         test_assert(w->coeff[j] == 0);
+      }
+   }
+
+   destroy_mat(matrix);
+
+}
+
+
+void
+test_error_new_zero_matrix
+(void)
+{
+
+   matrix_t *matrix;
+
+   set_alloc_failure_countdown_to(0);
+   redirect_stderr();
+   matrix = new_zero_matrix(50);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(matrix == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_n");
+
+   set_alloc_failure_countdown_to(1);
+   redirect_stderr();
+   matrix = new_zero_matrix(50);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(matrix == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+}
+
+
+void
+test_error_new_matrix_M
+(void)
+{
+
+   matrix_t *M;
+
+   set_alloc_failure_countdown_to(0);
+   redirect_stderr();
+   M = new_matrix_M(50);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(M == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_n");
+
+   set_alloc_failure_countdown_to(1);
+   redirect_stderr();
+   M = new_zero_matrix(50);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(M == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
 
 }
 
@@ -981,26 +1593,100 @@ test_compute_mem_prob
 }
 
 
+void
+test_error_compute_mem_prob
+(void)
+{
+
+   double x;
+
+   redirect_stderr();
+   x = compute_mem_prob(2,2);
+   unredirect_stderr();
+
+   test_assert(x != x);
+   test_assert_stderr("[compute_mem_prob] error in function `comp");
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   redirect_stderr();
+   x = compute_mem_prob(1025,2);
+   unredirect_stderr();
+
+   test_assert(x != x);
+   test_assert_stderr("[compute_mem_prob] error in function `comp");
+
+   redirect_stderr();
+   x = compute_mem_prob(2,51);
+   unredirect_stderr();
+
+   test_assert(x != x);
+   test_assert_stderr("[compute_mem_prob] error in function `comp");
+
+   set_alloc_failure_countdown_to(0);
+   redirect_stderr();
+   x = compute_mem_prob(2,10);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(x != x);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   set_alloc_failure_countdown_to(1);
+   redirect_stderr();
+   x = compute_mem_prob(2,10);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(x != x);
+   test_assert_stderr("[compute_mem_prob] error in function `new_n");
+
+   clean_mem_prob();
+
+}
+
+
 
 // Test cases for export.
 const test_case_t test_cases_compute_mem_prob[] = {
-   {"set_params_mem_prob",       test_set_params_mem_prob},
-   {"error_set_params_mem_prob", test_error_set_params_mem_prob},
-   {"uninitialized_error",       test_uninitialized_error},
-   {"new_zero_trunc_pol",        test_new_zero_trunc_pol},
-   {"trunc_pol_mult",            test_trunc_pol_mult},
-   {"new_trunc_pol_A",           test_new_trunc_pol_A},
-   {"error_new_trunc_pol_A",     test_error_new_trunc_pol_A},
-   {"new_trunc_pol_B",           test_new_trunc_pol_B},
-   {"error_new_trunc_pol_B",     test_error_new_trunc_pol_B},
-   {"new_trunc_pol_C",           test_new_trunc_pol_C},
-   {"new_error_trunc_pol_C",     test_error_new_trunc_pol_C},
-   {"new_trunc_pol_D",           test_new_trunc_pol_D},
-   {"new_error_trunc_pol_D",     test_error_new_trunc_pol_D},
-   {"new_trunc_pol_u",           test_new_trunc_pol_u},
-   {"new_error_trunc_pol_u",     test_error_new_trunc_pol_u},
-   {"new_trunc_pol_v",           test_new_trunc_pol_v},
-   {"new_error_trunc_pol_v",     test_error_new_trunc_pol_v},
-//   {"compute_mem_prob",          test_compute_mem_prob},
+   {"set_params_mem_prob",         test_set_params_mem_prob},
+   {"error_set_params_mem_prob",   test_error_set_params_mem_prob},
+   {"uninitialized_error",         test_uninitialized_error},
+   {"new_zero_trunc_pol",          test_new_zero_trunc_pol},
+   {"trunc_pol_mult",              test_trunc_pol_mult},
+   {"matrix_mult",                 test_matrix_mult},
+   {"error_matrix_mult",           test_error_matrix_mult},
+   {"new_trunc_pol_A",             test_new_trunc_pol_A},
+   {"error_new_trunc_pol_A",       test_error_new_trunc_pol_A},
+   {"new_trunc_pol_B",             test_new_trunc_pol_B},
+   {"error_new_trunc_pol_B",       test_error_new_trunc_pol_B},
+   {"new_trunc_pol_C",             test_new_trunc_pol_C},
+   {"error_new_trunc_pol_C",       test_error_new_trunc_pol_C},
+   {"new_trunc_pol_D",             test_new_trunc_pol_D},
+   {"error_new_trunc_pol_D",       test_error_new_trunc_pol_D},
+   {"new_trunc_pol_u",             test_new_trunc_pol_u},
+   {"error_new_trunc_pol_u",       test_error_new_trunc_pol_u},
+   {"new_trunc_pol_v",             test_new_trunc_pol_v},
+   {"error_new_trunc_pol_v",       test_error_new_trunc_pol_v},
+   {"new_trunc_pol_w",             test_new_trunc_pol_w},
+   {"error_new_trunc_pol_w",       test_error_new_trunc_pol_w},
+   {"new_trunc_pol_y",             test_new_trunc_pol_y},
+   {"error_new_trunc_pol_y",       test_error_new_trunc_pol_y},
+   {"new_trunc_pol_T_down",        test_new_trunc_pol_T_down},
+   {"error_new_trunc_pol_T_down",  test_error_new_trunc_pol_T_down},
+   {"new_trunc_pol_T_ddown",       test_new_trunc_pol_T_ddown},
+   {"error_new_trunc_pol_T_ddown", test_error_new_trunc_pol_T_ddown},
+   {"new_trunc_pol_T_up",          test_new_trunc_pol_T_up},
+   {"error_new_trunc_pol_T_up",    test_error_new_trunc_pol_T_up},
+   {"new_trunc_pol_T_sim",         test_new_trunc_pol_T_sim},
+   {"error_new_trunc_pol_T_sim",   test_error_new_trunc_pol_T_sim},
+   {"new_null_matrix",             test_new_null_matrix},
+   {"error_new_null_matrix",       test_error_new_null_matrix},
+   {"new_zero_matrix",             test_new_zero_matrix},
+   {"error_new_zero_matrix",       test_error_new_zero_matrix},
+   {"error_new_matrix_M",          test_error_new_matrix_M},
+   {"compute_mem_prob",            test_compute_mem_prob},
+   {"error_compute_mem_prob",      test_error_compute_mem_prob},
    {NULL, NULL},
 };
