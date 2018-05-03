@@ -94,14 +94,16 @@ Some introduction
 \subsection{Seeds}
 DEFINE MEM SEED AND SHARED MEM SEED.
 
+EXPLAIN THAT THE TAIL IS AN UNTERMINATED SEGMENT.
+
 \subsection{The seeding alphabet}
 
-By nature, reads are sequences of \texttt{A}, \texttt{T}, \texttt{G} and
-\texttt{C}, but for the purpose of the seeding process, it is more useful
-to consider them as a sequence of symbols telling if the nucleotides match
-the target and~/ or the duplicates. Here, we will consider that reads are
-sequences of the five symbols $\Downarrow$, $\downarrow$, $\uparrow$, $\sim$
-and $\square$.
+In order to compute seeding probabilities, we need to consider that reads
+are sequences of letters from the \emph{seeding alphabet} rather than from
+the nucleotide alphabet. them as a sequence of symbols telling if the
+nucleotides match the target and~/ or the duplicates. Here, we will
+consider that reads are sequences of the five symbols $\Downarrow$,
+$\downarrow$, $\uparrow$, $\sim$ and $\square$.
 
 The $\Downarrow$ symbol indicates that the nucleotide is not only a
 mismatch for the target, but also for every duplicate. The $\downarrow$
@@ -154,7 +156,7 @@ mismatch. For simplicity, we will refer to the Bernoulli processes as
 
 \begin{definition}
 At a given position of the read, a duplicate thread is said to be
-\emph{strictly masking} if its match streak is strictly longer than the
+\emph{strictly masking} if its success streak is strictly longer than the
 match streak of the target. A duplicate thread is said to be
 \emph{potentially masking} if its match streak is the same as the target.
 \end{definition}
@@ -208,13 +210,13 @@ co-dominant if inequality is not strict and there exists $i$ $(1\leq i
 
 
 
-\begin{figure}[h]
-\centering
-\includegraphics[scale=1]{no_3MEM_graph.pdf}
-\caption{\textbf{Transfer graph of a read without 3-MEM}. 
-Some legend.}
-\label{fig:noMEM_graph}
-\end{figure}
+%\begin{figure}[h]
+%\centering
+%\includegraphics[scale=1]{no_3MEM_graph.pdf}
+%\caption{\textbf{Transfer graph of a read without 3-MEM}. 
+%Some legend.}
+%\label{fig:noMEM_graph}
+%\end{figure}
 
 
 
@@ -285,6 +287,11 @@ $(\uparrow)_i$ is
 u_i(z) = (\xi_{i-1,N}-\xi_{i,N})(qz)^i.
 \end{equation}
 
+\begin{remark}
+If $N = 0$, the states $(\downarrow)_2, \ldots, (\downarrow)_{\gamma-1}$
+are inacessible. Consistently, the mononomial $u_i(z)$ is equal to $qz$ if
+$i = 1$ and $0$ otherwise.
+\end{remark}
 
 If the next terminator is $\Downarrow$, there is a limit on the
 number of $\square$ symbols. Indeed, if there are $\gamma$ or more
@@ -383,6 +390,13 @@ V_i &=& \sum_{m=0}^{N-1} Q_m \cdot \xi_{i,m} \cdot
 \delta_i &=& 1-(1-\mu+\mu^2/3)(1-\mu)^i.
 \end{eqnarray}
 
+\begin{remark}
+The term $\alpha_i^N-\alpha_i^N$ is the probability that the last dupicate
+thread fails in one error followed by $i$ error-free nucleotides. The term
+$\gamma_i^N - \delta_{i-1}^N$ is the probability that all threads fail in
+$i$ error-free nucleotides...
+\end{remark}
+
 We have assumed $m>0$, but the sum above can start at $m=0$ because
 $\xi_{i,0}=0$. The weighted generating function of the transition from
 $\downarrow$ to $(\sim)_i$ is
@@ -392,7 +406,7 @@ v_i(z) = \frac{\alpha_i^N-\alpha_{i-1}^N-
 \end{equation}
 
 \begin{remark}
-When $N = 1$, $V_i = 0$ and none of the states $(\sim)_i$ is accessible.
+When $N = 1$, $V_i = 0$ and the states $(\sim)_i$ are inaccessible.
 The symbol $\sim$ can exist only if there is more than one duplicate.
 \end{remark}
 
@@ -716,6 +730,39 @@ T(z) =
     \ddots & \vdots \\
 \up{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & \ldots & 0 & 0 &
     \ldots & 0 \\
+\end{block}
+\end{blockarray}
+\end{equation*}
+
+In the case $N = 1$, reads never contain the symbol $\sim$ and the matrix
+is
+\begin{equation*}
+\begin{blockarray}{cccccc}
+   & \DN & \dn & \up{1} & \ldots & \up{\gamma-1} \\
+\begin{block}{c[ccccc]}
+\DN & A_\gamma(z) & \tilde{A}_\infty(z) & u_1(z)
+    & \ldots & u_{\gamma-1}(z) \\
+\dn & B_\infty(z) & \tilde{B}_\infty(z) & w_1(z)
+    & \ldots & w_{\gamma-1}(z) \\
+\up{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) & 0 &
+    \ldots & 0 \\
+\up{2} & D_{\gamma-2}(z) & \tilde{D}_{\gamma-2}(z) & 0 &
+    \ldots & 0  \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+\up{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & \ldots & 0 \\
+\end{block}
+\end{blockarray}
+\end{equation*}
+
+In the case $N = 0$, the symbol $\downarrow$ also disappears. Some
+polynomials have a particularly simple form in this case, and the
+body of the transfer matrix is
+\begin{equation*}
+\begin{blockarray}{ccc}
+   & \DN & \up{1} \\
+\begin{block}{c[cc]}
+\DN    & pz              & qz \\
+\up{1} & D_{\gamma-1}(z) & 0  \\
 \end{block}
 \end{blockarray}
 \end{equation*}

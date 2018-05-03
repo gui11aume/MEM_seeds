@@ -12,7 +12,7 @@ CC= gcc
 INCLUDES= -I.. -Ilib
 COVERAGE= -fprofile-arcs -ftest-coverage
 PROFILE= -pg
-CFLAGS= -std=gnu99 -g -Wall -O3 $(INCLUDES) $(COVERAGE) $(PROFILE)
+CFLAGS= -std=gnu99 -g -Wall -O0 $(INCLUDES) $(COVERAGE) $(PROFILE)
 LDLIBS= -L. -lunittest -lz -lm -lpthread
 # Use different flags on Linux and MacOS.
 ifeq ($(shell uname -s),Darwin)
