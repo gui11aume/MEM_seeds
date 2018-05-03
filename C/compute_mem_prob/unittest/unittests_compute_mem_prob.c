@@ -837,93 +837,6 @@ test_error_new_trunc_pol_u
 
 
 void
-test_new_trunc_pol_v
-(void)
-{
-
-   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
-   test_assert_critical(success);
-
-   // Test a v polynomial of degree 10 with N = 2.
-   trunc_pol_t *v = new_trunc_pol_v(10, 2);
-   test_assert_critical(v != NULL);
-
-   const double denom = 1-pow(1-.05/3,2);
-   const double num = pow(1-pow(1-.05,10)*.05/3,2) - \
-      pow(1-pow(1-.05,9)*.05/3,2) - pow(1-pow(1-.05,10),2) + \
-      pow(1-(1-.05+.05*.05/3)*pow(1-.05,9),2);
-   const double target = pow(1-.01,10) * num / denom;
-   test_assert(v->mono.deg == 10);
-   test_assert(fabs(v->mono.coeff-target) < 1e-9);
-   for (int i = 0 ; i <= 50 ; i++) {
-      if (i == 10)
-         test_assert(fabs(v->coeff[i]-target) < 1e-9);
-      else
-         test_assert(v->coeff[i] == 0);
-   }
-
-   // Test the special case N = 0.
-   trunc_pol_t *v0 = new_trunc_pol_v(1, 0);
-   test_assert_critical(v0 != NULL);
-   test_assert(v0->mono.deg == 0);
-   test_assert(v0->mono.coeff == 0);
-   for (int i = 0 ; i <= 50 ; i++) {
-      test_assert(v0->coeff[i] == 0);
-   }
-   
-   free(v);
-   free(v0);
-   clean_mem_prob();
-
-}
-
-
-void
-test_error_new_trunc_pol_v
-(void)
-{
-
-   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
-   test_assert_critical(success);
-
-   trunc_pol_t *v;
-
-   redirect_stderr();
-   v = new_trunc_pol_v(0, 0);
-   unredirect_stderr();
-
-   test_assert(v == NULL);
-   test_assert_stderr("[compute_mem_prob] error in function `new_t");
-
-   redirect_stderr();
-   v = new_trunc_pol_v(0, 2);
-   unredirect_stderr();
-
-   test_assert(v == NULL);
-   test_assert_stderr("[compute_mem_prob] error in function `new_t");
-
-   redirect_stderr();
-   new_trunc_pol_v(51, 2);
-   unredirect_stderr();
-
-   test_assert(v == NULL);
-   test_assert_stderr("[compute_mem_prob] error in function `new_t");
-
-   set_alloc_failure_rate_to(1);
-   redirect_stderr();
-   v = new_trunc_pol_v(10, 2);
-   unredirect_stderr();
-   reset_alloc();
-
-   test_assert(v == NULL);
-   test_assert_stderr("[compute_mem_prob] error in function `new_z");
-
-   clean_mem_prob();
-
-}
-
-
-void
 test_new_trunc_pol_w
 (void)
 {
@@ -935,10 +848,11 @@ test_new_trunc_pol_w
    trunc_pol_t *w = new_trunc_pol_w(10, 2);
    test_assert_critical(w != NULL);
 
-   const double num = pow(1-pow(1-.05,10),2) - \
-      pow(1-(1-.05+.05*.05/3)*pow(1-.05,9),2);
    const double denom = 1-pow(1-.05/3,2);
-   const double target = num / denom * pow(1-.01,10);
+   const double num = pow(1-pow(1-.05,10)*.05/3,2) - \
+      pow(1-pow(1-.05,9)*.05/3,2) - pow(1-pow(1-.05,10),2) + \
+      pow(1-(1-.05+.05*.05/3)*pow(1-.05,9),2);
+   const double target = pow(1-.01,10) * num / denom;
    test_assert(w->mono.deg == 10);
    test_assert(fabs(w->mono.coeff-target) < 1e-9);
    for (int i = 0 ; i <= 50 ; i++) {
@@ -1002,6 +916,92 @@ test_error_new_trunc_pol_w
    reset_alloc();
 
    test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   clean_mem_prob();
+
+}
+
+
+void
+test_new_trunc_pol_v
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   // Test a v polynomial of degree 10 with N = 2.
+   trunc_pol_t *v = new_trunc_pol_v(10, 2);
+   test_assert_critical(v != NULL);
+
+   const double num = pow(1-pow(1-.05,10),2) - \
+      pow(1-(1-.05+.05*.05/3)*pow(1-.05,9),2);
+   const double denom = 1-pow(1-.05/3,2);
+   const double target = num / denom * pow(1-.01,10);
+   test_assert(v->mono.deg == 10);
+   test_assert(fabs(v->mono.coeff-target) < 1e-9);
+   for (int i = 0 ; i <= 50 ; i++) {
+      if (i == 10)
+         test_assert(fabs(v->coeff[i]-target) < 1e-9);
+      else
+         test_assert(v->coeff[i] == 0);
+   }
+
+   // Test the special case N = 0.
+   trunc_pol_t *v0 = new_trunc_pol_v(1, 0);
+   test_assert_critical(v0 != NULL);
+   test_assert(v0->mono.deg == 0);
+   test_assert(v0->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(v0->coeff[i] == 0);
+   }
+   
+   free(v);
+   free(v0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_trunc_pol_v
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *v;
+
+   redirect_stderr();
+   v = new_trunc_pol_v(0, 0);
+   unredirect_stderr();
+
+   test_assert(v == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   v = new_trunc_pol_v(0, 2);
+   unredirect_stderr();
+
+   test_assert(v == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   redirect_stderr();
+   new_trunc_pol_v(51, 2);
+   unredirect_stderr();
+
+   test_assert(v == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_t");
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   v = new_trunc_pol_v(10, 2);
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(v == NULL);
    test_assert_stderr("[compute_mem_prob] error in function `new_z");
 
    clean_mem_prob();

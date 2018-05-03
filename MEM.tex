@@ -376,10 +376,10 @@ threads at the $\downarrow$ symbol, the probability that the have not all
 faied at position $i$ is $\xi_{i,m}$. Similarly, the probability that the
 last strictly masking thread fails at position $i$ is
 $\xi_{i-1,N-m}-\xi_{i,N-m}$. So the probability that the next terminator
-is $(\sim)_i$ is $q^j V_i$, where
+is $(\sim)_i$ is $q^j W_i$, where
 \begin{eqnarray}
 \label{eq:Si}
-V_i &=& \sum_{m=0}^{N-1} Q_m \cdot \xi_{i,m} \cdot
+W_i &=& \sum_{m=0}^{N-1} Q_m \cdot \xi_{i,m} \cdot
   (\xi_{i-1,N-m}-\xi_{i,N-m}) \notag \\
   &=& \frac{\alpha_i^N-\alpha_{i-1}^N-\gamma_i^N+\delta_{i-1}^N}
 {1-(1-\mu/3)^N} \text{, where}
@@ -401,7 +401,7 @@ We have assumed $m>0$, but the sum above can start at $m=0$ because
 $\xi_{i,0}=0$. The weighted generating function of the transition from
 $\downarrow$ to $(\sim)_i$ is
 \begin{equation}
-v_i(z) = \frac{\alpha_i^N-\alpha_{i-1}^N-
+w_i(z) = \frac{\alpha_i^N-\alpha_{i-1}^N-
   \gamma_i^N+\delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
 \end{equation}
 
@@ -420,7 +420,7 @@ probability that the last strictly masking thread fails at position $j$ is
 $\xi_{i-1,N-m}-\xi_{i,N-m}$. So the probability that the next terminator
 is the $\uparrow$ symbol at position $i$ is $q^i W_i$, where
 \begin{eqnarray}
-  W_i &=& \sum_{m=0}^{N-1} Q_m \cdot (1-\xi_{i,m}) \cdot
+  V_i &=& \sum_{m=0}^{N-1} Q_m \cdot (1-\xi_{i,m}) \cdot
   (\xi_{i-1,N-m}-\xi_{i,N-m}) \notag \\
     &=& \frac{\gamma_i^N-\delta_{i-1}^N}{1-(1-\mu/3)^N}.
 \end{eqnarray}
@@ -428,7 +428,7 @@ is the $\uparrow$ symbol at position $i$ is $q^i W_i$, where
 The weighted generating function of the transition from $\downarrow$ to
 $(\uparrow)_i$ is
 \begin{equation}
-w_i(z) = \frac{\gamma_i^N- \delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
+v_i(z) = \frac{\gamma_i^N- \delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
 \end{equation}
 
 %In order to compute the weighted generating functions of the other
@@ -712,8 +712,8 @@ T(z) =
 \begin{block}{c[cccccccc]}
 \DN & A_\gamma(z) & \tilde{A}_\infty(z) & 0 & \ldots & 0 & u_1(z)
     & \ldots & u_{\gamma-1}(z) \\
-\dn & B_\infty(z) & \tilde{B}_\infty(z) & v_1(z) & \ldots &
-    v_{\gamma-1}(z) & w_1(z) & \ldots & w_{\gamma-1}(z) \\
+\dn & B_\infty(z) & \tilde{B}_\infty(z) & w_1(z) & \ldots &
+    w_{\gamma-1}(z) & v_1(z) & \ldots & v_{\gamma-1}(z) \\
 \eq{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
     \ldots & y_{1,\gamma-2}(z) \\
 \eq{2} & C_{\gamma-2}(z) & \tilde{C}_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
@@ -734,6 +734,35 @@ T(z) =
 \end{blockarray}
 \end{equation*}
 
+\begin{equation*}
+\begin{blockarray}{ccccccccc}
+   & \DN & \dn &\up{\gamma-1} & \ldots & \up{1} &
+    \eq{\gamma-1} & \ldots & \eq{1} \\
+\begin{block}{c[cccccccc]}
+\DN & A_\gamma(z) & \tilde{A}_\infty(z) & u_{\gamma-1}(z) & \ldots &
+    u_1(z) & 0 & \ldots & 0 \\
+\dn & B_\infty(z) & \tilde{B}_\infty(z) & v_{\gamma-1}(z) & \ldots &
+    v_1(z) & w_{\gamma-1}(z) & \ldots & w_1(z) \\
+\up{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & 
+    \ldots & 0 & 0 & \ldots & 0 \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
+    \ddots & \vdots \\
+\up{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
+    \ldots & 0 \\
+\eq{\gamma-1} & C_1(z) & \tilde{C}_1(z) & 0 & \ldots & 0 & 0 &
+    \ldots & 0 \\
+\eq{\gamma-2} & C_2(z) & \tilde{C}_2(z) & y_{\gamma-2,1}(z) &
+    \ldots & 0 & 0 & \ldots & 0 \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
+    \ddots & \vdots \\
+\eq{2} & C_{\gamma-2}(z) & \tilde{C}_{\gamma-2}(z) &
+    y_{2,\gamma-3}(z) & \ldots & 0 & 0 & \ldots & 0 \\
+\eq{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) &
+    y_{1,\gamma-2}(z) & \ldots & 0 & 0 & \ldots & 0 \\
+\end{block}
+\end{blockarray}
+\end{equation*}
+
 In the case $N = 1$, reads never contain the symbol $\sim$ and the matrix
 is
 \begin{equation*}
@@ -742,8 +771,8 @@ is
 \begin{block}{c[ccccc]}
 \DN & A_\gamma(z) & \tilde{A}_\infty(z) & u_1(z)
     & \ldots & u_{\gamma-1}(z) \\
-\dn & B_\infty(z) & \tilde{B}_\infty(z) & w_1(z)
-    & \ldots & w_{\gamma-1}(z) \\
+\dn & B_\infty(z) & \tilde{B}_\infty(z) & v_1(z)
+    & \ldots & v_{\gamma-1}(z) \\
 \up{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) & 0 &
     \ldots & 0 \\
 \up{2} & D_{\gamma-2}(z) & \tilde{D}_{\gamma-2}(z) & 0 &

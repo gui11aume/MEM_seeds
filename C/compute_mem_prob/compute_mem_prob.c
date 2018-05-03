@@ -420,7 +420,7 @@ in_case_of_failure:
 
 
 trunc_pol_t *
-new_trunc_pol_v
+new_trunc_pol_w
 (
    const size_t deg,  // Degree of polynomial v.
    const size_t N     // Number of duplicates.
@@ -456,7 +456,7 @@ in_case_of_failure:
 
 
 trunc_pol_t *
-new_trunc_pol_w
+new_trunc_pol_v
 (
    const size_t deg,  // Degree of polynomial w.
    const size_t N     // Number of duplicates.
@@ -739,15 +739,11 @@ new_matrix_M
 )
 {
 
-   const size_t dim = 2*G+2;
+   const size_t dim = 2*G+1;
    matrix_t *M = new_null_matrix(dim);
    handle_memory_error(M);
 
-   // First row.
-   M->term[0*dim+1] = new_zero_trunc_pol();
-   handle_memory_error(M->term[0*dim+1]);
-   M->term[0*dim+1]->coeff[0] = 1.0;
-   M->term[0*dim+1]->mono.coeff = 1.0;
+   // First row is null.
 
    // Second row.
    M->term[1*dim+1] = new_trunc_pol_A(G, N, NO);
@@ -755,11 +751,11 @@ new_matrix_M
    M->term[1*dim+2] = new_trunc_pol_A(HIGH, N, YES);
    handle_memory_error(M->term[1*dim+2]);
    for (int j = 1 ; j <= G-1 ; j++) {
-      M->term[1*dim+(j+G+1)] = new_trunc_pol_u(j, N);
-      handle_memory_error(M->term[1*dim+(j+G+1)]);
+      M->term[1*dim+(j+2)] = new_trunc_pol_u(G-j, N);
+      handle_memory_error(M->term[1*dim+(j+2)]);
    }
-   M->term[1*dim+dim-1] = new_trunc_pol_T_double_down(N);
-   handle_memory_error(M->term[1*dim+dim-1]);
+   M->term[1*dim+0] = new_trunc_pol_T_double_down(N);
+   handle_memory_error(M->term[1*dim+0]);
 
    // Third row.
    M->term[2*dim+1] = new_trunc_pol_B(HIGH, N, NO);
@@ -767,41 +763,39 @@ new_matrix_M
    M->term[2*dim+2] = new_trunc_pol_B(HIGH, N, YES);
    handle_memory_error(M->term[2*dim+2]);
    for (int j = 1 ; j <= G-1 ; j++) {
-      M->term[2*dim+j+2] = new_trunc_pol_v(j, N);
+      M->term[2*dim+(j+2)] = new_trunc_pol_v(G-j, N);
       handle_memory_error(M->term[2*dim+j+2]);
    }
    for (int j = 1 ; j <= G-1 ; j++) {
-      M->term[2*dim+j+G+1] = new_trunc_pol_w(j, N);
+      M->term[2*dim+(j+G+1)] = new_trunc_pol_w(G-j, N);
       handle_memory_error(M->term[2*dim+j+G+1]);
    }
-   M->term[2*dim+dim-1] = new_trunc_pol_T_down(N);
-   handle_memory_error(M->term[2*dim+dim-1]);
+   M->term[2*dim+0] = new_trunc_pol_T_down(N);
+   handle_memory_error(M->term[2*dim+0]);
 
    // First series of middle rows.
    for (int j = 1 ; j <= G-1 ; j++) {
-      M->term[(j+2)*dim+1] = new_trunc_pol_C(G-j, N, NO);
+      M->term[(j+2)*dim+1] = new_trunc_pol_D(j, N, NO);
       handle_memory_error(M->term[(j+2)*dim+1]);
-      M->term[(j+2)*dim+2] = new_trunc_pol_C(G-j, N, YES);
+      M->term[(j+2)*dim+2] = new_trunc_pol_D(j, N, YES);
       handle_memory_error(M->term[(j+2)*dim+2]);
-      for (int i = 1 ; i <= G-j-1 ; i++) {
-         M->term[(j+2)*dim+G+j+i+1] = new_trunc_pol_y(j, i ,N);
-         handle_memory_error(M->term[(j+2)*dim+G+j+i+1]);
-      }
-      M->term[(j+2)*dim+dim-1] = new_trunc_pol_T_sim(G-j-1, N);
-      handle_memory_error(M->term[(j+2)*dim+dim-1]);
+      M->term[(j+2)*dim+0] = new_trunc_pol_T_up(j-1, N);
+      handle_memory_error(M->term[(j+2)*dim+0]);
    }
 
    // Second series of middle rows.
    for (int j = 1 ; j <= G-1 ; j++) {
-      M->term[(j+G+1)*dim+1] = new_trunc_pol_D(G-j, N, NO);
+      M->term[(j+G+1)*dim+1] = new_trunc_pol_C(j, N, NO);
       handle_memory_error(M->term[(j+G+1)*dim+1]);
-      M->term[(j+G+1)*dim+2] = new_trunc_pol_D(G-j, N, YES);
+      M->term[(j+G+1)*dim+2] = new_trunc_pol_C(j, N, YES);
       handle_memory_error(M->term[(j+G+1)*dim+2]);
-      M->term[(j+G+1)*dim+dim-1] = new_trunc_pol_T_up(G-j-1, N);
-      handle_memory_error(M->term[(j+G+1)*dim+dim-1]);
+      for (int i = 1 ; i < j ; i++) {
+         M->term[(j+G+1)*dim+(i+2)] = new_trunc_pol_y(G-j, j-i ,N);
+         handle_memory_error(M->term[(j+G+1)*dim+i+2]);
+      }
+      M->term[(j+G+1)*dim+0] = new_trunc_pol_T_sim(j-1, N);
+      handle_memory_error(M->term[(j+G+1)*dim+0]);
    }
-
-   // Last row is null.
 
    return M;
 
@@ -958,11 +952,15 @@ compute_mem_prob // VISIBLE //
       
       w = new_zero_trunc_pol();
       handle_memory_error(w);
+
       M = new_matrix_M(N);
       handle_memory_error(M);
-      powM1 = new_zero_matrix(2*G+2);
+
+      trunc_pol_update_add(w, M->term[2*G+1]);
+
+      powM1 = new_zero_matrix(2*G+1);
       handle_memory_error(powM1);
-      powM2 = new_zero_matrix(2*G+2);
+      powM2 = new_zero_matrix(2*G+1);
       handle_memory_error(powM2);
 
       matrix_mult(powM1, M, M);
