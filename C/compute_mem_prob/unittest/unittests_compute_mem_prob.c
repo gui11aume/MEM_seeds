@@ -286,7 +286,80 @@ void
 test_matrix_mult
 (void)
 {
-   test_assert(0);
+
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   matrix_t *mat1 = new_zero_matrix(2);
+   matrix_t *mat2 = new_zero_matrix(2);
+   test_assert_critical(mat1 != NULL);
+   test_assert_critical(mat2 != NULL);
+
+   
+   //  | 1   z |    |  0   z  |
+   //  |z^2 z^3|    |2z^2 3z^3|
+
+   // Fill dummy matrices mat1 and mat2.
+   for (int i = 0; i < 4 ; i++) {
+      trunc_pol_t *w1 = mat1->term[i];
+      trunc_pol_t *w2 = mat2->term[i];
+      w1->mono.deg = i;
+      w1->mono.coeff = 1;
+      w1->coeff[w1->mono.deg] = w1->mono.coeff;
+      w2->mono.deg = i;
+      w2->mono.coeff = i;
+      w2->coeff[w2->mono.deg] = w2->mono.coeff;
+   }
+
+   matrix_t *tmp1 = new_zero_matrix(2);
+   test_assert_critical(tmp1 != NULL);
+
+   matrix_mult(tmp1, mat1, mat2);
+
+   const double tmp1_array1[51] = {0,0,0,2};
+   const double tmp1_array2[51] = {0,1,0,0,3};
+   const double tmp1_array3[51] = {0,0,0,0,0,2};
+   const double tmp1_array4[51] = {0,0,0,1,0,0,3};
+
+   for (int i = 0 ; i < 4 ; i++) {
+      test_assert(tmp1->term[i]->mono.deg == 0);
+      test_assert(tmp1->term[i]->mono.coeff == 0);
+   }
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(tmp1->term[0]->coeff[i] == tmp1_array1[i]);
+      test_assert(tmp1->term[1]->coeff[i] == tmp1_array2[i]);
+      test_assert(tmp1->term[2]->coeff[i] == tmp1_array3[i]);
+      test_assert(tmp1->term[3]->coeff[i] == tmp1_array4[i]);
+   }
+
+   matrix_t *tmp2 = new_zero_matrix(2);
+   test_assert_critical(tmp2 != NULL);
+
+   matrix_mult(tmp2, mat2, mat1);
+
+   const double tmp2_array1[51] = {0,0,0,1};
+   const double tmp2_array2[51] = {0,0,0,0,1};
+   const double tmp2_array3[51] = {0,0,2,0,0,3};
+   const double tmp2_array4[51] = {0,0,0,2,0,0,3};
+
+   for (int i = 0 ; i < 4 ; i++) {
+      test_assert(tmp2->term[i]->mono.deg == 0);
+      test_assert(tmp2->term[i]->mono.coeff == 0);
+   }
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(tmp2->term[0]->coeff[i] == tmp2_array1[i]);
+      test_assert(tmp2->term[1]->coeff[i] == tmp2_array2[i]);
+      test_assert(tmp2->term[2]->coeff[i] == tmp2_array3[i]);
+      test_assert(tmp2->term[3]->coeff[i] == tmp2_array4[i]);
+   }
+
+   destroy_mat(mat1);
+   destroy_mat(mat2);
+   destroy_mat(tmp1);
+   destroy_mat(tmp2);
+   clean_mem_prob();
+
 }
 
 
@@ -294,7 +367,28 @@ void
 test_error_matrix_mult
 (void)
 {
-   test_assert(0);
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   matrix_t *mat1 = new_zero_matrix(2);
+   matrix_t *mat2 = new_zero_matrix(3);
+   matrix_t *tmp = new_zero_matrix(3);
+   test_assert_critical(mat1 != NULL);
+   test_assert_critical(mat2 != NULL);
+   test_assert_critical(tmp != NULL);
+
+   redirect_stderr();
+   test_assert(matrix_mult(tmp, mat1, mat2) == NULL);
+   unredirect_stderr();
+
+   test_assert_stderr("[compute_mem_prob] error in function `mat");
+
+   destroy_mat(mat1);
+   destroy_mat(mat2);
+   destroy_mat(tmp);
+   clean_mem_prob();
+
 }
 
 
@@ -357,6 +451,77 @@ test_new_trunc_pol_A
    free(_A);
    free(A0);
    free(_A0);
+   clean_mem_prob();
+
+}
+
+
+void
+test_error_new_zero_trunc_pol
+(void)
+{
+   trunc_pol_t *w;
+
+   redirect_stderr();
+   w = new_zero_trunc_pol();
+   unredirect_stderr();
+
+   test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+   set_alloc_failure_rate_to(1);
+   redirect_stderr();
+   w = new_zero_trunc_pol();
+   unredirect_stderr();
+   reset_alloc();
+
+   test_assert(w == NULL);
+   test_assert_stderr("[compute_mem_prob] error in function `new_z");
+
+}
+
+
+void
+test_trunc_pol_update_add
+(void)
+{
+
+   int success = set_params_mem_prob(17, 50, 0.01, 0.05);
+   test_assert_critical(success);
+
+   trunc_pol_t *w1 = new_zero_trunc_pol();
+   trunc_pol_t *w2 = new_zero_trunc_pol();
+   test_assert_critical(w1 != NULL);
+   test_assert_critical(w2 != NULL);
+
+   w1->mono.deg = 1;
+   w1->mono.coeff = 1;
+   w1->coeff[1] = 1;
+
+   w2->mono.deg = 2;
+   w2->mono.coeff = 2;
+   w2->coeff[2] = 2;
+
+   trunc_pol_update_add(w1, w2);
+
+   double array[51] = {0,1,2};
+   test_assert(w1->mono.deg == 0);
+   test_assert(w1->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(w1->coeff[i] == array[i]);
+   }
+
+   trunc_pol_update_add(w1, NULL);
+
+   // Check that nothing has changed.
+   test_assert(w1->mono.deg == 0);
+   test_assert(w1->mono.coeff == 0);
+   for (int i = 0 ; i <= 50 ; i++) {
+      test_assert(w1->coeff[i] == array[i]);
+   }
+
+   free(w1);
+   free(w2);
    clean_mem_prob();
 
 }
@@ -1444,16 +1609,16 @@ test_new_zero_matrix
    int success = set_params_mem_prob(17, 50, 0.01, 0.05);
    test_assert_critical(success);
 
-   // Test a matrix of dimension 50.
-   matrix_t *matrix = new_zero_matrix(50);
+   // Test a matrix of dimension 10.
+   matrix_t *matrix = new_zero_matrix(10);
 
    test_assert_critical(matrix != NULL);
-   for (int i = 0 ; i < 50*50 ; i++) {
+   for (int i = 0 ; i < 10*10 ; i++) {
       trunc_pol_t *w = matrix->term[i];
       test_assert_critical(w != NULL);
       test_assert(w->mono.deg == 0);
       test_assert(w->mono.coeff == 0);
-      for (int j = 0 ; j <= 50 ; j++) {
+      for (int j = 0 ; j <= 10 ; j++) {
          test_assert(w->coeff[j] == 0);
       }
    }
@@ -1472,7 +1637,7 @@ test_error_new_zero_matrix
 
    set_alloc_failure_countdown_to(0);
    redirect_stderr();
-   matrix = new_zero_matrix(50);
+   matrix = new_zero_matrix(10);
    unredirect_stderr();
    reset_alloc();
 
@@ -1481,7 +1646,7 @@ test_error_new_zero_matrix
 
    set_alloc_failure_countdown_to(1);
    redirect_stderr();
-   matrix = new_zero_matrix(50);
+   matrix = new_zero_matrix(10);
    unredirect_stderr();
    reset_alloc();
 
@@ -1500,7 +1665,7 @@ test_error_new_matrix_M
 
    set_alloc_failure_countdown_to(0);
    redirect_stderr();
-   M = new_matrix_M(50);
+   M = new_matrix_M(10);
    unredirect_stderr();
    reset_alloc();
 
@@ -1509,7 +1674,7 @@ test_error_new_matrix_M
 
    set_alloc_failure_countdown_to(1);
    redirect_stderr();
-   M = new_zero_matrix(50);
+   M = new_zero_matrix(10);
    unredirect_stderr();
    reset_alloc();
 
@@ -1654,6 +1819,8 @@ const test_case_t test_cases_compute_mem_prob[] = {
    {"error_set_params_mem_prob",   test_error_set_params_mem_prob},
    {"uninitialized_error",         test_uninitialized_error},
    {"new_zero_trunc_pol",          test_new_zero_trunc_pol},
+   {"error_new_zero_trunc_pol",    test_error_new_zero_trunc_pol},
+   {"trunc_pol_updated_add",       test_trunc_pol_update_add},
    {"trunc_pol_mult",              test_trunc_pol_mult},
    {"matrix_mult",                 test_matrix_mult},
    {"error_matrix_mult",           test_error_matrix_mult},

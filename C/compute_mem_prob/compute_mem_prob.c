@@ -205,7 +205,14 @@ in_case_of_failure:
 trunc_pol_t *
 new_zero_trunc_pol
 (void)
+// IMPORTANT: do not call before set_params_mem_prob().
 {
+
+   if (G == 0 || K == 0 || P == 0 || U == 0 || KSZ == 0) {
+      warning("parameters unset: call `set_params_mem_prob'",
+            __func__, __LINE__);
+      goto in_case_of_failure;
+   }
 
    trunc_pol_t *new = calloc(1, KSZ);
    handle_memory_error(new);
@@ -856,7 +863,6 @@ trunc_pol_mult
 }
 
 
-
 void
 trunc_pol_update_add
 (
@@ -868,12 +874,14 @@ trunc_pol_update_add
    // No update when adding zero.
    if (a == NULL) return;
 
+   // No monomial after update.
+   dest->mono = (monomial_t) {0};
+
    for (int i = 0 ; i <= K ; i++) {
       dest->coeff[i] += a->coeff[i];
    }
 
 }
-
 
 
 matrix_t *
@@ -888,7 +896,7 @@ matrix_mult
    if (a->dim != dest->dim || b->dim != dest->dim) {
       warning(internal_error, __func__, __LINE__);
       ERRNO = __LINE__;
-      return NULL;
+      goto in_case_of_failure;
    }
 
    size_t dim = dest->dim;
@@ -898,6 +906,9 @@ matrix_mult
       // Erase destination entry.
       bzero(dest->term[i*dim+j], KSZ);
       for (int m = 0 ; m < dim ; m++) {
+         // By construction, the first NULL term of the row
+         // indicates that all the remaining terms are zero.
+         if (a->term[i*dim+m] == NULL) break;
          trunc_pol_update_add(dest->term[i*dim+j],
             trunc_pol_mult(TEMP, a->term[i*dim+m], b->term[m*dim+j]));
       }
@@ -905,6 +916,9 @@ matrix_mult
    }
 
    return dest;
+
+in_case_of_failure:
+   return NULL;
 
 }
 
@@ -924,7 +938,7 @@ compute_mem_prob // VISIBLE //
    matrix_t *powM1 = NULL;
    matrix_t *powM2 = NULL;
 
-   if (G == 0 || K == 0 || P == 0 || U == 0) {
+   if (G == 0 || K == 0 || P == 0 || U == 0 || KSZ == 0) {
       warning("parameters unset: call `set_params_mem_prob'",
             __func__, __LINE__);
       goto in_case_of_failure;
@@ -956,6 +970,8 @@ compute_mem_prob // VISIBLE //
       M = new_matrix_M(N);
       handle_memory_error(M);
 
+      // Update weighted generating function with
+      // one-segment reads (i.e. tail only).
       trunc_pol_update_add(w, M->term[2*G+1]);
 
       powM1 = new_zero_matrix(2*G+1);
@@ -963,15 +979,24 @@ compute_mem_prob // VISIBLE //
       powM2 = new_zero_matrix(2*G+1);
       handle_memory_error(powM2);
 
+      // Update weighted generating
+      // function with two-segment reads.
       matrix_mult(powM1, M, M);
       trunc_pol_update_add(w, powM1->term[2*G+1]);
 
-      // FIXME: 10 must be replaced by a smart number. //
-      for (int i = 0 ; i < 10 ; i++) {
-         matrix_mult(powM2, powM1, M);
+      // There is at least one sequencing error for every three
+      // segments, so the probability of a read with n or more
+      // segments is less than p^n/3 / (1-p^1/3).
+      const double denom = 1-pow(P,1.0/3.0);
+      double bound_on_imprecision = P / denom;
+      while (bound_on_imprecision > 1e-9) {
+         // Update weighted generating function
+         // with multiple-segment reads.
+         matrix_mult(powM2, M, powM1);
          trunc_pol_update_add(w, powM2->term[2*G+1]);
-         matrix_mult(powM1, powM2, M);
+         matrix_mult(powM1, M, powM2);
          trunc_pol_update_add(w, powM1->term[2*G+1]);
+         bound_on_imprecision *= pow(P,2.0/3.0);
       }
 
       // Clean temporary variables.
