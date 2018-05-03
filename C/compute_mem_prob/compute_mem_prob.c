@@ -821,17 +821,15 @@ trunc_pol_mult
 )
 {
 
+   // Erase destination.
+   bzero(dest, KSZ);
 
    // If any of the two k-polynomials is zero,
-   // set 'dest' to zero and return 'NULL'.
-   if (a == NULL || b == NULL) {
-      bzero(dest, KSZ);
-      return NULL;
-   }
+   // set 'dest' to zero and return 'NULL' (not dest).
+   if (a == NULL || b == NULL) return NULL;
 
    if (a->mono.coeff && b->mono.coeff) {
       // Both are monomials, just do one multiplication.
-      bzero(dest, KSZ);
       // If degree is too high, all coefficients are zero.
       if (a->mono.deg + b->mono.deg > K) return NULL;
       // Otherwise do the multiplication.
@@ -841,13 +839,11 @@ trunc_pol_mult
    }
    else if (a->mono.coeff) {
       // 'a' is a monomial, do one "row" of multiplications.
-      bzero(dest, KSZ);
       for (int i = a->mono.deg ; i <= K ; i++)
          dest->coeff[i] = a->mono.coeff * b->coeff[i-a->mono.deg];
    }
    else if (b->mono.coeff) {
       // 'b' is a monomial, do one "row" of multiplications.
-      bzero(dest, KSZ);
       for (int i = b->mono.deg ; i <= K ; i++)
          dest->coeff[i] = b->mono.coeff * a->coeff[i-b->mono.deg];
    }
