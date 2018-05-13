@@ -241,13 +241,13 @@ and of the $\downarrow$ error symbols, respectively, \textit{i.e.}
 The weighted generating function of the transition from $(\uparrow)_j$ to
 $\Downarrow$ is
 \begin{equation}
-D_{\gamma-j}(z) = \omega z \sum_{i=0}^{\gamma-j-1} (qz)^i.
+C^\Downarrow_j(z) = \omega z \sum_{i=0}^{\gamma-j-1} (qz)^i.
 \end{equation}
 
 The weighted generating function of the transition from
 $(\uparrow)_j$ to $\downarrow$ is
 \begin{equation}
-\tilde{D}_{\gamma-j}(z) = \tilde{\omega} z
+C^\downarrow_j(z) = \tilde{\omega} z
   \sum_{i=0}^{\gamma-j-1} (qz)^i.
 \end{equation}
 
@@ -301,22 +301,39 @@ generating function of the $\Downarrow$ symbol is $pz(1-\mu/3)^N$. By the
 same rationale as above, the weighted generating function of the
 transition from $\Downarrow$ to $\Downarrow$ is
 \begin{equation}
-A_\gamma(z) = \omega z
+A^\Downarrow(z) = \omega z
   \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
 \end{equation}
 
 
 If the next terminator is $\downarrow$ we have to dinstinguish two cases.
-If there are $\gamma-1$ or fewer error-free nucleotides, we must only make
-sure that there is no $\uparrow$ symbol among them. The weighted
-generating function is
+In the example below, there is a shared MEM seed only if $\gamma \leq
+11$. The main thread is unmasked, so the number of nucleotides between the
+error symbols matters.
+\begin{inset}
+\includegraphics[scale=.9]{ddown_to_down_case_1.pdf}
+\end{inset}
+In this other example, there can be no MEM seed because the first
+duplicate masks the main thread. This depends neither on the value of
+$\gamma$ nor on the number of nucleotides between the error symbols.
+\begin{inset}
+\includegraphics[scale=.9]{ddown_to_down_case_2.pdf}
+\end{inset}
+
+So if the $\Downarrow$ and the $\downarrow$ symbols are separated by
+$\gamma-1$ or fewer nucleotides, there is no MEM seed and we must only
+rule out the presence of other terminators in the segment (in this case
+the $\uparrow$ symbol). The weighted generating function is
 \begin{equation}
 \tilde{\omega} z \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
 \end{equation}
 
-There can also be more than $\gamma-1$ error-free nucleotides, but in this
-case, we must make sure that at least one potentially masking thread masks
-the main thread.
+On the other hand, if the $\Downarrow$ and the $\downarrow$ symbols are
+separated by $\gamma$ or more nucleotides, there could be a shared MEM
+seed, so we must enforce the condition that at least one potentially
+masking thread masks the main thread up to and including the $\downarrow$
+symbol (this incidentally rules out the presence of other terminators in
+the segment).
 
 \begin{definition}
 $\alpha_i$ is the probability that the first thread has at least one
@@ -337,7 +354,7 @@ pz\sum_{i=\gamma}^\infty (1 - \alpha_i^N) \cdot (qz)^i.
 Finally, the weighted generating function of the transition from
 $\Downarrow$ to $\downarrow$ is
 \begin{equation}
-\tilde{A}_\infty(z) =
+A^\downarrow(z) =
 \tilde{\omega} z \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i +
 pz\sum_{i=\gamma}^\infty (1 - \alpha_i^N) \cdot (qz)^i.
 \end{equation}
@@ -431,30 +448,6 @@ $(\uparrow)_i$ is
 v_i(z) = \frac{\gamma_i^N- \delta_{i-1}^N}{1-(1-\mu/3)^N} \cdot (qz)^i.
 \end{equation}
 
-%In order to compute the weighted generating functions of the other
-%transitions, first observe that
-%\begin{equation}
-%V_j+W_j = \frac{\alpha_j^N - \alpha_{j-1}^N}{1-(1-\mu/3)^N}.
-%\end{equation}
-%So the probability that an error-free stretch of length $i \geq 1$
-%following a $\downarrow$ symbol contains neither a $\sim$ symbol nor a
-%$\uparrow$ symbol is
-%\begin{equation}
-%1 - \sum_{j=1}^i V_j+W_j = 1 - \frac{\alpha_i^N -
-%\alpha_0^N}{1-(1-\mu/3)^N}.
-%\end{equation}
-%
-%The probability that the next terminator after a $\downarrow$ symbol is a
-%$\Downarrow$ symbol at position $j$ is the probability of an error-free
-%stretch of size $j-1$ that contains neither the $\sim$ symbol nor the
-%$\uparrow$ symbol -- probability as above multiplied by $q^j$ -- followed
-%by a $\Downarrow$ symbol -- probability $pz(1-\mu/3)^N$. Thus, the
-%weighted generating function of the transition from $\downarrow$ to
-%$\Downarrow$ is
-%\begin{equation}
-%B_\infty(z) = \omega z \sum_{i=0}^\infty
-%\Big(1 - \frac{\alpha_i^N - \alpha_0^N}{1-(1-\mu/3)^N} \Big) (qz)^i.
-%\end{equation}
 
 The probability that there is neither $\sim$ nor $\uparrow$ symbol is just
 the probability that at least one stricty masking thread is still alive
@@ -465,16 +458,76 @@ the probability that at least one stricty masking thread is still alive
 So the weighted generating function of the transition from $\downarrow$ to
 $\Downarrow$ is
 \begin{equation}
-B_\infty(z) = \omega z\sum_{i=0}^\infty
+B^\Downarrow(z) = \omega z\sum_{i=0}^\infty
 \frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i.
 \end{equation}
 
-By the same rationale, we see that the weighted generating function of the
-transition from $\downarrow$ to $\downarrow$ is
+If the next terminator is $\downarrow$, we again have to distinguish two
+cases. In the example below there is no MEM seed, but the nature of the
+terminator depends on $\gamma$. If $\gamma < 10$, the state $(\sim)_9$
+does not exist, so there is a single segment of size 12, terminated by
+$\downarrow$. If $\gamma \geq 10$, the state $(\sim)_9$ exists and there
+is a segment of size 9 terminated by $\sim$, followed by a segment of size
+3 terminated by $\downarrow$.
+\begin{inset}
+\includegraphics[scale=.9]{down_to_down_case_1.pdf}
+\end{inset}
+
+So if the two $\downarrow$ symbols are separated by $\gamma-1$ or fewer
+nucleotides, there is no MEM seed and we must only rule out the presence
+of other terminators in the segment (in this case $\sim$ and $\uparrow$).
+With the probability computed above that there are neither $\sim$ nor
+$\uparrow$ symbols, the weighted generating function is
 \begin{equation}
-\tilde{B}_\infty(z) = \tilde{\omega} z\sum_{i=0}^\infty
+\tilde{\omega} z\sum_{i=0}^{\gamma-1}
 \frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i.
 \end{equation}
+
+If the two $\downarrow$ symbols are separated by $\gamma$ or more
+nucleotides, there could be a shared MEM seed, so we must enforce the
+condition that the main thread is masked. In addition, we must also rule
+out the presence of the $\sim$ terminator among the first $\gamma-1$
+nucleotides (but not among the remaining nucleotides). Finally, we must
+rule out the presence of the $\uparrow$ terminator throughout the segment.
+This is satisfied if and only if $i.$ a strictly masking thread survives
+until the penultimate nucleotide of the fragment or $ii.$ all the strictly
+masking threads fail before the penultimate nucleotide but not before the
+$\gamma$-th nucleotide, and a potentially masking thread survives until
+the last nucleotide of the fragment.
+
+If there are $m$ potentially masking threads and $N-m$ strictly masking
+threads, the respective probabilities of conditions $i.$ and $ii.$ are
+$\xi_{i-1,N-m} \cdot (1-(1-\mu/3)^N)$ and $(\xi_{i-1,N-m}
+-\xi_{\gamma-1,N-m})(1-\alpha_{i-1}^m)$. Since the conditions are
+are mutually exclusive, the full probability is
+\begin{equation}
+\sum_{m=0}^{N-1}Q_m \bigg(\xi_{i-1,N-m} \cdot (1-(1-\mu/3)^N) +
+(\xi_{\gamma-1,N-m}-\xi_{i-1,N-m})(1-\alpha_{i-1}^m) \bigg).
+\end{equation}
+
+The first term is equal to $1-\alpha_{i-1}^N$, the second is equal to
+\begin{equation}
+\frac{\alpha_{i-1}^N - \alpha_{\gamma-1}^N -
+  \zeta_{i-1,i-1}^N + \zeta_{\gamma-1,i-1}^N}{1-(1-\mu/3)^N}.
+\end{equation}
+where
+\begin{equation}
+\zeta_{j,i} = 1-(1-\mu)^j\mu/3-(1-\mu)^i\mu/3(1-\mu/3)
+\end{equation}
+
+Finally, the weighted generating function of the transitions from
+$\downarrow$ to $\downarrow$ is
+
+\begin{equation*}
+\begin{split}
+B^\downarrow(z) = \tilde{\omega} z \sum_{i=0}^{\gamma-1}
+& \frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i + \\
+pz\sum_{i=\gamma}^\infty & \left( 1-\alpha_i^N + 
+\frac{\alpha_i^N - \alpha_{\gamma-1}^N -
+  \zeta_{i,i}^N + \zeta_{\gamma-1,i}^N}{1-(1-\mu/3)^N} \right)
+(qz)^i
+\end{split}
+\end{equation*}
 
 \subsection{Transitions from $\sim$}
 \label{sec:trans_from_sim}
@@ -582,7 +635,7 @@ P_{m,j} = \frac{(1-\mu)^{jm} (1-\mu/3)^m}{1-(1-\mu/3)^N} {N \choose m}
 \end{equation*}
 
 
-The sum of the terms above for $m = 1, \ldots, N-1$ is $V_j$ from equation
+The sum of the terms above for $m = 1, \ldots, N-1$ is $W_j$ from equation
 (\ref{eq:Si}), which is the probability of the $(\sim)_j$ terminator.
 
 Now, referring to the decision tree of Fig.~\ref{fig:decision_tree}, we
@@ -592,11 +645,11 @@ will be either the $\Downarrow$ symbol or the $\downarrow$ symbol.
 
 The probability that the last of the $m$ potentially masking threads fails
 at position $i$ after entering state $(\sim)_j$ is
-$\xi_{i-1,m}-\xi_{i,m}$. Dividing by $V_j$ and summing over $m = 1,
+$\xi_{i-1,m}-\xi_{i,m}$. Dividing by $W_j$ and summing over $m = 1,
 \ldots, N-1$, we find that the weighted generating function of the
 transition from $(\sim)_j$ to $(\uparrow)_{j+i}$ is
 \begin{eqnarray}
-y_{j,i}(z) &=& \sum_{m=1}^{N-1} \frac{P_{m,j}}{V_j}
+y_{j,i}(z) &=& \sum_{m=1}^{N-1} \frac{P_{m,j}}{W_j}
 \big( \xi_{i-1,m}-\xi_{i,m} \big) (qz)^i \notag \\
 &=& \frac{\beta_{j,i+j}^N - \beta_{j,i+j-1}^N
 -\beta_{j-1,i+j}^N + \beta_{j-1,i+j-1}^N}
@@ -611,27 +664,36 @@ The probability that the next terminator is a $\Downarrow$ symbol or a
 $\downarrow$ symbol at position $i$ is the probability that at least one
 of the potentially masking threads survives until position $i-1$ --
 probability $\xi_{i-1,m}$ -- and that the next nucleotide is a sequencing
-error -- probability $p$. Dividing by $V_j$ and summing over $m = 1,
+error -- probability $p$. Dividing by $W_j$ and summing over $m = 1,
 \ldots, N-1$, we find that the weighted generating function of the
 transtion from $(\sim)_j$ to
 $\Downarrow$ is
 \begin{eqnarray}
-C_{\gamma-j}(z) &=& \omega z \sum_{i=1}^{\gamma-j-1} \sum_{m=1}^{N-1}
-  \frac{P_{m,j}}{V_j} \xi_{i-1,m} \cdot (qz)^{i-1} \notag \\
-  &=& \omega z \sum_{i=1}^{\gamma-j-1}
-\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j-1}^N
-  +\beta_{j-1,i+j-1}^N }
-{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^{i-1}.
+D^\Downarrow_j(z) &=& \omega z \sum_{i=0}^{\gamma-j-2} \sum_{m=1}^{N-1}
+  \frac{P_{m,j}}{W_j} \xi_{i,m} \cdot (qz)^i \notag \\
+  &=& \omega z \sum_{i=0}^{\gamma-j-2}
+\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j}^N
+  +\beta_{j-1,i+j}^N }
+{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^i.
 \end{eqnarray}
 
 With the same notations, the weighted generating function from $(\sim)_j$
 to $\downarrow$ is seen to be 
-\begin{equation}
-\tilde{C}_{\gamma-j}(z) = \tilde{\omega} z \sum_{i=1}^{\gamma-j-1}
-\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j-1}^N
-  +\beta_{j-1,i+j-1}^N }
-{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^{i-1}.
-\end{equation}
+\begin{eqnarray}
+D^\downarrow_j(z) = \tilde{\omega} z
+  \sum_{i=0}^{\gamma-j-2} \sum_{m=1}^{N-1}
+  \frac{P_{m,j}}{W_j} \xi_{i,m} \cdot (qz)^i +
+  pz \sum_{i=\gamma-j-1}^\infty \sum_{m=1}^{N-1}
+  \frac{P_{m,j}}{W_j} (1-\alpha_i^m) \cdot (qz)^i \notag \\
+\tilde{\omega} z \sum_{i=0}^{\gamma-j-2}
+\frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j}^N
+  +\beta_{j-1,i+j}^N }
+{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^i + \notag \\
+pz \sum_{i=\gamma-j-1}^\infty
+\frac{ \alpha_j^N-\alpha_{j-1}^N-\zeta_{j,i+j}^N
+  +\zeta_{j-1,i+j}^N }
+{\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^i + \notag \\
+\end{eqnarray}
 
 \subsection{Head and tail vectors}
 
@@ -661,13 +723,13 @@ end of the reads.
 
 For the $\downarrow$ symbol, the weighted generating function is
 \begin{equation}
-T_{\downarrow}(z) = \sum_{i=0}^\infty
+T^\downarrow(z) = \sum_{i=0}^\infty
 \frac{1-\alpha_i^N}{1-(1-\mu/3)^N} (qz)^i.
 \end{equation}
 
 For the $(\uparrow)_j$ state, the weighted generating function is
 \begin{equation}
-T_{(\uparrow)_j}(z) = \sum_{i=0}^{\gamma-j-1} (qz)^i.
+T^\uparrow_j(z) = \sum_{i=0}^{\gamma-j-1} (qz)^i.
 \end{equation}
 
 For the other symbols, we must take care that the potentially masking
@@ -675,12 +737,12 @@ threads do not all fail (otherwise this would imply the presence of a
 $\uparrow$ terminator in the tail). For the $\Downarrow$ symbol, the
 weighted generating function is
 \begin{equation}
-T_{\Downarrow}(z) = \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
+T^\Downarrow(z) = \sum_{i=0}^{\gamma-1} \xi_{i,N} \cdot (qz)^i.
 \end{equation}
 
 For the $(\sim)_j$ state, the weighted generating function is
 \begin{equation}
-T_{(\sim)_j}(z) = \sum_{i=0}^{\gamma-j-1}
+T^\sim_j(z) = \sum_{i=0}^{\gamma-j-1}
 \frac{ \alpha_j^N-\alpha_{j-1}^N-\beta_{j,i+j}^N +\beta_{j-1,i+j}^N }
 {\alpha_j^N-\alpha_{j-1}^N-\gamma_j^N+\delta_{j-1}^N} (qz)^i.
 \end{equation}
@@ -690,49 +752,20 @@ In summary,
 T(z) = 
 \begin{blockarray}{cc}
 \begin{block}{c[c]}
-\DN & T_\Downarrow(z) \\
-\dn & T_\downarrow(z) \\
-\eq{1} & T_{(\sim)_1}(z) \\
+\DN & T^\Downarrow(z) \\
+\dn & T^\downarrow(z) \\
+\up{\gamma-1} & T^\uparrow_{\gamma-1}(z) \\
 \vdots & \vdots \\
-\eq{\gamma-1} & T_{(\sim)_{\gamma-1}}(z) \\
-\up{1} & T_{(\uparrow)_1}(z) \\
+\up{1} & \; T^\uparrow_1(z) \; \\
+\eq{\gamma-1} & T^\sim_{\gamma-1}(z) \\
 \vdots & \vdots \\
-\up{\gamma-1} & \; T_{(\uparrow)_{\gamma-1}}(z) \; \\
+\eq{1} & T^\sim_1(z) \\
 \end{block}
 \end{blockarray}.
 \end{equation*}
 
 
 \section{Conclusion}
-
-\begin{equation*}
-\begin{blockarray}{ccccccccc}
-   & \DN & \dn &\eq{1} & \ldots & \eq{\gamma-1} &
-    \up{1} & \ldots & \up{\gamma-1} \\
-\begin{block}{c[cccccccc]}
-\DN & A_\gamma(z) & \tilde{A}_\infty(z) & 0 & \ldots & 0 & u_1(z)
-    & \ldots & u_{\gamma-1}(z) \\
-\dn & B_\infty(z) & \tilde{B}_\infty(z) & w_1(z) & \ldots &
-    w_{\gamma-1}(z) & v_1(z) & \ldots & v_{\gamma-1}(z) \\
-\eq{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & y_{1,\gamma-2}(z) \\
-\eq{2} & C_{\gamma-2}(z) & \tilde{C}_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & y_{2,\gamma-3}(z) \\
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
-    \ddots & \vdots \\
-\eq{\gamma-1} & C_1(z) & \tilde{C}_1(z) & 0 & 
-    \ldots & 0 & 0 & \ldots & 0 \\
-\up{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & 0 \\
-\up{2} & D_{\gamma-2}(z) & \tilde{D}_{\gamma-2}(z) & 0 & \ldots & 0 & 0 &
-    \ldots & 0  \\
-\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
-    \ddots & \vdots \\
-\up{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & \ldots & 0 & 0 &
-    \ldots & 0 \\
-\end{block}
-\end{blockarray}
-\end{equation*}
 
 \begin{equation*}
 \begin{blockarray}{ccccccccc}
@@ -743,21 +776,21 @@ T(z) =
     u_1(z) & 0 & \ldots & 0 \\
 \dn & B_\infty(z) & \tilde{B}_\infty(z) & v_{\gamma-1}(z) & \ldots &
     v_1(z) & w_{\gamma-1}(z) & \ldots & w_1(z) \\
-\up{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & 
+\up{\gamma-1} & C_1(z) & \tilde{C}_1(z) & 0 & 
     \ldots & 0 & 0 & \ldots & 0 \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
     \ddots & \vdots \\
-\up{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
+\up{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) & 0 & \ldots & 0 & 0 &
     \ldots & 0 \\
-\eq{\gamma-1} & C_1(z) & \tilde{C}_1(z) & 0 & \ldots & 0 & 0 &
+\eq{\gamma-1} & D_1(z) & \tilde{D}_1(z) & 0 & \ldots & 0 & 0 &
     \ldots & 0 \\
-\eq{\gamma-2} & C_2(z) & \tilde{C}_2(z) & y_{\gamma-2,1}(z) &
+\eq{\gamma-2} & D_2(z) & \tilde{D}_2(z) & y_{\gamma-2,1}(z) &
     \ldots & 0 & 0 & \ldots & 0 \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots &
     \ddots & \vdots \\
-\eq{2} & C_{\gamma-2}(z) & \tilde{C}_{\gamma-2}(z) &
+\eq{2} & D_{\gamma-2}(z) & \tilde{D}_{\gamma-2}(z) &
     y_{2,\gamma-3}(z) & \ldots & 0 & 0 & \ldots & 0 \\
-\eq{1} & C_{\gamma-1}(z) & \tilde{C}_{\gamma-1}(z) &
+\eq{1} & D_{\gamma-1}(z) & \tilde{D}_{\gamma-1}(z) &
     y_{1,\gamma-2}(z) & \ldots & 0 & 0 & \ldots & 0 \\
 \end{block}
 \end{blockarray}
