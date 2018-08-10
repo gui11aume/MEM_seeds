@@ -578,7 +578,7 @@ conclude that the weighted generating function of the segments terminated
 by $\uparrow_{/i}$ following a segment terminated by $\downarrow_{/m}$ is
 \begin{equation}
 \label{eq:B}
-B_i(z) = \Big( \xi_{i-1}^N-\xi_i^N \Big) (qz)^i.
+B_i(z) = \Big( \xi_i^N-\xi_{i-1}^N \Big) (qz)^i.
 \end{equation}
 
 In the equation above, $q^i$ is the probability that there is no
@@ -675,87 +675,50 @@ The probability of condition $ii)$ is
 \xi_i^m \Big(1 - \eta_i^{N-m} \Big),
 \end{equation*}
 but we need to break up this term among the terminators $\downarrow_{/n}$,
-($0 \leq n \leq N$). For this, we need to keep track of the number of soft
+($0 \leq n \leq N$). For this, we decompose the sum on the number of soft
 masks that run to the end of the segment, including the terminator. The
 probability that there are $r \geq 1$ such soft masks is
 \begin{equation*}
 {N-m \choose r} (1 - \eta_i)^r \eta_i^{N-m-r}.
 \end{equation*}
 
-Each of the terminator, so the total number of matches is $r$ plus the
-number of sequences, among the $N-r$ that remain, that also match the
-terminator. The probability that in total $n$ sequences match the
-terminator is
+Each of them matches the nucleotide at the end of the segment, so the
+total number of matches is $r$ plus the number of sequences, among the
+remaining $N-m-r$ soft masks and $m$ hard masks, that also match the
+last nucleotide.
+
+Let us start with the $N-m-r$ that failed somewhere in the segment. The
+conditional probability that they match the last nucleotide given that
+they fail somewhere in the segment is $\mu/3 \cdot \xi_i / \eta_i$. The
+conditional probability that they do not match is $(1-\mu/3) / \eta_i$.
+For the $m$ hard masks, the probability that they match the last
+nucleotide given that they sail somewhere in the segment is simply
+$\mu/3$, and the probability that they do not is $1-\mu/3$.
+
+The probability that those $N-r$ duplicates contribute $n-r$ matches is
+\begin{equation*}
+\frac{(\mu/3)^{n-r}(1-\mu/3)^{N-n}}{\eta_i^{N-m-r}}
+\psi_{i,m,n,r}\text{, where \;}
+\psi_{i,m,n,r} = \sum_{q \geq 0}{m \choose q}{N-m-r \choose n-r-q}
+\xi_i^{n-r-q}.
+\end{equation*}
+
+
+The probability that in
+total $n$ sequences match the terminator is
 \begin{eqnarray*}
-&\;& \sum_{r\geq1} {N-m \choose r} (1 - \eta_i)^r
-\eta_i^{N-m-r} {N-r \choose n-r} (\mu/3)^{n-r} (1-\mu/3)^{N-n} \\
-&=& \eta_i^{N-m} (\mu/3)^n(1-\mu/3)^{N-n}
-  \sum_{r\geq1} {N-m \choose r} {N-r \choose n-r}
-  \left( \frac{1-\eta_i}{\eta_i \mu/3} \right)^r \\
-&=& \omega_n \cdot \eta_i^{N-m} \cdot \zeta_{i,m,n},
+&\;& \sum_{r\geq1} {N-m \choose r}
+(1 - \eta_i)^r (\mu/3)^{n-r} (1-\mu/3)^{N-n} \psi_{i,m,n,r} \\
+&=& (\mu/3)^n(1-\mu/3)^{N-n} \sum_{r\geq1} {N-m \choose r}
+  (1 - \mu)^{ri} \psi_{i,m,n,r} \\
+&=& \omega_n \cdot \zeta_{i,m,n},
 \end{eqnarray*}
 where
 \begin{equation}
 \label{eq:zeta}
-\zeta_{i,m,n} = \sum_{r\geq1}
-{N-m \choose r} {N-r \choose n-r}
-\left( \frac{1-\eta_i}{\eta_i \mu/3} \right)^r \bigg/ {N \choose n}.
+\zeta_{i,m,n} = \sum_{r\geq1} {N-m \choose r}
+(1-\mu)^{ri} \psi_{i,m,n,r} \bigg/ {N \choose n}.
 \end{equation}
-
-%\begin{remark}
-%It is possible to approximate $\zeta_{i,m,n}$ with a simpler expression as
-%follows. We start with general expressions of the form
-%\begin{equation*}
-%\sum_{r\geq0} {N-m \choose r} {N-r \choose n-r} x^r.
-%\end{equation*}
-%
-%Applying $m$ times the identity ${a \choose b} = {a-1 \choose b} + {a-1
-%\choose b-1}$ we obtain
-%\begin{equation*}
-%{N-m \choose n-r} = \sum_{s=0}^m {m \choose s} {N-r-m \choose n-r-s}.
-%\end{equation*}
-%
-%Combining the binomial terms, we can see that
-%\begin{equation*}
-%{N-m \choose r} {N-r-m \choose n-r-s} = {N-m \choose n-s} {n-s \choose r}.
-%\end{equation*}
-%
-%This finally leads to the following expression featuring a sum of
-%hypergeometric probabilities
-%\begin{equation*}
-%\sum_{s=0}^m {m \choose s} {N-m \choose n-s}  \sum_{r\geq0} {n-s
-%\choose r} x^r = \sum_{s=0}^m {m \choose s} {N-m \choose n-s} (1+x)^{n-s}.
-%\end{equation*}
-%
-%The hypergeometric distribution can be approximated by the binomial
-%distribution using the following formula
-%\begin{equation*}
-%{m \choose s} {N-m \choose n-s} \Bigg/ {N \choose n} \approx
-%{n \choose s} (m/N)^s (1-m/N)^{n-s}.
-%\end{equation*}
-%
-%We can thus simplify the sum above using Newton's binomial theorem. We
-%obtain
-%\begin{equation*}
-%{N \choose n} \big( 1+x \cdot (1-m/N) \big)^n.
-%\end{equation*}
-%
-%From this we conclude
-%\begin{equation*}
-%\sum_{r=1}^{N-m} {N-m \choose r} {N-r \choose n-r} x^r  \approx
-%{N \choose n} \Big[ \big( 1+x \cdot (1-m/N) \big)^n - 1 \Big].
-%\end{equation*}
-%
-%Substituting the value of $x$, we finally obtain
-%\begin{equation*}
-%\zeta_{i,m,n} \approx \omega_n \xi_i^m \cdot \lambda_{i,m,n},
-%\end{equation*}
-%where
-%\begin{equation}
-%\lambda_{i,m,n} = \eta_i^{N-m} \left[ \left( 1+ \frac{1-\eta_i}{\eta_i \mu
-%/ 3} \cdot \frac{N-m}{N} \right)^n - 1 \right].
-%\end{equation}
-%\end{remark}
 
 
 The weighted generating function we are looking for is thus
@@ -763,8 +726,8 @@ The weighted generating function we are looking for is thus
 \label{eq:A}
 A_{m,n} =
 \omega_n pz \sum_{i=0}^{\gamma-1} \Big(1 - \xi_i^N \Big) (qz)^i + \omega_n
-pz \sum_{i=\gamma}^\infty \Big(1 - \xi_i^m \cdot (1- \eta_i^{N-m}
-\zeta_{i,m,n}) \Big) (qz)^i.
+pz \sum_{i=\gamma}^\infty \Big(1 - \xi_i^m \cdot
+(1- \zeta_{i,m,n}) \Big) (qz)^i.
 \end{equation}
 
 \subsection{The expression of the transfer matrix}
@@ -794,10 +757,10 @@ where
 \tag{\ref{eq:A}}
 A_{m,n} =
 \omega_n pz \sum_{i=0}^{\gamma-1} \Big(1 - \xi_i^N \Big) (qz)^i + \omega_n
-pz \sum_{i=\gamma}^\infty \Big(1 - \xi_i^m \cdot (1- \eta_i^{N-m}
-\zeta_{i,m,n}) \Big) (qz)^i \\
+pz \sum_{i=\gamma}^\infty \Big(1 - \xi_i^m \cdot
+(1- \zeta_{i,m,n}) \Big) (qz)^i \\
 \tag{\ref{eq:B}}
-B_i(z) = \Big( \xi_{i-1}^N-\xi_i^N \Big) (qz)^i \\
+B_i(z) = \Big( \xi_i^N-\xi_{i-1}^N \Big) (qz)^i \\
 \tag{\ref{eq:C}}
 C_m(z) =
 \sum_{i=0}^{\gamma-1} \Big(1 - \xi_i^N \Big) (qz)^i +
@@ -816,9 +779,11 @@ and where
 \tag{\ref{eq:eta}}
 \eta_i = 1-(1-\mu)^i\mu/3 \\
 \tag{\ref{eq:zeta}}
-\zeta_{i,m,n} = \sum_{r\geq1}
-{N-m \choose r} {N-r \choose n-r}
-\left( \frac{1-\eta_i}{\eta_i \mu/3} \right)^r \bigg/ {N \choose n}.
+\zeta_{i,m,n} = \sum_{r\geq1} {N-m \choose r}
+(1-\mu)^{ri} \psi_{i,m,n,r} \bigg/ {N \choose n} \\
+\notag
+\psi_{i,m,n,r} = \sum_{q \geq 0}{m \choose q}{N-m-r \choose n-r-q}
+\xi_i^{n-r-q}.
 \end{gather}
 
 
@@ -924,6 +889,35 @@ The method is summarized by the algorithm below.
     }
  }
 \end{algorithm}
+
+\section{Estimating the parameters}
+
+Let us assume that we have a sequence of length $L$ that has $N$
+duplicates in the genome. Let us further assume that the instrument has a
+uniform error rate of $p$, and that at each nucleotide, duplicates are
+different from the original sequence with probability $\mu$. What are the
+values of $p$ and $\mu$ that maximize the probability that the read is
+different from the original, but identical to a duplicate?
+
+If the read has no error, this cannot happen. If we consider the reads
+with one error, the probability that this happens is
+\begin{equation}
+Q(p,\mu) = L \cdot p \cdot (1-p)^{L-1}
+\cdot \Big( 1- (1-(1-\mu)^{L-1} \mu/3)^N \Big).
+\end{equation}
+
+Observe that for every value of $p$, $\mu = 1/L$ maximizes $Q(p,\mu)$. So
+in this simple proble, there exists a ``worst'' value of $\mu$, that
+maximizes the probability of making a mistake irrespective of the
+precision of the sequencing instrument and of the number of duplicates.
+
+The MEM seeding heuristic is more complex than the toy problem above, but
+we still get the intuition that values of $\mu$ close to $1/L$ are the
+most problematic, where $L$ is the typical size of MEM seeds.
+
+Using the above methods to compute MEM seeding probabilities, we can test
+this claim with typical values of the parameters. For the human genome,
+seeds of length $\approx 20$ are the norm...
 
 
 \section{Conclusion}
