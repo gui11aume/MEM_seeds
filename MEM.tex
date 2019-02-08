@@ -82,13 +82,21 @@ Spain.}
 \maketitle
 
 \begin{abstract}
-The abstract will come later.
-A popular mapping heuristic is called \emph{seeding}, and a recent variant
-is the \emph{MEM seeding} approach. Here we tackle the question of how to
-evaluate the probability that MEM seeding hits are on-target. This in turn
-expresses the confidence one should have in the location of the mapped DNA
-fragment and can be used to calibrate the MEM seeding heuristic, or to
-filter the hits at the desired level of confidence.
+High throughput sequencing produces massive amounts of data that must be
+processed efficiently. Most reads are identified by mapping them to a
+reference, typically a genome. Modern mappers rely on heuristics to gain
+speed at a reasonable cost of accuracy. MEM seeding is a popular heuristic
+that shows good empirical performance but for which no theory is
+available. It is thus difficult to calibrate or optimize mapping
+strategies based on MEM seeding. Here we develop a theory to predict the
+performance of MEM seeding. More specifically, we design a method to
+compute the probability a read is mapped to the right location when using
+MEM seeds. Our computational strategy is based on the analytic
+combinatorics programme, but uses only part of it. By recoding the reads
+in a specialized combinatorial alphabet, we can implicitly specify their
+generating function and extract the probabilities of interest by direct
+methods or by Monte Carlo sampling. This yields an efficient algorithm to
+calibrate the MEM seeding heuristic for short read technologies.
 \end{abstract}
 
 
@@ -514,7 +522,7 @@ construction of reads, but a construction of reads without good seeds. For
 this, we need to introduce a new set of tools.
 
 
-\section{The computational strategy}
+\section{Computational strategy}
 \label{sec:symbolic}
 
 We turn to the question of translating the extended MEM segment
@@ -1035,6 +1043,7 @@ clearly needed.
 
 
 \subsection{Monte Carlo sampling}
+\label{sec:montecarlo}
 
 The symbolic representation as MEM segments can be used for an efficient
 method to sample reads. Instead of generating the nucleotides of the $N+1$
@@ -1178,17 +1187,17 @@ generating function of interest, from which we extract the coefficients
 that correspond to the terms $P(E_0 \cap E_1)$ for reads of different
 sizes.
 
-The reads are recoded as sequences of symbols from the following alphabet
-$\mathcal{A}_* = \{\square, |, \downarrow_{/1}^-, \downarrow_{/2}^-,
-\ldots, \downarrow_{/1}^+, \downarrow_{/2}^+, \ldots, \Downarrow\}$. The
-symbols $\downarrow_{/j}^-$ signify that the nucleotide is a mismatch
-against the off-target sequence, the symbols $\downarrow_{/j}^+$ signify
-that it is a mismatch against the target, and the symbol $\Downarrow$
-signifies that it is a mismatch against both. As before, every other
-nucleotide is replaced by the symbol $\square$, and the terminator $|$
-is appended at the end of the read. We again define reads as sequences of
-segments, except that now the terminators are the symbols
-$\downarrow_{/j}^-$, $\downarrow_{/j}^+$, $\Downarrow$ and $|$.
+The reads are recoded as sequences of symbols from the so-called ``+/-
+alphabet'' $\mathcal{A}_{+/-} = \{\square, |, \downarrow_{/1}^-,
+\downarrow_{/2}^-, \ldots, \downarrow_{/1}^+, \downarrow_{/2}^+, \ldots,
+\Downarrow\}$. The symbols $\downarrow_{/j}^-$ signify that the nucleotide
+is a mismatch against the off-target sequence, the symbols
+$\downarrow_{/j}^+$ signify that it is a mismatch against the target, and
+the symbol $\Downarrow$ signifies that it is a mismatch against both. As
+before, every other nucleotide is replaced by the symbol $\square$, and
+the terminator $|$ is appended at the end of the read. We again define
+reads as sequences of segments, except that now the terminators are the
+symbols $\downarrow_{/j}^-$, $\downarrow_{/j}^+$, $\Downarrow$ and $|$.
 
 The number $j$ in the symbol $\downarrow_{/j}^-$ indicates the relative
 position of the last mismatch against the target. Likewise, the number $j$
@@ -1204,8 +1213,14 @@ target.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.88]{sketch_dual.pdf}
-\caption{\textbf{Title.}
-Caption.}
+\caption{\textbf{The +/- encoding.}
+A example read is represented in the +/- alphabet. The symbols
+$\downarrow_{/j}^-$ represent a mismatch against the off-target sequence,
+the symbols $\downarrow_{/j}^+$ represent a mismatch against the target,
+and the symbol $\Downarrow$ represent a mismatch against both. The index
+$j$ is the number of matches since the last mismatch for the other
+sequence. Note the presence of the terminator $|$ at the end of the read.
+}
 \label{fig:dual}
 \end{figure}
 
@@ -1369,7 +1384,7 @@ extract the entry at the first column and the last row. When the bound is
 lower than a set fraction $\varepsilon$ of the coefficient of $z^k$, we
 stop the computations.
 
-\subsection{The probability of outcome $ii.$}
+\subsection{The probability of false positives}
 
 For given values of the parameters $p$, $\mu$ and $N$, we can now compute
 the probability of a false positive, which is outcome $ii$.
@@ -1522,17 +1537,107 @@ information, we can compute the probability that the read has no good seed
 using the methods presented above.
 
 
+\section{Discussion}
 
-\section{Conclusion}
+We have devised a method to compute the probability that the MEM seeding
+heuristic misguides the mapping algorithm so that it cannot find the true
+location of the read. The pillars of our strategy are borrowed from
+analytic combinatorics~\cite{flajolet2009analytic,
+sedgewick2013introduction}, even though we do not follow the standard
+programme. Constructing generating functions usually serves the purpose of
+finding their singularities in order to approximate the solution. In our
+case, however, the weighted generating functions cannot be computed so
+this strategy is not applicable.
 
-This is awesome.
+To find the probabilities of interest in the absence of a fully specified
+weighted generating function, we compute only the first terms using
+iterative methods as in sections~\ref{sec:extract}, \ref{sec:cPE0} and
+\ref{sec:cPE0E1}, or using Monte Carlo sampling as in
+section~\ref{sec:montecarlo}. In this regard, the breakthrough is the
+encoding of reads as MEM segments, which is a form of implicit Markov
+imbedding~\cite{fu1994distribution}.
+
+The method is general, but it is important to clearly state the
+assumptions it depends on. First and most importantly, we have ignored
+insertions and deletions. We assume that the sequencing errors are
+substitutions only, which makes the method adapted to the Illumina
+technology, but not to deletion-prone instruments such as the Oxford
+Nanopore technology. We also assume that insertions and deletions never
+occur among duplicated sequences. This is obviously incorrect, but our
+initial tests with real data suggest that this is a minor impediment. On
+real genomes, the estimations are only approximately correct and this is
+but one of several simplifying assumptions. The theory is substantially
+intrincate; insertions and deletions would make it intractable.
+It is presently unclear how gracefully incorporate them in the theory.
+
+The second assumption is that all the candidate locations with a MEM
+seed of size $\geq \gamma$ are tested with the exact sequence alignment
+algorithm, so that the best location is always discovered if it is in the
+candidate set. This is not completely unrealistic, but it is important to
+realize that for plant and animal genomes, a shared MEM seed may have tens
+of thousands of hits. Therefore, most mappers impose a limit on the number
+of alignments so the best hit may not be found even if it is in the
+candidate set. This is again a minor impediment, since we can correct the
+probability that the location is a false positive when only some
+candidates have been tested.
+
+The third assumption is that all the duplicate sequences evolve
+independently of each other and at the same rate. This is again incorrect,
+because duplication events can happen continuously, creating complex
+ancestry relationships. It is possible to infer the ancestry using tree
+reconstruction techniques, but it would be challenging to incorporate this
+information in the present theory. The symbols of the MEM alphabet
+implicitly assume that the sequences are exchangeable and the complexity
+of the calculations explodes if it is not the case.
+
+The last assumption is that MEM seeds can match only the target or one of
+its duplicates. This is not the case: MEM seeds overlapping a sequencing
+error often match random locations of the genome. When this occurs, the
+MEM seeds are typically small and the alignment score at the candidate
+location is very bad because the sequences are unrelated. So in practice,
+it is relatively easy to detect this case and reject the location, even if
+it is the best in the candidate set.
+
+The proposed methods are compliant with the demand for speed of the
+mapping algorithms. One needs to compute the probabilities only once for a
+given value of $N$ and $\mu$ (the error rate $p$ is known and constant).
+For $N > 20$, the iterative method is usually prohibitive and we need to
+use Monte Carlo sampling instead, which for reads of size $< 200$
+nucleotides keeps the computations around 1 second on modern hardware. The
+values of $N$ and $\mu$ can be binned in intervals of interest so that
+there are only $\approx 100$ pairs for a total cost of a few minutes per
+run. Considering that mappers can process at most $10,000$ reads per
+second, the computer time of mapping a sequencing run of 250 million reads
+is over 7 hours, two orders of magnitude larger than the time required to
+estimate the probabilities of error.
+
+In conclusion, we presented a practical solution to the problem of
+estimating the probability of false positives when using MEM seeds. This
+solution is adapted for mapping short reads sequenced with the Illumina
+technology. Being able to calibrate the MEM seeding heuristic not only
+allows the user to choose how to balance speed versus accuracy, but also
+opens new applications. For instance, one can map reads from contaminated
+samples in pools of closely related genomes (\textit{e.g.}, modern human
+and Neanderthal) in order to assign the reads to the organism they belong
+to. The probabilities of false positives give the right level of
+confidence in the assignment.
+
+More generally, the analytic combinatorics programme is a very powerful
+tool to address problems in bioinformatics. Here we have seen how this
+strategy can be useful even when the generating functions cannot be
+computed. Using the same ideas, one could calibrate heuristics used in
+other alignment methods, especially in expanding fields such as long-read
+technologies.
+
 
 \section*{Acknowledgements}
 
-We acknowledge the financial support of the Spanish Ministry of Economy
-and Competitiveness (‘Centro de Excelencia Severo Ochoa 2013-2017’, Plan
-Nacional BFU2012-37168), of the CERCA Programme~/~Generalitat de
-Catalunya, and of the European Research Council (Synergy Grant 609989).
+We thank Ruggero Cortini for suggesting Monte Carlo methods as a way to
+tackle intractable cases. We acknowledge the financial support of the
+Spanish Ministry of Economy and Competitiveness (‘Centro de Excelencia
+Severo Ochoa 2013-2017’, Plan Nacional BFU2012-37168), of the CERCA
+Programme~/~Generalitat de Catalunya, and of the European Research Council
+(Synergy Grant 609989).
 
 
 %---------------------------------------------------------------
