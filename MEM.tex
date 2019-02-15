@@ -85,18 +85,19 @@ Spain.}
 High throughput sequencing produces massive amounts of data that must be
 processed efficiently. Most reads are identified by mapping them to a
 reference, typically a genome. Modern mappers rely on heuristics to gain
-speed at a reasonable cost of accuracy. MEM seeding is a popular heuristic
-that shows good empirical performance but for which no theory is
-available. It is thus difficult to calibrate or optimize mapping
-strategies based on MEM seeding. Here we develop a theory to predict the
-performance of MEM seeding. More specifically, we design a method to
-compute the probability a read is mapped to the right location when using
-MEM seeds. Our computational strategy is based on the analytic
-combinatorics programme, but uses only part of it. By recoding the reads
-in a specialized combinatorial alphabet, we can implicitly specify their
-generating function and extract the probabilities of interest by direct
-methods or by Monte Carlo sampling. This yields an efficient algorithm to
-calibrate the MEM seeding heuristic for short read technologies.
+speed at a reasonable cost of accuracy. MEM seeding (where MEM stands for
+Maximal Exact Match) is a popular heuristic that shows good empirical
+performance but for which no theory is available. It is thus difficult to
+calibrate or optimize mapping strategies based on MEM seeding. Here we
+develop a theory to predict the performance of MEM seeding. More
+specifically, we design a method to compute the probability a read is
+mapped to the right location when using MEM seeds. Our computational
+strategy is based on the analytic combinatorics programme, but uses only
+part of it. By recoding the reads in a specialized combinatorial alphabet,
+we can implicitly specify their generating function and extract the
+probabilities of interest by direct methods or by Monte Carlo sampling.
+This yields an efficient algorithm to calibrate the MEM seeding heuristic
+for short read technologies.
 \end{abstract}
 
 
@@ -108,14 +109,14 @@ calibrate the MEM seeding heuristic for short read technologies.
 \subsection{Mapping reads to genomes}
 
 Suppose that a DNA fragment drawn at random from a known
-genome\footnote{We will assume throughout that the sequence of the genome
-is known exactly and with absolute certainty. This is not the case in
-practical application, but this assumption will allow us to develop a
-theory centered on the read.} is sequenced with an imperfect instrument;
-how can we identify the location of the fragment in the genome?
+genome\footnote{We will assume that the sequence of the genome is known
+exactly and with absolute certainty. This is not the case in practical
+application, but this assumption will allow us to develop a theory
+centered on the read.} is sequenced with an imperfect instrument; how can
+we identify the location of the fragment in the genome?
 
 We will refer to this question as the \emph{true location problem}.
-It is central to countless applications, including discovering
+It has applications in countless domains, like discovering
 disease-causing mutations; diagnosing viral, bacterial or fungal
 infections; diagnosing cancer and choosing appropriate therapies;
 selecting breeds of interest in agriculture; tracing human migrations from
@@ -126,20 +127,21 @@ The focus of this document is not to solve the true location problem
 \textit{per se}, but rather to evaluate whether a given solution is
 correct. At first sight, whether we can map a read to its true location
 seems to depend only on its length and on the error rate of the
-instrument. However, there is another important factor to consider: most
+sequencer. However, there is another important factor to consider: most
 genomes contain repeated sequences, \textit{i.e.} relatively large
-subsequences that are present at more than one location. So we cannot map
-the fragment with certainty if there exists an exact copy of the sequence
-somewhere else in the genome, because we cannot know which of the two
-copies was sequenced.
+subsequences that are present at more than one location. For instance, we
+cannot map the fragment with certainty if there exists an exact copy of
+the sequence somewhere else in the genome, because we cannot know which of
+the two copies was sequenced.
 
 This case is rare though. Repeated sequences are in general not identical,
 but merely homologous\footnote{By that we mean that drawing nucleotides
 uniformly at random is very unlikely to produce sequences with the
-observed degree of identity.}. So when the DNA fragment is duplicated, we
-can map it with high confidence provided we can distinguish it from its
-duplicates. This in turn depends on their similarity with the target
-fragment and on the error rate of the sequencer.
+observed degree of identity, meaning that the similarity is due some
+biological duplication process.}. So when the DNA fragment is duplicated,
+we can still map it, as long as we can distinguish it from its duplicates.
+This in turn depends on their similarity with the target fragment and on
+the error rate of the sequencer.
 
 Because sequencing errors can convert a DNA fragment into one of its
 duplicates, the \emph{true} location of a DNA fragment is not always the
@@ -147,14 +149,11 @@ duplicates, the \emph{true} location of a DNA fragment is not always the
 candidate location). This leads to the following question: how can we
 identify the \emph{best} location of the fragment in the genome? 
 
-We will refer to this as the \emph{best location problem}. It amounts to
-finding the optimal alignment between two sequences, and for this reason
-has received substantial attention in bioinformatics. The distinction is
-relevant for the present discussion because the candidate solution of the
-\emph{true} location problem can only be the \emph{best} location. So in
-order to solve the true location problem, we must first solve the best
-location problem.
-
+We will refer to this task as the \emph{best location problem}. It amounts
+to finding the optimal alignment between two sequences, and for this
+reason has received substantial attention in bioinformatics. Finding the
+best location of the read is the only way to get to its true location, so
+we need to focus our attention on the best location problem.
 
 \subsection{Seeding heuristics}
 \label{sec:seedheur}
@@ -165,7 +164,7 @@ the large amount of data generated by modern sequencers. Instead, one uses
 heuristic methods, \textit{i.e.} algorithms that run fast, but may not
 return the best location\cite{Waterman1984}. Heuristic mapping algorithms
 thus have three possible outcomes: $i.$ the DNA fragment is mapped to the
-best location, $ii.$ the DNA fragment is mapped to another location,
+best location, $ii.$ the DNA fragment is mapped to some other location,
 $iii.$ the DNA fragment is not mapped at all.
 
 The most popular heuristic to address the best location problem is to
@@ -176,12 +175,12 @@ similarity are called ``seeds''. This is for instance the general strategy
 of the popular alignment algorithm BLAST\cite{pmid2231712}.
 
 If seeds can be discovered fast, we can quickly zoom in on a small set of
-candidate locations and reduce the input size of the exact but slow
+candidate locations and reduce the input size of the (slow) alignment
 algorithm. The disadvantage is that the target location is not always in
 the candidate set. In this case, it cannot be discovered and the outcome
-is either a false positive or a false negative.
+is either $ii.$ or $iii.$
 
-This imposes a trade-off between speed and accuracy between each candidate
+This imposes a trade-off between speed and accuracy because each candidate
 location must be tested with a slow algorithm. If the seeding step is set
 to produce many candidates, the target is likely to be among them and it
 will be discovered. The downside is that this will take long. Conversely,
@@ -189,21 +188,29 @@ if the seeding step is set to produce few candidates, the process will
 run faster but the target is less likely to be in the candidate list so it
 is less likely to be discovered.
 
-Importantly, the terms of this trade-off are not set in stone. Some
+Importantly, the terms of this trade-off depend on the algorithm. Some
 seeding methods are better than others\cite{pmid16533404,pmid20460430}, so
 one can develop faster mapping algorithms at no cost for accuracy.
 
-This framework was developed for the best location problem, but it also
-applies to the true location problem. Actually, the process is exactly the
-same but the outcomes $i.$ and $ii.$ are different. The first, called a
-``true positive'' or an ``on-target hit'', is that the DNA fragment is
-mapped to the \emph{true} location; the second, called a ``false
-positive'' or an ``off-target hit'' is that the DNA fragment is mapped
-somewhere else in the genome. A true positive thus requires that the
-target (the true location) is in the candidate set, and that it has the
-best score. For now, we will assume that the true location is always the
-best and we defer the discussion about this assumption until
-section~\ref{sec:not_the_best}.
+The seeding framework was developed for the best location problem, but it
+also applies to the true location problem. Actually, the process is
+exactly the same except that outcomes $i.$ and $ii.$ now refer to the true
+location. Outcome $i.$, called a ``true positive'', is that the DNA
+fragment is mapped to the \emph{true} location. Outcome $ii.$, called a
+``false positive'' is that the DNA fragment is mapped to an incorrect
+location. Outcome $iii.$, called a ``false negative'', does not change and
+still means that the DNA fragment is not mapped at all.
+
+We will make two assumptions that will simplify the discussion. The first
+is that the true location is always the best. We will further comment on
+this and explain how to relax this assumption in section
+section~\ref{sec:not_the_best}. Until then, we consider that the true
+location problem is the same as the best location problem. The second
+assumption is that the best location is always discovered if it is in the
+candidate set. This implies that outcomes $i.$, $ii.$ and $iii.$ are
+determined by the seeding process. For this reason, we will sometimes
+refer to them as the outcomes of the seeding step, even though they are
+the outcomes of the whole mapping process.
 
 \subsection{MEM seeds}
 
@@ -216,15 +223,16 @@ In other words, a seed is a perfect match between a part of the read and a
 genomic site.
 
 The rest of the document will focus on a seeding heuristic known as ``MEM
-seeding''. This approach gives good empirical results when mapping short
-reads (it is for instance the strategy\footnote{To be exact, BWA-MEM uses
-SMEM seeds (Super Maximal Exact Match seeds).} of the popular mapper
-BWA-MEM\cite{li2013aligning}) but there is presently no theory to justify
-this performance. A deeper understanding of MEM seeding would thus be
-useful to calibrate the speed/accuracy trade-off of this heurisitic.
+seeding'' (where MEM stands for Maximal Exact Match). This approach gives
+good empirical results when mapping short reads (it is for instance the
+strategy\footnote{To be exact, BWA-MEM uses SMEM seeds (Super Maximal
+Exact Match seeds).} of the popular mapper BWA-MEM\cite{li2013aligning})
+but there is presently no theory to justify its performance. A deeper
+understanding of MEM seeding would be useful to calibrate the
+speed/accuracy trade-off of this heurisitic.
 
-Before developing a formal theory, let us clarify the meaning of the MEM
-acronym.
+Before developing a formal theory, let us explain in more detail what
+Maximal Exact Matches are and how MEM seeding works.
 
 \begin{definition}
 A Maximal Exact Match (MEM) seed is a subsequence of a read that is
@@ -234,40 +242,41 @@ genome.
 \end{definition}
 
 This definition presents a computational challenge: to know if a given
-subsequence is a MEM seed, we need to know if it exists somewhere in the
+subsequence is a MEM seed we need to know if it exists somewhere in the
 genome. This is a non trivial problem in itself, but fortunately there
-exists practical methods to identify all the MEM seeds from a read, even
-for very large genomes\cite{ferragina2000opportunistic,
+exists practical methods to identify MEM seeds, even when the reference
+genome is very large\cite{ferragina2000opportunistic,
 ferragina2005indexing}. Such algorithms are crucial for the present
 discussion, but describing them falls outside the scope of the document.
 We refer the interested reader to the relevant
 literature\cite{pmid24336412,pmid25399029,pmid23349213,pmid19389736,
-li2013aligning}, and here on we will assume that MEM seeds are simply
-available at all times. Looking ahead to section~\ref{sec:est}, let
-us just say that this can be done with an algorithm called the
-\emph{backward search}\cite{ferragina2000opportunistic}.
+li2013aligning}, and here on we will assume that MEM seeds are available
+at all times. Looking ahead to section~\ref{sec:est}, let us just mention
+that this can be done with an algorithm called the \emph{backward
+search}\cite{ferragina2000opportunistic}.
 
 Before going further, we need to move a practical consideration out of the
 way. It stands to reason that very short matches between the read and the
 genome are uninformative. For instance, $99.7\%$ of all the possible
 12-mers are present in the reference human genome, so an exact match of
-size 12 or lower says nothing about the location of the DNA fragment.
-In what follows, we will assume that subsequences of the read can only
-match the original DNA sequence and/or its duplicates, but not the rest of
-the genome. This will simplify the discussion and we defer the discussion
-of this assumption until section~\ref{sec:short_MEMs}
+size 12 or lower says nothing about the location of the DNA fragment. In
+what follows, we will assume that subsequences of the read can only match
+the original DNA sequence and/or its duplicates, but not the rest of the
+genome. This will greatly simplify the exposition of the theory. We will
+discuss how to relax this assumption in section~\ref{sec:short_MEMs}.
 
-Fig.~\ref{fig:MEM_example} shows a concrete example. The target (the true
-location of the read) is first potential location. The locations below
-correspond to duplicate sequences. The mismatches between the genome and
-the read are highlighted in bold. The read has three errors indicated by
-stars, so \texttt{T}, \texttt{T} and \texttt{C} should actually be
-\texttt{A}, \texttt{A} and \texttt{G}.
+Fig.~\ref{fig:MEM_example} shows a concrete example where a read is
+aligned to candidate locations. The target (the true location of the
+read) is first potential location. The locations below correspond to
+duplicate sequences. The mismatches between the genome and the read are
+highlighted in bold. The read has three errors indicated by stars, so
+\texttt{T}, \texttt{T} and \texttt{C} should actually be \texttt{A},
+\texttt{A} and \texttt{G} (\textit{i.e.} as in the target sequence).
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1]{MEM_example.pdf}
-\caption{\textbf{A concrete example of MEM seeding.}
+\caption{\textbf{Example of MEM seeding.}
 A DNA fragment is sequenced with an imperfect instrument. It comes from
 the top genomic location (Truth), but three errors were introduced
 (indicated by stars). The sequence of the DNA fragment has three
@@ -311,78 +320,63 @@ the following terms to simplify the discussion.
 
 \begin{definition}
 Assume that the thresohld $\gamma$ is fixed. A \emph{good} seed is an
-on-target MEM seed of size $\gamma$ or greater. Every other MEM seed is a
-\emph{bad} seed. In other words, the true location is in the candidate set
-if and only if the read has a good seed.
+on-target MEM seed of size $\gamma$ or greater. In other words, the true
+location is in the candidate set if and only if the read contains a
+good seed.
 \end{definition}
 
 Compared to seeds of fixed size, MEM seeds have at least two
-counter-intuitive properties. The first is that there are cases where
-there is no good seed, even when $\gamma$ is decreased.
-Fig.~\ref{fig:full_masking_example} shows such an example. Even though
-there is a single sequencing error, the read does not have any MEM seed
-matching the target. Lowering $\gamma$ does not change this, so there is
-no way to discover the true location (even though it is also the best
-location).
+counter-intuitive (and undesirable) properties. The first is that there
+are cases where there cannot be any good seed, even when changing
+$\gamma$. Fig.~\ref{fig:full_masking_example} shows such an example. Even
+though there is a single sequencing error, the read has no good seed.
+Lowering $\gamma$ does not change this, so there is no way to discover the
+true location (even though it is the best location).
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1]{full_masking_example.pdf}
-\caption{\textbf{MEM masking case 1.}
-The read, the MEM seeds and the sequences are as in
+\caption{\textbf{Issues with MEM seeds: inaccessible targets.}
+The read, the MEM seeds and the sequences are represented as in
 Fig.~\ref{fig:MEM_example}. The MEM seeds matching the two incorrect
-locations at the bottom effectively mask the target, so it cannot
-be discovered. MEM masking can occur even when the true location is the
+locations at the bottom effectively hide the target, so it cannot
+be discovered. This can occur even when the true location is the
 best and when there is a single error on the read.}
 \label{fig:full_masking_example}
 \end{figure}
 
-The second counter-intuitive property of MEM seeding is that there are
-cases where there would be a good seed if the read were shorter.
-Fig.~\ref{fig:short_vs_long} shows an example of this case. Again, there
-is no on-target MEM seed, but there would be if the read were two
-nucleotides shorter on the right side. Indeed, in this case there would be
-a shared MEM seed matching the first and the second locations. It would
-also be a good seed for $\gamma \leq 12$.
+The second counter-intuitive property of MEM seeding is that shortening
+a read can sometimes create a good seed. Fig.~\ref{fig:short_vs_long}
+shows an example of this case. Again, there is no good seed, but there
+would be one if the read were two nucleotides shorter on the right side.
+Indeed, in this case there would be a shared MEM seed matching the first
+and the second locations, provided $\gamma \leq 12$.
 
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1]{short_vs_long_example.pdf}
-\caption{\textbf{MEM masking case 2.}
-The read, the MEM seeds and the sequences are as in
-Fig.~\ref{fig:MEM_example}. There is no on-target MEM seed, but there
-would be a shared MEM seed if the read were two nucleotides shorter. The
-true location has been masked by sequencing the last two nucleotides.}
+\caption{\textbf{Issues with MEM seeds: too long reads.}
+The read, the MEM seeds and the sequences are represented as in
+Fig.~\ref{fig:MEM_example}. There would be a good seed (shared) if the
+read were two nucleotides shorter. The true location is hidden by
+the last two nucleotides.}
 \label{fig:short_vs_long}
 \end{figure}
 
 These examples show that MEM seeds can perform worse than seeds of fixed
-size, again raising the question why they seem to give good performance in
-practice. The theory developed below will allow us to compute the
-probability that a read has no good seed and thus that the true location
-is missed. This probability is the key to evaluating and calibrating the
-MEM seeding heuristic.
+size. MEM seeds yield fewer candidates and therefore speed up the mapping
+process, but the question is at what cost for accuracy? The theory
+developed below will allow us to compute the probability that a read has
+no good seed and thus that the true location is missed. This probability
+is the key to evaluating and calibrating the MEM seeding heuristic.
 
-From now we will make the simplifying assumption that a read with a good
-seed is always mapped at the correct location. In other words, we assume
-that a good seed is necessary and sufficient for a true positive or
-outcome $i.$ In practice this is not always the case, but this assumption
-shifts the burden of mapping to the alignment algorithm and allows us
-focus on improving the seeding heuristic.
-
-We first explain a detailed strategy to compute the probablity of outcome
-$i.$ We then explain how to compute the probability of outcome $iii.$,
-\textit{i.e.} that the seeding step returns no hit. Combining these two
-quantities allows us to compute the probability of interest, which is that
-the read is mapped to an incorrect location or outcome $ii.$ Finally, we
-provide a computationally efficient method for estimating the parameters
-that are necessary to estimate the probabilities of interest.
-
-Before going further, we recommend the readers that are not already
-familiar with MEM seeding to take a moment to study the examples above.
-The complexity of the next sections will go \textit{crescendo} and they
-will draw heavily from the concepts and definitions above.
+We first expose a strategy to compute the probablity of true positives
+(outcome $i.$), then show how to compute the probability of false
+negatives (outcome $iii.$), and combine these two quantities to compute
+the probability of false positives (outcome $ii.$). Finally, we provide a
+computationally efficient method for estimating the parameters that are
+necessary to estimate the probabilities of interest.
 
 
 \section{Combinatorial construction}
@@ -396,27 +390,46 @@ seeds so that we can later compute their probability of occurrence.
 For each potential location including the target, we define the
 \emph{match streak} at a given nucleotide as the number of nucleotides
 since the last mismatch on the left, or since the beginning of the read.
-For instance, in Fig.~\ref{fig:MEM_example}, the match streak of the
-target at the ninth nucleotide is $1$ while for the second potential
-location, it is $7$.
 
 \begin{definition}
-At a given position of the read, an off-target location is a \emph{hard
+At a given position of the read, an off-target sequence is a \emph{hard
 mask} if its success streak is strictly longer than the match streak of
-the target. An off-target location is a \emph{soft mask} if its has the
+the target. An off-target sequence is a \emph{soft mask} if its has the
 same match streak as the target.
 \end{definition}
 
-For instance, the second location in the example above is a hard mask at
-the ninth nucleotide. On Fig.~\ref{fig:MEM_example}, one can further see
-that at the second nucleotide, all the off-target locations are soft masks
-and that at the last nucleotide, the second location is a soft mask.
+Fig.~\ref{fig:hard_vs_soft_masks} illustrates hard and soft masks with an
+example. It is important to bear in mind that hard and soft masks depend
+on the position of interest: a sequence can be a mask at the left end of
+the read but not at the right end, or \textit{vice versa}. In the example
+of Fig.~\ref{fig:full_masking_example}, every nucleotide of the read has a
+hard mask, which is why the target cannot be discovered. In the example of
+Fig.~\ref{fig:short_vs_long}, the middle sequence is a soft mask on the
+right half of the read, but it turns into a hard mask two nucleotides
+before the right end, which is why the target could be discovered if the
+read were shorter.
 
-From the definition, the last nucleotide of every strict on-target MEM
-seed is always unmasked. Conversely, an unmasked nucleotide always belongs
-to exactly one strict on-target MEM seed. Also, the last nucleotide of
-every shared on-target MEM seed is always soft-masked, but a soft-masked
-nucleotide does not always belong to a shared on-target MEM seed.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.85]{hard_vs_soft_masks.pdf}
+\caption{\textbf{Example of hard and soft masks.}
+The nucleotides that do not match the read are reprsented as black boxes.
+The nucleotides that contribute to the match streak are represented as
+grey boxes. The remaining nucleotides are represented as open boxes. At
+the given position, the match streak of the target is 7. The first
+off-target is a hard mask because its match streak is $13>7$. The second
+off-target sequence is a soft mask because its match streak is 7 like the
+target. The third off-target sequence is not a mask because its match
+streak is $2<7$.}
+\label{fig:hard_vs_soft_masks}
+\end{figure}
+
+From the definition, we see that the last nucleotide of every strict
+on-target MEM seed is always unmasked. Conversely, an unmasked nucleotide
+always belongs to exactly one strict on-target MEM seed. Also, the last
+nucleotide of every shared on-target MEM seed is always soft-masked, but a
+soft-masked nucleotide does not always belong to a shared on-target MEM
+seed.
 
 Since hard and soft masks inform us about the positions of on-target
 MEM seeds, we construct an alphabet that encodes the masking status of the
@@ -455,7 +468,7 @@ Fig.~\ref{fig:MEM_example} in the MEM alphabet.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=.85]{sketch_extended.pdf}
-\caption{\textbf{The extended MEM encoding}.
+\caption{\textbf{The MEM encoding}.
 The read of Fig.~\ref{fig:MEM_example} is represented in the MEM alphabet.
 The arrows departing from those numbers help understand their meaning. The
 $\downarrow$ symbol is decorated by the number of locations that match the
@@ -1215,7 +1228,7 @@ target.
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.88]{sketch_dual.pdf}
+\includegraphics[scale=0.85]{sketch_dual.pdf}
 \caption{\textbf{The +/- encoding.}
 A example read is represented in the +/- alphabet. The symbols
 $\downarrow_{/j}^-$ represent a mismatch against the off-target sequence,
@@ -1232,9 +1245,9 @@ differs from the target with a fixed probability $p$ and the sequences
 differ from each other with a fixed probability $\mu$. With these
 definitions, the probability of occurrence of the symbol $\square$ is $a =
 (1-p)(1-\mu)$. Likewise, the collective probability of occurrence of the
-symbols $\downarrow_{/j}^-$ is $b = p\mu/3$, that of the symbols 
-$\downarrow_{/j}^+$ is $c = (1-p)\mu$, and the probability of occurrence
-of the symbol $\Downarrow$ is $d = p(1-\mu/3)$. It is easy to verify that
+symbols $\downarrow_{/j}^-$ is $b = (1-p)\mu$, that of the symbols
+$\downarrow_{/j}^+$ is $c = p\mu/3$, and the probability of occurrence of
+the symbol $\Downarrow$ is $d = p(1-\mu/3)$. It is easy to verify that
 $a+b+c+d=1$.
 
 These definitions allow us to specify the weighted generating function of
@@ -1433,8 +1446,8 @@ P(N_{i+1}|N_i) = {N_i \choose N_{i+1}}
 \end{equation*}
 
 Assuming that there are $N = N_0$ duplicates and that we run $m$
-iterations of the backward search, the probability of the sequence of
-observations $(N_1, N_2, \ldots, N_m)$ is thus
+iterations of the backward search, the probability of the observations
+$(N_1, N_2, \ldots, N_m)$ is thus
 
 \begin{equation*}
 P(N_1, \ldots, N_m|N_0) = 
@@ -1634,15 +1647,15 @@ verifying them is wasted. Second, they can cause false positives.
 Fortunately, both issues can be addressed so that they do not constitute a
 major problem.
 
-To avoid spending too much time on small random MEM seeds, we can
-prioritize the seeds so that the best hit is likely to be discovered first
-and bail out from the alignments as soon as it appears that their score
-will be worse than the best hit so far. We can even put an upper bound on
-the quality of candidate so that the alignment can be skipped altogether.
-For instance, if we already have a candidate at distance 1 from the read,
-there is no need to verify candidates from MEM seeds that do not reach one
-end of the read. Indeed, the hit must be at distance at least 2 because
-there is a mismatch before the MEM seed and another one after it.
+To save time during the alignment phase, we can prioritize the seeds so
+that the best hit is likely to be discovered first, allowing us to bail
+out from other alignments as early as possible. We can even bound
+the maximum quality of some candidates so that the alignment can be
+skipped altogether. For instance, if we already have a candidate at
+distance 1 from the read, there is no need to verify candidates from MEM
+seeds in the middle of the read. Indeed, the hit must be at distance at
+least 2 because there is a mismatch before the MEM seed and another one
+after it.
 
 These considerations depend on the implementation of the mapper so we will
 not further develop them. What matters is that random hits do not have to
@@ -1693,13 +1706,14 @@ for the hypothesis that the hit is not random is overwhelming.
 
 In general, one does not need to worry about the value of $\beta$ because
 random hits are extremely visible when $p$ is small. For instance, one can
-choose $\beta=1/2$ so that the term $(1-/\beta)/\beta$ disappears to
-simplify expression (\ref{eq:bayes}). We compute this expression for every
-read and add the result to the estimated probability of false positive for
-the read. Either the term is negligible and it does not affect the
-estimated probability, or it is strongly dominant and yields a very strong
-probability that the location is incorrect, regardless of the estimate
-from the MEM seeding process.
+choose $\beta=1/2$ so that the term $(1-/\beta)/\beta$ disappears in
+expression (\ref{eq:bayes}).
+
+Because the probability that the best candidate is a random sequence is
+either very small or very large, it either has no influence on the
+probability of false positive, or completely dominates it. For every read,
+we thus take the maximum of this probability or the estimated probability
+that MEM seeding returned a false positive.
 
 In summary, MEM seeds in random sequences happen relatively frequently,
 but it is possible to minimize their computational burden. Also, they
