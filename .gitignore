@@ -1,4 +1,8 @@
+MEM.bbl
+MEM.blg
 MEM.log
 MEM.pdf
 *.swp
+*.pyc
 *.o
+.vimtags
