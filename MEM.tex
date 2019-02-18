@@ -82,22 +82,22 @@ Spain.}
 \maketitle
 
 \begin{abstract}
-High throughput sequencing produces massive amounts of data that must be
-processed efficiently. Most reads are identified by mapping them to a
-reference, typically a genome. Modern mappers rely on heuristics to gain
-speed at a reasonable cost of accuracy. MEM seeding (where MEM stands for
-Maximal Exact Match) is a popular heuristic that shows good empirical
-performance but for which no theory is available. It is thus difficult to
-calibrate or optimize mapping strategies based on MEM seeding. Here we
-develop a theory to predict the performance of MEM seeding. More
-specifically, we design a method to compute the probability a read is
-mapped to the right location when using MEM seeds. Our computational
-strategy is based on the analytic combinatorics programme, but uses only
-part of it. By recoding the reads in a specialized combinatorial alphabet,
-we can implicitly specify their generating function and extract the
-probabilities of interest by direct methods or by Monte Carlo sampling.
-This yields an efficient algorithm to calibrate the MEM seeding heuristic
-for short read technologies.
+The increasing throughput of DNA sequencing technologies demands faster
+algorithms to analyze sequencing data. The fate of most reads is to be
+mapped to a reference sequence, typically a genome. Modern mappers rely on
+heuristics to gain speed at a reasonable cost for accuracy. MEM seeding
+(where MEM stands for Maximal Exact Match) is a popular heuristic that
+shows good empirical performance but for which theory is lacking. It is
+thus difficult to calibrate or optimize mapping strategies based on MEM
+seeding. Here we develop a theory to estimate the probability that the MEM
+seeding heuristic fails to return the correct candidate. The major
+innovation is to use concepts from analytic combinatorics to represent
+reads as abstract sequences, from which we estimate the probabilities of
+interest. We provide two separate methods, which combined together give a
+practicial solution to the problem of calibrating MEM seeding when
+aligning short reads. These results have implications for MEM-based
+heuristics and lay the foundation of a general strategy to tackle sequence
+alignment problems.
 \end{abstract}
 
 
@@ -123,16 +123,14 @@ selecting breeds of interest in agriculture; tracing human migrations from
 ancient bones; identifying the donor of a biological sample; diagnosing
 genetic diseaes at birth; finding compatible graft donors \textit{etc}.
 
-The focus of this document is not to solve the true location problem
-\textit{per se}, but rather to evaluate whether a given solution is
-correct. At first sight, whether we can map a read to its true location
-seems to depend only on its length and on the error rate of the
-sequencer. However, there is another important factor to consider: most
-genomes contain repeated sequences, \textit{i.e.} relatively large
-subsequences that are present at more than one location. For instance, we
-cannot map the fragment with certainty if there exists an exact copy of
-the sequence somewhere else in the genome, because we cannot know which of
-the two copies was sequenced.
+At first sight, whether a read read can be mapepd to its correct location
+seems to depend only on its length and on the error rate of the sequencer.
+However, there is another important factor to consider: most genomes
+contain repeated sequences, \textit{i.e.} relatively large subsequences
+that are present at more than one location. For instance, we cannot map
+the fragment with certainty if there exists an exact copy of the sequence
+somewhere else in the genome, because we cannot know which of the two
+copies was sequenced.
 
 This case is rare though. Repeated sequences are in general not identical,
 but merely homologous\footnote{By that we mean that drawing nucleotides
@@ -151,9 +149,10 @@ identify the \emph{best} location of the fragment in the genome?
 
 We will refer to this task as the \emph{best location problem}. It amounts
 to finding the optimal alignment between two sequences, and for this
-reason has received substantial attention in bioinformatics. Finding the
-best location of the read is the only way to get to its true location, so
-we need to focus our attention on the best location problem.
+reason has received substantial attention in bioinformatics. It turns out
+that finding the best location of the read is the only way to get to its
+true location, so for now we need to focus our attention on the best
+location problem.
 
 \subsection{Seeding heuristics}
 \label{sec:seedheur}
@@ -169,41 +168,42 @@ $iii.$ the DNA fragment is not mapped at all.
 
 The most popular heuristic for this problem is to first identify short
 regions of high similiarity between the read and the genome, and then run
-an exact alignment algorithm around those regions. The first step is a
-filtration called ``seeding'' and the regions of high similarity
-are called ``seeds''. This is for instance the general strategy of the
-popular alignment algorithm BLAST~\cite{pmid2231712}.
+an exact alignment algorithm locally at those regions. The first step is a
+filtration called ``seeding'' and the regions of high similarity are
+called ``seeds''. This is for instance the general strategy of the popular
+alignment algorithm BLAST~\cite{pmid2231712}.
 
 If seeds can be discovered fast, we can quickly zoom in on a small set of
 candidate locations and reduce the input size of the (slow) alignment
 algorithm. The disadvantage is that the target location is not always in
 the candidate set. In this case, it cannot be discovered and the outcome
-is either $ii.$ or $iii.$
+is either $ii.$ or $iii.$, which are both erroneous.
 
-This imposes a trade-off between speed and accuracy because each candidate
-location must be tested with a slow algorithm. If the seeding step is set
-to produce many candidates, the target is likely to be among them and it
-will be discovered. The downside is that this will take long. Conversely,
-if the seeding step is set to produce few candidates, the process will
-run faster but the target is less likely to be in the candidate list so it
-is less likely to be discovered.
+The slowness of the alignment algorithm imposes a trade-off between speed
+and accuracy. If the seeding step is set to produce many candidates, the
+target is likely to be among them and it will be discovered. The downside
+is that this will take long. Conversely, if the seeding step is set to
+produce few candidates, the process will run faster but the target is less
+likely to be in the candidate list so it is less likely to be discovered.
 
 Importantly, the terms of this trade-off depend on the algorithm. Some
-seeding methods are better than others (see~\cite{sun2005designing,
-pmid11934743,xu2006optimizing,pmid17044164,brejova2003vector,
-pmid18684737} for examples of design, see~\cite{pmid16533404,pmid20460430}
-for comparisons and discussions, and see~\cite{navarro2001guided} for a
-more general review of filtration methods in pattern matching). The upshot
-is that one can develop faster mapping algorithms at no cost for accuracy.
+seeding methods are better than others (see~\cite{pmid20460430,
+sun2005designing,pmid11934743,xu2006optimizing,pmid17044164,
+brejova2003vector,pmid18684737,pmid15359419} for examples of design,
+see~\cite{pmid16533404, pmid20460430} for comparisons and discussions, and
+see~\cite{navarro2001guided} for a more general review of filtration
+methods in pattern matching). The upshot is that we can develop faster
+mapping algorithms at no cost for accuracy if we find better seeding
+strategies.
 
 The seeding framework was developed for the best location problem, but it
 also applies to the true location problem. Actually, the process is
 exactly the same except that outcomes $i.$ and $ii.$ now refer to the true
-location. Outcome $i.$, called a ``true positive'', is that the DNA
-fragment is mapped to the \emph{true} location. Outcome $ii.$, called a
-``false positive'' is that the DNA fragment is mapped to an incorrect
-location. Outcome $iii.$, called a ``false negative'', does not change and
-still means that the DNA fragment is not mapped at all.
+location. In outcome $i.$ called a ``true positive'', the DNA fragment is
+mapped to the \emph{true} location. In outcome $ii.$ called a ``false
+positive'', the DNA fragment is mapped to an incorrect location. Outcome
+$iii.$ called a ``false negative'' is the same as before and means that
+the DNA fragment is not mapped at all.
 
 We will make two assumptions that will simplify the discussion. The first
 is that the true location is always the best. We will further comment on
@@ -213,12 +213,15 @@ location problem is the same as the best location problem. The second
 assumption is that the best location is always discovered if it is in the
 candidate set. This implies that outcomes $i.$, $ii.$ and $iii.$ are
 determined by the seeding process. For this reason, we will sometimes
-refer to them as the outcomes of the seeding step, even though they are
-the outcomes of the whole mapping process.
+refer to them as the outcomes of the seeding step, even though strictly
+speaking they are the outcomes of the whole mapping pipeline\footnote{This
+can be confusing because some authors refer to the off-target seeds as
+false positives. When we say that the outcome of the seeding step is a
+false positive, we mean that \emph{all} the seeds are off-target.}.
 
 \subsection{MEM seeds}
 
-In general, seeds do not have to be exact matches~\cite{pmid20460430}. For
+In general, seeds do not have to be exact matches{}. For
 instance, the algorithm PatternHunter~\cite{pmid11934743} uses ``spaced
 seeds'' that tolerate mismatches\footnote{For the anecdote, the method is
 covered by a patent (reference US20070088510A1).}. However, in this
@@ -306,8 +309,8 @@ case motivates the following definition, which will play an important role
 for the development of the theory.
 
 \begin{definition}
-A \emph{strict} MEM seed has a single genomic match.
-A \emph{shared} MEM seed has several genomic matches.
+A \emph{strict} MEM seed has a single match in the genome.
+A \emph{shared} MEM seed has several matches in the genome.
 \end{definition}
 
 Without surprise, the principle of MEM seeding is to use the genomic
@@ -1129,6 +1132,12 @@ on the number of off-target sequences $N$. For values of $p$ around 0.01,
 the running time for 10,000,000 iterations is $1$-$10$ seconds on current
 hardware.
 
+Algorithm~\ref{alg:mcmc} is a major result. It gives a compact solution to
+the problem of estimating the probability that a read can be mapped when
+using MEM seeds. The algorithm is also much faster than the naive approach
+of sampling every nucleotide of every sequence, because it samples many
+nucleotidea from \emph{all} the sequences at each iteration.
+
 \section{False positives}
 
 So far we have designed a method to estimate the probability that a
@@ -1729,9 +1738,10 @@ be detected using Bayes formula.
 \section{Discussion}
 
 We have devised a method to compute the probability that the MEM seeding
-heuristic misguides the mapping algorithm so that it cannot find the true
-location of the read. The pillars of our strategy are borrowed from
-analytic combinatorics~\cite{flajolet2009analytic,
+heuristic fails and sets up the mapping process for a false positive. This
+fills a gap of theoretical knowledge to understand and calibrate the
+performance of the MEM seeding heuristic. The pillars of our strategy are
+borrowed from analytic combinatorics~\cite{flajolet2009analytic,
 sedgewick2013introduction}, even though we do not follow the standard
 programme. Constructing generating functions usually serves the purpose of
 finding their singularities in order to approximate the solution. In our
