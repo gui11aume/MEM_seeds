@@ -9,6 +9,7 @@
 \usepackage{blkarray}
 \usepackage[font=small]{caption}
 \usepackage{cite}
+\usepackage{enumerate}
 \usepackage{graphicx}
 
 \setlength{\thickmuskip}{2mu plus 3mu minus 1mu}
@@ -56,12 +57,15 @@
 % ---- Macros ---- %
 
 \newcommand{\dn}[1]{\scriptstyle{\downarrow_{/#1}}}
+\newcommand{\Dn}[1]{\scriptstyle{\Downarrow_{#1}}}
 \newcommand{\up}[1]{\scriptstyle{\uparrow_{/#1}}}
 \newcommand{\nd}{\scriptstyle{|}}
+\newcommand{\modulo}[1]{\ (\mathrm{mod}\ #1)}
 
 %---------------------------------------------------------------
 
-\title{Computing MEM seeding probabilities}
+\title{Estimating mismapping rates in seed-based algorithms
+for read mapping}
 
 \author[1,2]{Guillaume J. Filion}
 \author[1,2]{Eduard Zorita}
@@ -82,22 +86,31 @@ Spain.}
 \maketitle
 
 \begin{abstract}
-High throughput sequencing produces massive amounts of data that must be
-processed efficiently. Most reads are identified by mapping them to a
-reference, typically a genome. Modern mappers rely on heuristics to gain
-speed at a reasonable cost of accuracy. MEM seeding (where MEM stands for
-Maximal Exact Match) is a popular heuristic that shows good empirical
-performance but for which no theory is available. It is thus difficult to
-calibrate or optimize mapping strategies based on MEM seeding. Here we
-develop a theory to predict the performance of MEM seeding. More
-specifically, we design a method to compute the probability a read is
-mapped to the right location when using MEM seeds. Our computational
-strategy is based on the analytic combinatorics programme, but uses only
-part of it. By recoding the reads in a specialized combinatorial alphabet,
-we can implicitly specify their generating function and extract the
-probabilities of interest by direct methods or by Monte Carlo sampling.
-This yields an efficient algorithm to calibrate the MEM seeding heuristic
-for short read technologies.
+% Statement of the problem.
+The increasing throughput of DNA sequencing technologies demands faster
+algorithms to analyze sequencing data. The fate of most reads is to be
+mapped to a reference sequence, typically a genome. Modern mappers rely on
+heuristics to gain speed at a reasonable cost for accuracy. In the seeding
+approach, short matches between the reads and the genome are used to
+narrow the search to a set of candidate locations. Several seeding
+variants used in modern mappers show good empirical performance but
+theoretical results are still lacking, making them difficult to calibrate
+or top optimize.
+% Summary of the results.
+Here we develop a theory to estimate the probability that reads are
+mismapped due to a seeding failure. We describe the properties of simple
+exact seeds, skip-seeds used in Bowtie2 and MEM (Maximal Exact Match)
+seeds used in BWA-MEM. 
+% Innovation.
+The major innovation is to use concepts from analytic combinatorics to
+represent reads as abstract sequences, from which we estimate the
+probabilities of interest.
+% Durability.
+We provide several algorithms, which combined together give a practicial
+solution to the problem of calibrating seeding heuristic for short reads.
+% Scope.
+These results significantly improve current mapping algorithms and lay the
+foundation of a general strategy to tackle sequence alignment problems.
 \end{abstract}
 
 
@@ -123,16 +136,14 @@ selecting breeds of interest in agriculture; tracing human migrations from
 ancient bones; identifying the donor of a biological sample; diagnosing
 genetic diseaes at birth; finding compatible graft donors \textit{etc}.
 
-The focus of this document is not to solve the true location problem
-\textit{per se}, but rather to evaluate whether a given solution is
-correct. At first sight, whether we can map a read to its true location
-seems to depend only on its length and on the error rate of the
-sequencer. However, there is another important factor to consider: most
-genomes contain repeated sequences, \textit{i.e.} relatively large
-subsequences that are present at more than one location. For instance, we
-cannot map the fragment with certainty if there exists an exact copy of
-the sequence somewhere else in the genome, because we cannot know which of
-the two copies was sequenced.
+At first sight, whether a read read can be mapepd to its correct location
+seems to depend only on its length and on the error rate of the sequencer.
+However, there is another important factor to consider: most genomes
+contain repeated sequences, \textit{i.e.} relatively large subsequences
+that are present at more than one location. For instance, we cannot map
+the fragment with certainty if there exists an exact copy of the sequence
+somewhere else in the genome, because we cannot know which of the two
+copies was sequenced.
 
 This case is rare though. Repeated sequences are in general not identical,
 but merely homologous\footnote{By that we mean that drawing nucleotides
@@ -151,84 +162,225 @@ identify the \emph{best} location of the fragment in the genome?
 
 We will refer to this task as the \emph{best location problem}. It amounts
 to finding the optimal alignment between two sequences, and for this
-reason has received substantial attention in bioinformatics. Finding the
-best location of the read is the only way to get to its true location, so
-we need to focus our attention on the best location problem.
+reason has received substantial attention in bioinformatics. For
+simplicity we will assume that the true location is always the best. We
+will relax this assumption in section section~\ref{sec:not_the_best}, but
+until then we will consider that the solution of the true location problem
+is the best location.
+
 
 \subsection{Seeding heuristics}
 \label{sec:seedheur}
 
-There exists exact algorithms to solve the best location
+There exists algorithms to solve the best location
 problem~\cite{pmid7265238,pmid5420325}, but they are too slow to process
 the large amount of data generated by modern sequencers. Instead, one uses
-heuristic methods, \textit{i.e.} algorithms that run fast, but may not
-return the best location~\cite{Waterman1984}. Heuristic mapping algorithms
-thus have three possible outcomes: $i.$ the DNA fragment is mapped to the
-best location, $ii.$ the DNA fragment is mapped to some other location,
-$iii.$ the DNA fragment is not mapped at all.
+heuristic methods, \textit{i.e.} algorithms that run fast, but that may
+return an incorrect result~\cite{Waterman1984}.
 
-The most popular heuristic for this problem is to first identify short
+The most popular heuristic for the best location problem is a filtration
+method called ``seeding''. The principle is to first identify short
 regions of high similiarity between the read and the genome, and then run
-an exact alignment algorithm around those regions. The first step is a
-filtration called ``seeding'' and the regions of high similarity
-are called ``seeds''. This is for instance the general strategy of the
-popular alignment algorithm BLAST~\cite{pmid2231712}.
+an exact alignment algorithm at the candidate locations. This is for
+instance the general strategy of the popular alignment algorithm
+BLAST~\cite{pmid2231712}.
 
-If seeds can be discovered fast, we can quickly zoom in on a small set of
-candidate locations and reduce the input size of the (slow) alignment
-algorithm. The disadvantage is that the target location is not always in
-the candidate set. In this case, it cannot be discovered and the outcome
-is either $ii.$ or $iii.$
+If seeding is fast, we can quickly zoom in on a small set of candidate
+locations and reduce the input size of the (slow) alignment algorithm. The
+disadvantage is that the target location is not always in the candidate
+set. When that happens, the read cannot be mapped to the correct location
+because it has been filtered out at the seeding step.
 
-This imposes a trade-off between speed and accuracy because each candidate
-location must be tested with a slow algorithm. If the seeding step is set
-to produce many candidates, the target is likely to be among them and it
-will be discovered. The downside is that this will take long. Conversely,
-if the seeding step is set to produce few candidates, the process will
-run faster but the target is less likely to be in the candidate list so it
-is less likely to be discovered.
+The slowness of the alignment algorithm imposes a trade-off between speed
+and accuracy: If the seeding step is set to produce many candidates, it is
+likely to retrieve the candidate. The downside is that this will take
+long. Conversely, if the seeding step is set to produce few candidates,
+the process will run faster but the target is less likely to be in the
+candidate list.
 
-Importantly, the terms of this trade-off depend on the algorithm. Some
-seeding methods are better than others (see~\cite{sun2005designing,
-pmid11934743,xu2006optimizing,pmid17044164,brejova2003vector,
-pmid18684737} for examples of design, see~\cite{pmid16533404,pmid20460430}
-for comparisons and discussions, and see~\cite{navarro2001guided} for a
-more general review of filtration methods in pattern matching). The upshot
-is that one can develop faster mapping algorithms at no cost for accuracy.
+Importantly, the trade-off depends on the seeding method. This means that
+we can develop faster mapping algorithms at no cost for accuracy, as long
+as we can find better seeding strategies. Progress on this line of
+research has largely benefited from the improvement of computer hardware
+and from the deveopment of indexing algorithms. Literature on this topic
+is already abudant. Some examples of seeding algorithms are given in
+references~\cite{sun2005designing,pmid11934743,xu2006optimizing,
+pmid17044164,brejova2003vector,pmid18684737,pmid15359419}.
+References~\cite{pmid16533404} and~\cite{pmid20460430} present high-level
+comparisons of different designs, and reference~\cite{navarro2001guided}
+gives a global overview of filtration methods in pattern matching.
 
-The seeding framework was developed for the best location problem, but it
-also applies to the true location problem. Actually, the process is
-exactly the same except that outcomes $i.$ and $ii.$ now refer to the true
-location. Outcome $i.$, called a ``true positive'', is that the DNA
-fragment is mapped to the \emph{true} location. Outcome $ii.$, called a
-``false positive'' is that the DNA fragment is mapped to an incorrect
-location. Outcome $iii.$, called a ``false negative'', does not change and
-still means that the DNA fragment is not mapped at all.
+\subsection{The two types of seeding failure}
 
-We will make two assumptions that will simplify the discussion. The first
-is that the true location is always the best. We will further comment on
-this and explain how to relax this assumption in section
-section~\ref{sec:not_the_best}. Until then, we consider that the true
-location problem is the same as the best location problem. The second
-assumption is that the best location is always discovered if it is in the
-candidate set. This implies that outcomes $i.$, $ii.$ and $iii.$ are
-determined by the seeding process. For this reason, we will sometimes
-refer to them as the outcomes of the seeding step, even though they are
-the outcomes of the whole mapping process.
+Filtering methods are considered to fail whenever the target is not in the
+candidate set. For seeding heuristics, we need to distinguish two
+different kinds of failure. In the first kind, the candidate set contains 
+a duplicate of the target but does not contain the target itself; in the
+second kind, the candidate set contains neither.
+
+The distinction is important because duplicates of the target are similar
+to the read (due to their similarity to the target), so a failure of the
+first kind is difficult to distinguish from a success. A failure of the
+second kind is easier to recognize because in this case the best hit is
+not similar to the read.
+
+Before going further, we introduce some vocabulary that will be useful to
+simplify the exposition of the theory.
+
+\begin{definition}
+The seeding process is said to be
+\begin{enumerate}[i)]
+\item on target if the candidate set contains the target,
+\item off target if the candidate set contains a duplicate but
+not the target, 
+\item null if the candidate set contains neither.
+\end{enumerate}
+\end{definition}
+
+If a seed-based algorithm returns an incorrect location, then the best
+location was never tested with an exact alignment. If the error is given a
+high confidence, then it must be the best in the candidate set and it must
+be similar to the read. This narrows down the cases of mismapping, or more
+exactly high confidence mismapping to off-target seeding.
+
+This observation is fundamental. In order to estimate the mismapping rate
+of an algorithm, we must know how often the associated seeding heuristic
+is off target. Yet, this information is missing for nearly all seeding
+methods, meaning that current mappers cannot be properly calibrated.
+
+The focus of this article is to develop a theory to estimate the
+probability of off-target seeding under the most popular seeding
+heuristics. Our previous work pioneered a method to compute seeding
+probabilities but it did not distinguish off-target from null
+seeding~\cite{filion2017analytic,filion2018analytic}, and therefore did
+not provide a way to control the mismapping rate. Other authors
+investigated the reliability of mapping algorithms~\cite{pmid23872968},
+but they focused on the probability that random sequences have a single
+hit, recognizing that solving the problem requires taking into
+consideration the repeat structure of the genome.
+
+\section{Types of seeds}
+
+The term ``seed'' does not have exactly the same meaning according to
+different authors. It can designate a part of the read, a part of the
+genome, a particular sequence motif or a structured pattern of matches.
+Also, the term is not always short for ``exact match''. For instance, the
+algorithm PatternHunter~\cite{pmid11934743} describes ``spaced seeds''
+that tolerate mismatches\footnote{For the anecdote, the method is covered
+by a patent (reference US20070088510A1).}. To avoid potential confusion,
+we will adopt the following convention.
+
+\begin{definition}
+A seed is a subsequence of the read that is above a certain size $\gamma$
+(defined by the context of the problem) and that has at least one perfect
+match in the reference genome.
+\end{definition}
+
+When a seed matches a particular location of the genome, we will say that
+it is a seed \emph{for} that location. For instance, we will often refer
+to a seed for the target or a seed for one of its duplicates.
+
+This definition presents a computational challenge: to know if a given
+subsequence is a seed we need to know if it exists somewhere in the
+genome. This is a non trivial problem in itself, but fortunately there
+exists practical methods to solve it, even when the reference genome is
+very large~\cite{ferragina2000opportunistic, ferragina2005indexing}. Such
+algorithms are crucial for the present theory, but describing them
+falls outside the scope of the document. Looking ahead to
+section~\ref{sec:est}, let us only mention that this can be done with an
+algorithm called the \emph{backward
+search}~\cite{ferragina2000opportunistic}. We refer the interested reader
+to the relevant
+literature~\cite{pmid24336412,pmid25399029,pmid23349213,pmid19389736} and
+here on we will assume that seeds are always known without ambiguity [ALL
+THE CITED LITERATURE IS FOR MEM SEEDS, WE NEED TO FIND ARTICLES THAT TREAT
+THE CASE OF OTHER SEEDS].
+
+
+\subsection{Exact seeds}
+
+Exact seeds have a fixed size $\gamma$. When using exact seeds, all the
+perfect matches of size $\gamma$ are collected to constitute the candidate
+set. This seeding heuristic was used in the first version of
+BLASTN~\cite{pmid2231712}, but is no longer used because they produce many
+overlapping matches in the same regions, as we are about to illustrate.
+
+Fig.~\ref{fig:exact_seed_example} shows the example of a read produced
+by an imperfect sequencer. The sequenced DNA fragment comes from a region
+of the genome that has three extra duplicates, and the read has three
+miscalled nucleotides (indicated by stars).
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=1]{exact_seed_example.pdf}
+\caption{\textbf{Example of exact seeds.}
+A sequenced DNA fragment (Read) is shown above its original form in the
+genome (Target).}
+\label{fig:exact_seed_example}
+\end{figure}
+
+Fig.~\ref{fig:exact_seed_example} also illustrates the seeding process
+with exact seeds of size $\gamma=7$. It is clear that erroneous
+nucleotides can also belong to exact seeds because they sometimes match
+one of the duplicates. However, this is not the case of erroneous
+nucleotides that are also mismatches for \emph{all} the duplicates, like
+the second sequencing error in this example.
+
+Thie middle of the read shows some cluttering where consecutive seeds
+match consecutive sequences at the same location. This is typical for
+exact seeds and constitutes a nuisance for the implementation. Indeed, it
+is a waste of computer resources to discover matches in sequences that are
+already in the candidate set. In addition, this seeding method is not
+particularly sensitive~\cite{pmid11934743} so it is used only for specific
+applications. Nevertheless, it will be extremely useful for the
+development of the present theory.
+
+
+\subsection{Skip seeds}
+
+Skip seeds have a fixed size $\gamma$, but unlike exact seeds they cannot
+start at every nucleotide. Instead, a fixed amount of nucleotides is
+skipped between every seed. This is a way to reduce the amount of
+overlapping matches at the same location, but the cost is a loss of
+sensitivity. This seeding heuristic is used by
+Bowtie2~\cite{pmid22388286}, where seeds have size $\gamma=16$ and fall
+every 10 nucleotides (9 nucleotides are skipped between seeds).
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=1]{skip_seed_example.pdf}
+\caption{\textbf{Example of skip seeds.}
+The sequences and the annotations are the same as in
+Fig.~\ref{fig:exact_seed_example}, but here one nucleotide is skipped
+betwen the seeds. In other words, seeds can never start on a nucleotide
+with an even index. To highlight the difference with
+Fig.~\ref{fig:exact_seed_example}, the missing seeds are represented by
+dotted lines. Skipping nucleotides reduces the clutter at the center of
+the read, but it also removes the only seed for the second duplicate.}
+\label{fig:skip_seed_example}
+\end{figure}
+
+Fig.~\ref{fig:skip_seed_example} shows the seeding process on the read of
+Fig.~\ref{fig:exact_seed_example} when using skip seeds instead of exact
+seeds. Here the size is still $\gamma=7$ but 1 extra nucleotide is skipped
+between seeds. This amounts to removing every other seed. The consequence
+is that there are fewer overlapping matches at the center of the read, but
+the only seed for the second duplicate was lost. This is a rather positive
+outcome because there is one off-target location fewer in the candidate
+set, but in general the same might happen to the target.
+
+It is clear that skipping nucleotides reduces the sensitivity of the
+seeding, but to what extent? One could test this empirically, but it
+depends on the seed length, the amount of nucleotides that are skipped,
+the error rate of the sequencer and the size of the reads. The present
+theory will allow us to get the answer automatically.
+
 
 \subsection{MEM seeds}
 
-In general, seeds do not have to be exact matches~\cite{pmid20460430}. For
-instance, the algorithm PatternHunter~\cite{pmid11934743} uses ``spaced
-seeds'' that tolerate mismatches\footnote{For the anecdote, the method is
-covered by a patent (reference US20070088510A1).}. However, in this
-document, we will always assume that a seed is an exact match with no gap.
-In other words, a seed is a perfect match between a part of the read and a
-genomic site.
-
-The rest of the document will focus on a seeding heuristic known as ``MEM
-seeding'' (where MEM stands for Maximal Exact Match). This approach gives
-good empirical results when mapping short reads (it is for instance the
+We will now focus on a seeding heuristic known as ``MEM seeding'' (where
+MEM stands for Maximal Exact Match). This approach gives good empirical
+results when mapping short reads (it is for instance the
 strategy\footnote{To be exact, BWA-MEM uses SMEM seeds (Super Maximal
 Exact Match seeds).} of the popular mapper BWA-MEM~\cite{li2013aligning})
 but there is presently no theory to justify its performance. A deeper
@@ -245,30 +397,6 @@ because the read ends or because the extended subsequence is not in the
 genome.
 \end{definition}
 
-This definition presents a computational challenge: to know if a given
-subsequence is a MEM seed we need to know if it exists somewhere in the
-genome. This is a non trivial problem in itself, but fortunately there
-exists practical methods to identify MEM seeds, even when the reference
-genome is very large~\cite{ferragina2000opportunistic,
-ferragina2005indexing}. Such algorithms are crucial for the present
-discussion, but describing them falls outside the scope of the document.
-We refer the interested reader to the relevant
-literature~\cite{pmid24336412,pmid25399029,pmid23349213,pmid19389736,
-li2013aligning}, and here on we will assume that MEM seeds are available
-at all times. Looking ahead to section~\ref{sec:est}, let us just mention
-that this can be done with an algorithm called the \emph{backward
-search}~\cite{ferragina2000opportunistic}.
-
-Before going further, we need to move a practical consideration out of the
-way. It stands to reason that very short matches between the read and the
-genome are uninformative. For instance, $99.7\%$ of all the possible
-12-mers are present in the reference human genome, so an exact match of
-size 12 or lower says nothing about the location of the DNA fragment. In
-what follows, we will assume that subsequences of the read can only match
-the original DNA sequence and/or its duplicates, but not the rest of the
-genome. This will greatly simplify the exposition of the theory. We will
-discuss how to relax this assumption in section~\ref{sec:short_MEMs}.
-
 Fig.~\ref{fig:MEM_example} shows a concrete example where a read is
 aligned to candidate locations. The target (the true location of the
 read) is first potential location. The locations below correspond to
@@ -280,7 +408,7 @@ highlighted in bold. The read has three errors indicated by stars, so
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1]{MEM_example.pdf}
-\caption{\textbf{Example of MEM seeding.}
+\caption{\textbf{Example of MEM seeds.}
 A DNA fragment is sequenced with an imperfect instrument. It comes from
 the top genomic location (Truth), but three errors were introduced
 (indicated by stars). The sequence of the DNA fragment has three
@@ -301,13 +429,724 @@ the case of the second and the third from the left. In this case, they
 must be separated by a nucleotide that is a mismatch against \emph{all}
 the duplicates.
 
+
+\section{Model and computational strategy}
+\label{sec:symbolic}
+
+\subsection{Sequencing error and duplications}
+
+Now that this is clarified, we need to model the sequencing and the
+duplication processes so that we can compute the probabilities of the
+events of interest. We assume that the sequencing instrument has a
+constant substitution rate $p$, and that insertions and deletions never
+occur. When a substitution occurs, we assume that the instrument is
+equally likely to output any one of the remaining three nucleotides. This
+is a coarse-grain description of the error spectrum of the Illumina
+technology~\cite{pmid21576222}.
+
+Next, we assume that the target sequence has $N \geq 0$ duplicates, so
+that there are $N$ off-target sequences. We further assume that
+duplication happened instantaenously at some point in the past and that
+all $N+1$ sequences diverge independently of each other at a constant
+rate. In other words, we ignore the complications due to the genealogy of
+the duplication events and we simply assume that at each position, any
+given duplicate is identical to the target with probability $1-\mu$. If it
+is not, we assume that the duplicate has any of the remaining three
+nucleotides with equal probability (\textit{i.e.} each is found with
+probability $\mu/3$).
+
+Note that read errors are always mismatches against the target (because we
+assume that the target is the true sequence), and they match each
+off-target sequence with probability $\mu/3$. Correct nucleotides are
+always a match for the target, and they match each off-target sequence
+with probability $1-\mu$.
+
+
+\subsection{Weighted generating functions}
+
+The central object of analytic combinatorics is the generating function,
+and for our particular purpose we will use a special kind known as
+\emph{weighted generating function}.
+
+\begin{definition}
+\label{def:GF}
+Let $\mathcal{A}$ be a set of combinatorial objects characterized by a
+size in $\mathbb{N}$ and a weight in $\mathbb{R}^+$. The weighted
+generating function of $\mathcal{A}$ is defined as
+
+\begin{equation}
+\label{eq:GF1}
+A(z) = \sum_{a \in \mathcal{A}} w(a) z^{|a|},
+\end{equation}
+where $|a|$ and $w(a)$ denote the size and weight of the object $a$,
+respectively. Expression (\ref{eq:GF1}) also defines a sequence $(a_k)_{k
+\geq 0}$ such that 
+
+\begin{equation*}
+A(z) = \sum_{k=0}^\infty a_k z^k.
+\end{equation*}
+
+By definition $a_k = \sum_{a \in A_k}w(a)$, where $A_k$ is the class of
+objects of size $k$ in $\mathcal{A}$. The number $a_k$ is the
+total weight of objects of size $k$.
+\end{definition}
+
+To give a concrete example, if the probability of the symbol
+$\downarrow_{/0}$ is $q$, the weighted generating function of a segment
+containing only this symbol is $qz$. In our case, we are interested in the
+weighted generating function of reads without good seeds, so that the
+coefficient $a_k$ is equal to the probability that a read of size $k$ has
+no good seed.
+
+The motivation for introducing weighted generating functions is that
+operations on combinatorial objects translate into operations on their
+weighted generating functions. If $A(z)$ and $B(z)$ are the weighted
+generating functions of two mutually exclusive sets $\mathcal{A}$ and
+$\mathcal{B}$, the weighted generating function of $\mathcal{A} \cup
+\mathcal{B}$ is $A(z) + B(z)$, as evident from expression (\ref{eq:GF1}).
+Size and weight can be defined for pairs of objects in $\mathcal{A} \times
+\mathcal{B}$ as $|(a,b)| = |a| + |b|$ and $w(a,b) = w(a)w(b)$. In other
+words the sizes are added and the weights are multiplied.  With this
+convention, the weighted generating function of the Cartesian product
+$\mathcal{A} \times \mathcal{B}$ is $A(z)B(z)$. This simply follows from
+expression (\ref{eq:GF1}) and from
+
+\begin{equation*}
+A(z)B(z) =
+\sum_{a\in \mathcal{A}}w(a)z^{|a|} \sum_{b\in \mathcal{B}}w(b)z^{|b|}
+= \sum_{(a,b) \in \mathcal{A} \times \mathcal{B}} w(a)w(b)z^{|a|+|b|}.
+\end{equation*}
+
+These two operations are all we need in order to compute the weighted
+generating functions of the reads of interest. Addition corresponds to
+creating a new family by merging reads from families $\mathcal{A}$ and
+$\mathcal{B}$. Multiplication corresponds to creating a new family by
+concatenating reads from families $\mathcal{A}$ and $\mathcal{B}$.
+
+\subsection{Analytic representation}
+
+The symbolic method is a strategy belonging to the general \emph{analytic
+combinatorics} framework. The idea is to combine simple combinatorial
+objects into more complex objects. Each combinatorial operation on the
+objects corresponds to a mathematical operation on their weighted
+generating functions. One can thus obtain the weighted generating function
+of complex objects, and from there extract their probability of
+occurrence.
+
+The combinatorial construction of reads using the extended MEM alphabet
+gives us a method to express their weighted generating function from the
+simpler generating function of segments. More specifically, we can
+describe complex sequences of segments through a so-called \emph{transfer
+matrix} $M(z)$ that specifies which pairs of consecutive segments are
+allowed and which are forbidden in the reads of interest.
+
+The segment types are identified by their terminators arranged in a
+predefined oder. The entry of $M(z)$ at coordinates $(i,j)$ is the
+weighted generating function of segments with the $j$-th terminator that
+can be inserted immediately after segments with the $i$-th terminator. The
+entries of the matrix $M(z) + M(z)^2 + \ldots = M(z) \cdot (I-M(z))^{-1}$
+are the weighted generating functions of the reads of all sizes using all
+the allowed combinations of segments.
+
+The entry of interest from $M(z)$ is the one that corresponds to the
+terminators $\downarrow_{/0}$ and $|$ because it represents the reads of
+any size whose first segment can be inserted after $\downarrow_{/0}$, and
+whose last segment is terminated by $|$. Indeed, the $|$ terminator marks
+the end of the read, so it must be the final symbol of every valid read.
+As for the first segment, observe that all the segments that can follow
+the $\downarrow_{/0}$ symbol are exactly those that can be at the frst
+postion of the read\footnote{One could have introduced a special start
+symbol. It is equivalent to an invisible $\downarrow_{/0}$ prepending
+the reads.}.
+
+In summary, the transfer matrix $M(z)$ contains the weighted generating
+function of interest. Our next task is thus to specify $M(z)$.
+
+More didactic descriptions of the strategy to compute seeding
+probabilities using analytic combinatorics have been published
+elsewhere~\cite{filion2017analytic,filion2018analytic}. The interested
+readers can also discover more about analytic combinatorics in the
+standard textbooks~\cite{flajolet2009analytic,sedgewick2013introduction}.
+
+
+\subsection{Example 1: on-target exact seeds}
+\label{sec:sample_exact}
+
+We highlight the strategy above with an example that will turn out to be
+central for the development of the theory. In addition, it is simple
+enough to provide a gentle introduction to the general methodology. This
+example was described in detail in~\cite{filion2017analytic} and
+in~\cite{filion2018analytic}, but we repeat it here with a formalism that
+fits the present manuscript.
+
+The first step is to note that the nucleotide sequence of the read is
+irrelevant. Indeed, the read has an on-target seed if and only if it
+contains a stretch of $\gamma$ nucleotides without error. So the main step
+is to recode the read as sequence of correct or erroneous nucleotides.
+
+We define the mismatch alphabet $\mathcal{A}_0 = \{\square, |,
+\Downarrow,\}$, where $\square$ represents a correct nucleotide,
+$\Downarrow$ represents an erroneous nucleotide and $|$ is special symbol
+appended after the last nucleotide to mark the end of the read.
+
+This recoding allows us to segment the read in \emph{segments} defined as
+a sequence of 0 or more symbols $\square$ followed by a symbol
+$\Downarrow$. The last part of the read is called the tail and it is
+terminated by the symbol $|$ instead of $\Downarrow$. The symbol $|$ does
+not correspond to a nucleotide, it has size 0. This decomposition is
+unique, so we can view a read as a sequence of segments with a tail,
+instead of a sequence of nucleotides.
+
+Fig.~\ref{fig:simple} shows an example of decomposition in segments.
+On-target seeds cannot contain sequencing errors, therefore they must lie
+inside a segment or inside the tail. So the size of the segments and of
+the tail indicates whether the read contains an on-target seed.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.85]{sketch_simple.pdf}
+\caption{\textbf{The mismatch encoding.}
+A example read is represented in the match alphabet. The symbol
+$\Downarrow$ represents a mismatch against the target sequence and
+the symbol $\square$ represents a match.}
+\label{fig:simple}
+\end{figure}
+
+The probability of occurrence of the symbol $\Downarrow$ is $p$, the error
+rate of the sequencer, and the probability of occurrence of the symbol
+$\square$ is thus $1-p = q$. Both symbols have size 1, so their respective
+weighted generating function are $pz$ and $qz$. Using the rule for
+concatenation, we see that the weighted generating function of a segment
+with $m$ symbols $\square$ is $(qz)^mpz$. The symbol $|$ has size 0, so
+the weighted generating function of a tail segment with $m$ symbols
+$\square$ is $(qz)^m$.
+
+The key insight is that reads without on-target seed correspond exactly
+with the reads that are made of segments and tail with fewer than $\gamma$
+symbols $\square$. The weighted generating function of such segments is
+$pz \cdot \big( 1+qz+\ldots+(qz)^{\gamma-1} \big)$, and that of the tail
+is $1+qz+\ldots+(qz)^{\gamma-1}$. This gives a construction plan that can
+be encoded as a transfer matrix.
+
+Since there are two kinds of bjects, the segments and the tails, the
+dimensions of the transfer matrix are $2 \times 2$. A segment can be
+followed by another segment or by the tail. The tail can be followed by
+nothing. The expression of the transfer matrix $M(z)$ is thus
+\begin{equation*}
+\begin{blockarray}{ccc}
+   & \scriptstyle{\Downarrow} & \scriptstyle{|} \\
+\begin{block}{c[cc]}
+\scriptstyle{\Downarrow} & pz \cdot \big( 1+qz+\ldots+(qz)^{\gamma-1}
+\big)  & 1+qz+\ldots+(qz)^{\gamma-1} \\
+\scriptstyle{|} & 0 & 0 \\
+\end{block}
+\end{blockarray}.
+\end{equation*}
+
+In this case, it is possible to compute $M(z) + M(z)^2 + \ldots = M(z)
+\cdot (I-M(z))^{-1}$ directly and to extract the entry of interest.
+Here it is the top right term because the read can start with a segment or
+the tail (as if the read were prepended by an invisible segment), and it
+must end with the tail. It is easy to check that the weighted generating
+function is equal to
+\begin{equation}
+\label{eq:F}
+\frac{1+qz+\ldots+(qz)^{\gamma-1}}
+  {1-pz \big(1+qz+\ldots+(qz)^{\gamma-1} \big)}.
+\end{equation}
+
+The function above can be represented as a Taylor series $a_0 + a_1z +
+a_2z^2 + \ldots$ By construction, $a_k$ is the quantity of interest,
+\textit{i.e.} the probability that a read of size $k$ does not contain an
+on-target seed, so we now need to extract those coefficients from
+expression (\ref{eq:F}). There are several methods to do so, the one we
+choose here is to build a recurrence equation to compute $a_k$ from the
+previous terms of the series $a_0, a_1, \ldots, a_{k-1}$.
+
+For this, we observe that equation (\ref{eq:F}) is equivalent to
+\begin{equation*}
+(1-qz) \left(1-pz \big(1+qz+\ldots+(qz)^{\gamma-1} \big)\right)
+(a_0 + a_1z +a_2z^2 + \ldots) = 1-(qz)^\gamma.
+\end{equation*}
+Equating the terms of same degree on both side of the equal signs leads
+to the following relationship between the coefficients of the series:
+\begin{equation}
+\label{eq:PE0}
+a_k = 
+\begin{cases}
+1            &\quad\text{if } k < \gamma, \\
+1 -pq^\gamma &\quad\text{if } k = \gamma, \\
+a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
+\end{cases}
+\end{equation}
+
+The term of interest can be computed recursively using expression
+(\ref{eq:PE0}). This approach is very efficient because every iteration
+involves at most one multiplication and one subtraction. Also, the default
+floating-point arithmetic on modern computers gives sufficient precision
+to not worry about numeric instability for the problems considered here
+(we rarely need to compute those probabilities for reads above 500
+nucleotides).
+
+This example shows how the symbolic approach gives a non-trivial and yet
+very simple method to compute the probability that a read of size $k$ does
+not contain an on-target exact seed.
+
+
+\subsection{Example 2: on-target skip seeds}
+
+Another example that will turn out to be essential is to compute the
+probability that a read contains no on-target skip seed. We tackle the
+question with the same strategy as in the previous example, so we first
+recode the reads using a more useful alphabet to solve this problem.
+
+Once again, we need to know whether a nucleotide is a sequencing error,
+but this time we also need to know its phase in the repeated cycles of
+skipped positions. For this, we define the skip-$n$ alphabet
+$\mathcal{A}_n = \{\square, |, \Downarrow_0, \Downarrow_1, \ldots,
+\Downarrow_n \}$. As before, the symbol $\square$ represents a correct
+nucleotide and the symbol $|$ is a terminator appended at the end of the
+read. The symbols $\Downarrow_m$ ($m \in \mathbb{N}$) represent sequencing
+errors and $m$ indicates the number of nucleotides till the next
+non-skipped position (\textit{i.e.} $m=0$ for nucleotides immediately
+before a non-skipped position and $m=n$ for nucleotides at a non-skipped
+position).
+
+The segments in this alphabet are defined as sequences of 0 or more
+symbols $\square$ followed by any of the symbols $\Downarrow_m$. The tail
+is again defined as a sequence of 0 or more symbols $\square$ followed by
+the symbol $|$. Given that this decomposition is unique, we can again view
+a read as a sequence of segments with a tail. The example of
+Fig.~\ref{fig:simple} is showed again in Fig.~\ref{fig:skip}, where the
+segments in the mismatch alphabet have been replaced by the segments in
+the skip-3 alphabet,
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.85]{sketch_skip.pdf}
+\caption{\textbf{The skip encoding.}
+Legend.}
+\label{fig:skip}
+\end{figure}
+
+The probability of occurrence of a sequencing error is $p$ so the weighted
+generating function of all the symbols $\Downarrow_m$ are identical and
+equal to $pz$. The weighted generating function of the symbol $\square$ is
+again $qz$, and so the weighted generating function of a segment with $m$
+symbols $\square$ is again $(qz)^mpz$, and the weighted generating
+function of a tail segment with $m$ symbols $\square$ is again $(qz)^m$.
+
+Reads that do not contain any on-target skip seed can still contain
+segments with $\gamma$ or more symbols $\square$, so this case is more
+complex than the previous one. For instance, if there is a sequencing
+error in phase $r$, the status of the next $r$ nucleotides does not have
+any influence on the presence of an on-target seed. Indeed, there is no
+on-target seed upstream of the error by construction, and the next seed is
+scheduled to start $r$ nucleotides downstream of it, so the following
+segment or tail can have up to $\gamma+r-1$ symbols $\square$. So in order
+to enforce the absence of on-target seed, we have to adjust the maximum
+size of the segments depending on the preceding terminator.
+
+In the skip-$n$ alphabet, reads are composed of $n+2$ different kinds of
+objects: the segments terminated by the $n+1$ symbols $\Downarrow_0,
+\Downarrow_1, \ldots, \Downarrow_n$, plus the tail. The dimensions of the
+transfer matrix are thus $(n+2) \times (n+2)$.
+
+As mentioned above, after the $\Downarrow_r$ terminator, we can append
+segments with up to $\gamma+r-1$ symbols $\square$. The terminators of
+those $\gamma+r$ possible segments are distributed according to the laws
+of the modulo $n+1$ arithmetic. For instance, if the next segment has no
+symbol $\square$ then it is terminated by $\Downarrow_{r+1}$, but also if
+it has $n+1$ symbols $\square$ (assuming $n+1 < \gamma$). Specifying the
+transfer matrix thus involves a substantial amount of bookkeeping.
+
+\begin{equation*}
+\begin{blockarray}{cccccc}
+   & \Dn{0} & \Dn{1} & \ldots & \Dn{n} & \nd \\
+\begin{block}{c[ccccc]}
+\Dn{0} & H_{0,0}(z) & H_{0,1}(z) & \ldots & H_{0,n}(z) & J_0(z) \\
+\Dn{1} & H_{1,0}(z) & H_{1,1}(z) & \ldots & H_{1,n}(z) & J_1(z) \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\Dn{n} & H_{n,0}(z) & H_{n,1}(z) & \ldots & H_{n,n}(z) & J_n(z) \\
+\nd & 0 & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray}
+\end{equation*}
+
+\begin{eqnarray}
+H_{r,s}(z) &=& pz \cdot (qz)^x \cdot \big( 1 + (qz)^{n+1} +
+  \ldots + (qz)^{m(n+1)} \big), \\
+\notag
+  &\;& \text{where } x = r-s-1 \modulo{n+1},
+  \text{ and } m = \left\lfloor
+  \frac{\gamma+r-1-x}{n+1} \right\rfloor, \\
+J_r(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+r-1}.
+\end{eqnarray}
+
+The transfer matrix is now too complex to compute a close expression
+for $M(z)\cdot(I-M(z))^{-1}$. We return to the definition $M(z) + M(z)^2 +
+\ldots$ and we observe that the terms $M(z)^{k+2}, M(z)^{k+3}, \ldots$
+have no influence on the coefficients $a_0, a_1, \ldots, a_k$.
+
+Indeed, a read of size $k$ has at most $k$ segments (plus one obligatory
+tail). Since $M(z)^{s+1}$ contains the weighted generating functions of
+reads with exactly $s$ segments and one tail, $a_k$ cannot depend on
+$M(z)^{k+2}, M(z)^{k+3}$. More formally, we can prove by induction that
+all the entries of $M(z)^k$ are divisible by $z^{k-1}$, showing that the
+contribution of $M(z)^{k+2} + M(z)^{k+3} + \ldots$ to $a_0 + a_1z + \ldots
++a_kz^k$ is $0$.
+
+So we can compute the matrix $M(z) + M(z)^2 + \ldots + M(z)^{k+1}$,
+extract the entry of interest and then compute the terms of the Taylor
+expansion up to order $k$. But we can do better. Since we are only
+interested in the coefficients up to order $k$, we can perform all
+algebraic operation on truncated polynomials of order $k$, \textit{i.e.},
+we discard the coefficients of order $k+1$ or greater when multiplying two
+polynomials.
+
+But we can do even better. A read with $s$ segments contains $s$ errors.
+Since read errors typically have a small probability of occurrence, all
+the coefficients of $M(z)^{s+1}$ rapidly converge to $0$ as $s$ increases.
+So instead of computing the matrix $M(z) + M(z)^2 + \ldots + M(z)^{k+1}$,
+we can interrupt the summation after a certain power of $M(z)$ because the
+terms become negligible.
+
+The number of errors $X$ in a read of size $k$ has a Binomial
+distribution $X \sim B(k,p)$. From~\cite{arratia1989tutorial} we can bound
+the probabilities of the tail with the expression
+
+\begin{equation}
+\label{eq:bound}
+Pr(X \geq s) \leq \exp \left( (s-k)\log \frac{k-s}{k(1-p)} -s\log
+\frac{s}{kp} \right).
+\end{equation}
+
+Using the formula above, we can thus bound the probability that a read has
+$s$ segments or more. We compute the matrices $M(z) + M(z)^2 + \ldots
++M(z)^{s+1}$ where the weighted generating functions have been replaced by
+truncated polynomials and we extract the entry at the first column and the
+last row. When the bound is lower than a set fraction $\varepsilon$ of the
+smallest coefficient, we stop the computations. Typically $\varepsilon =
+0.01$ so this method ensures that the probabilities that a read of size
+$k$ has no good seeds are accurate to within 1\%.
+
+\section{Exact seeds}
+
+\subsection{Computing $P(E_0 \cap E_1)$}
+\label{sec:cPE0E1}
+
+The event $E_0 \cap E_1$ is that the read contains no match of size $\geq
+\gamma$ for either the target or the first off-target sequence (here
+``first'' refers to any fixed off-target sequence). We compute the
+probability of this event with the strategy described in
+section~\ref{sec:symbolic}: we first recode the reads using a different
+alphabet and then we specify the transfer matrix of the reads that have no
+match for any sequence. The powers of this matrix hold the weighted
+generating function of interest, from which we extract the coefficients
+that correspond to the terms $P(E_0 \cap E_1)$ for reads of different
+sizes.
+
+The reads are recoded as sequences of symbols from the so-called ``+/-
+alphabet'' $\mathcal{A}_{+/-} = \{\square, |, \downarrow_{/1}^-,
+\downarrow_{/2}^-, \ldots, \downarrow_{/1}^+, \downarrow_{/2}^+, \ldots,
+\Downarrow\}$. The symbols $\downarrow_{/j}^-$ signify that the nucleotide
+is a mismatch against the off-target sequence, the symbols
+$\downarrow_{/j}^+$ signify that it is a mismatch against the target, and
+the symbol $\Downarrow$ signifies that it is a mismatch against both. As
+before, every other nucleotide is replaced by the symbol $\square$, and
+the terminator $|$ is appended at the end of the read. We again define
+reads as sequences of segments, except that now the terminators are the
+symbols $\downarrow_{/j}^-$, $\downarrow_{/j}^+$, $\Downarrow$ and $|$.
+
+The number $j$ in the symbol $\downarrow_{/j}^-$ indicates the relative
+position of the last mismatch against the target. Likewise, the number $j$
+in the symbol $\downarrow_{/j}^+$ indicates the relative position of the
+last mismatch against the off-target sequence. In other words, the index
+$j$ is the size of the match for the sequence that does not have a
+mismatch. The terminators thus capture the local state of the read. For
+instance the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is a
+mismatch against the off-target sequence, that it is a match for the
+target, and that the six previous nucleotides were also a match for the
+target.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.85]{sketch_dual.pdf}
+\caption{\textbf{The +/- encoding.}
+A example read is represented in the +/- alphabet. The symbols
+$\downarrow_{/j}^-$ represent a mismatch against the off-target sequence,
+the symbols $\downarrow_{/j}^+$ represent a mismatch against the target,
+and the symbol $\Downarrow$ represent a mismatch against both. The index
+$j$ is the number of matches since the last mismatch for the other
+sequence. Note the presence of the terminator $|$ at the end of the read.
+}
+\label{fig:dual}
+\end{figure}
+
+We use the same error model as before: for every nucleotide, the read
+differs from the target with a fixed probability $p$ and the sequences
+differ from each other with a fixed probability $\mu$. With these
+definitions, the probability of occurrence of the symbol $\square$ is $a =
+(1-p)(1-\mu)$. Likewise, the collective probability of occurrence of the
+symbols $\downarrow_{/j}^-$ is $b = (1-p)\mu$, that of the symbols
+$\downarrow_{/j}^+$ is $c = p\mu/3$, and the probability of occurrence of
+the symbol $\Downarrow$ is $d = p(1-\mu/3)$. It is easy to verify that
+$a+b+c+d=1$.
+
+These definitions allow us to specify the weighted generating function of
+the segments. For instance, the weighted generating function of the
+first segment of Fig.~\ref{fig:dual} is $(az)bz$, and that of the second is
+$(az)^5cz$.
+
+To specify the transfer matrix, we must ensure that we eliminate
+the concatenations of two segments that would create a match of size $\geq
+\gamma$ for any of the two sequences. After defining
+\begin{equation*}
+\begin{gathered}
+r_i^+(z) = (az)^icz, \\
+r_i^-(z) = (az)^ibz, \\
+R_i(z) = \big( 1 + az + \ldots + (az)^i \big)dz, \\
+F_i(z) = 1 + az + \ldots + (az)^i,
+\end{gathered}
+\end{equation*}
+we can verify that the expression of the transfer matrix $L(z)$ is
+
+\begin{equation*}
+\begin{blockarray}{ccccccccc}
+   & \scriptstyle{\Downarrow} & \scriptstyle{\downarrow_{/1}^+} & 
+    \ldots & \scriptstyle{\downarrow_{\gamma-1}^+} &
+    \scriptstyle{\downarrow_{/1}^-} & \ldots &
+    \scriptstyle{\downarrow_{/\gamma-1}^-} & \scriptstyle{|} \\
+\begin{block}{c[cccccccc]}
+\scriptstyle{\Downarrow} & R_{\gamma-1}(z)  & r_0^+(z) & \ldots &
+    r_{\gamma-2}^+(z) & r_0^-(z) & \ldots & r_{\gamma-2}^-(z) &
+    F_{\gamma-1}(z) \\
+\scriptstyle{\downarrow_{/1}^+} & R_{\gamma-2}(z) & & & & & & &
+    F_{\gamma-2}(z) \\
+\scriptstyle{\downarrow_{/2}^+} & R_{\gamma-3}(z) & & & & & & &
+    F_{\gamma-3}(z) \\
+\vdots & \vdots & & A(z) & & & B(z) & & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-1}^+} & R_0(z) & & & & & & & F_0(z) \\
+\scriptstyle{\downarrow_{/1}^-} & R_{\gamma-2}(z) & & & & & & &
+    F_{\gamma-1}(z) \\
+\scriptstyle{\downarrow_{/2}^+} & R_{\gamma-3}(z) & & & & & & &
+    F_{\gamma-2}(z) \\
+\vdots & \vdots & & C(z) & & & D(z) & & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-1}^+} & R_0(z) & & & & & & & F_0(z) \\
+\scriptstyle{|} & 0 & 0 & \ldots & 0 & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray},
+\end{equation*}
+where $A(z)$, $B(z)$, $C(z)$ and $D(z)$ are square matrices with
+$\gamma-1$ rows/columns, that are defined as
+
+\begin{equation*}
+A(z) = 
+\begin{blockarray}{cccccc}
+   & \scriptstyle{\downarrow_{/1}^+} & \scriptstyle{\downarrow_{/2}^+} &
+    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^+} &
+    \scriptstyle{\downarrow_{/\gamma-1}^+} \\
+\begin{block}{c[ccccc]}
+\scriptstyle{\downarrow_{/1}^+} & 0 & r_0^+(z) & \ldots &
+    r_{\gamma-4}^+(z) & r_{\gamma-3}^+(z) \\
+\scriptstyle{\downarrow_{/2}^+} & 0 & 0 & \ldots &
+    r_{\gamma-5}^+(z) & r_{\gamma-4}^+(z) \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-2}^+} & 0 & 0 & \ldots & 0 & r_0^+(z) \\
+\scriptstyle{\downarrow_{/\gamma-1}^+} & 0 & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray},
+\end{equation*}
+
+\begin{equation*}
+B(z) = 
+\begin{blockarray}{cccccc}
+   & \scriptstyle{\downarrow_{/1}^-} & \scriptstyle{\downarrow_{/2}^-} &
+   \ldots & \scriptstyle{\downarrow_{/\gamma-2}^-} &
+   \scriptstyle{\downarrow_{/\gamma-1}^-} \\
+\begin{block}{c[ccccc]}
+\scriptstyle{\downarrow_{/1}^+} & r_0^-(z) & r_1^-(z) & \ldots &
+    r_{\gamma-3}^-(z) & r_{\gamma-2}^-(z) \\
+\scriptstyle{\downarrow_{/2}^+} & r_0^-(z) & r_1^-(z) & \ldots &
+    r_{\gamma-3}^-(z) & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-2}^+} & r_0^-(z) & r_1^-(z) &
+    \ldots & 0 & 0 \\
+\scriptstyle{\downarrow_{/\gamma-1}^+} & r_0^-(z) & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray},
+\end{equation*}
+
+\begin{equation*}
+C(z) = 
+\begin{blockarray}{cccccc}
+   & \scriptstyle{\downarrow_{/1}^+} & \scriptstyle{\downarrow_{/2}^+} &
+    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^+} &
+    \scriptstyle{\downarrow_{/\gamma-1}^+} \\
+\begin{block}{c[ccccc]}
+\scriptstyle{\downarrow_{/1}^-} & r_0^+(z) & r_1^+(z) & \ldots &
+    r_{\gamma-3}^+(z) & r_{\gamma-2}^+(z) \\
+\scriptstyle{\downarrow_{/2}^-} & r_0^+(z) & r_1^+(z) & \ldots &
+    r_{\gamma-3}^+(z) & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-2}^-} & r_0^+(z) & r_1^+(z) & \ldots &
+    0 & 0 \\
+\scriptstyle{\downarrow_{/\gamma-1}^-} & r_0^+(z) & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray},
+\end{equation*}
+
+\begin{equation*}
+D(z) = 
+\begin{blockarray}{cccccc}
+   & \scriptstyle{\downarrow_{/1}^-} & \scriptstyle{\downarrow_{/2}^-} &
+    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^-} &
+    \scriptstyle{\downarrow_{/\gamma-1}^-} \\
+\begin{block}{c[ccccc]}
+\scriptstyle{\downarrow_{/1}^-} & 0 & r_0^-(z) & \ldots &
+    r_{\gamma-4}^-(z) & r_{\gamma-3}^-(z) \\
+\scriptstyle{\downarrow_{/2}^-} & 0 & 0 & \ldots &
+    r_{\gamma-5}^-(z) & r_{\gamma-4}^-(z) \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-2}^-} & 0 & 0 & \ldots & 0 & r_0^-(z) \\
+\scriptstyle{\downarrow_{/\gamma-1}^-} & 0 & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray}.
+\end{equation*}
+
+The matrix $L(z)$ is relatively sparse and most non-zero entries are
+monomials. In addition, the number of rows/columns is approximately
+$2\gamma$, so the dimension of the matrix rarely exceeds 50. This means
+that computing the powers of $L(z)$ is not prohibitive and we do not need
+to design a Monte Carlo sampling scheme as we did before.
+
+That being said, we do not need to compute all the powers up to $k$
+because the terms vanish and become negligible after a certain iteration.
+Indeed, the terms of $L(z)^n$ are the weighted generating function of the
+reads without a match for either sequences and that contain exactly $n$
+segments. Of those $n$ segments, $n-1$ are terminated by a mismatch
+against at least one of the sequences. Following the rationale of
+section~\ref{sec:extract}, we define $\tilde{p}$ as the upper bound on the
+probability of a mismatch $\tilde{p} = \max\{b,c,d\}$, and updating
+formula (\ref{eq:bound}) we bound the probability that a read of size $k$
+contains $m = n-1$ or more mismatches
+
+\begin{equation*}
+Pr(X \geq m) \leq \exp \left( (m-k)\log \frac{k-m}{k(1-\tilde{p})} -m\log
+\frac{m}{k\tilde{p}} \right).
+\end{equation*}
+
+The strategy is the same as in section~\ref{sec:extract}: we compute the
+sum of matrices $L(z) + L(z)^2 + \ldots + L(z)^n$ where the weighted
+generating functions have been replaced by truncated polynomials and we
+extract the entry at the first column and the last row. When the bound is
+lower than a set fraction $\varepsilon$ of the coefficient of $z^k$, we
+stop the computations.
+
+\subsection{Corollary: this title sucks}
+
+The results of this section allow us to derive the probabilities of false
+positives when using seeds of fixed size $\gamma$.
+
+The complementary of the event $E_0$ is that the read contains at least
+one match of size $\geq \gamma$ for the target, implying that there is a
+seed for the target\footnote{This is the major difference with MEM seeds,
+where the logical implication does not hold.}. With our assumptions this
+means that the read is mapped to the correct location. The probability of
+outcome $i.$, a true positive, is thus $1-P(E_0)$.
+
+The event $E_0 \cap \ldots \cap E_N$ is that the read contains no match of
+size $\geq \gamma$ for either the targer or any of the off-target
+sequences. In other words, the probability of outome $iii.$, a false
+negative, is $P(E_0 \cap \ldots \cap E_N)$.
+
+The event $E_0 \cap (E_1 \cap \ldots \cap E_N)^c$ is that the read
+contains no match of size $\geq \gamma$ for the target, but contains a
+match of size $\geq \gamma$ for at least one of the off-target sequences.
+In other words, the probability of outcome $ii.$, a false positive, is
+$P(E_0) - P(E_0 \cap \ldots \cap E_N)$.
+
+It is easy to see that the three probabilities sum to 1, as expected.
+Below is a summary of the probabilities of interest.
+
+\begin{eqnarray}
+P(i.) &=& 1-P(E_0) \\
+P(ii.) &=& P(E_0) \cdot \left( 1- \left( \frac{P(E_0
+  \cap E_1)}{P(E_0)} \right)^N\right) \\
+P(iii.) &=& P(E_0) \cdot \left( \frac{P(E_0 \cap E_1)}{P(E_0)} \right)^N
+\end{eqnarray}
+
+In the expressions above, we have used equation (\ref{eq:PE0E1}) to
+highlight that these probabilities only depend on $P(E_0)$ and $P(E_0 \cap
+E_1)$, which can be computed precisely as shown in sections~\ref{sec:cPE0}
+and \ref{sec:cPE0E1}.
+
+Note that the formulas also hold when the target has no duplicate
+sequence. In this case, only outcome $i.$ and $iii.$ are possible, but
+since $N=0$ we see that the second probability is 0, as expected.
+
+\section{Skip seeds}
+
+
+\begin{algorithm}[H]
+\label{alg:mcmcskip}
+\SetAlgoLined
+\KwResult {Sample a read at random. Return 1 if the read contains a
+good seed, otherwise return 0.}
+  $\lambda \leftarrow 0$ \Comment*[r]{Current read size.}
+  $s_+ \leftarrow 0$ \Comment*[r]{Current + match size.}
+  $s_- \leftarrow 0$ \Comment*[r]{Current - match size.}
+  \While {$\lambda < k$}{
+    $i \leftarrow geom(a)-1$
+                \Comment*[r]{Double-match nucleotides.}
+    \If {$i > k-\lambda$}{
+      $i \leftarrow k-\lambda$ \;
+    }
+    $s_+ \leftarrow s_+ + i$ \;
+    $s_- \leftarrow s_- + i$ \;
+    \If {$s_+ \geq \gamma$ or $s_- \geq \gamma$}{
+      return 1 \;
+    }
+    $\lambda \leftarrow \lambda + i+1$ \;
+    $r \leftarrow rand(0,1-a)$
+                \Comment*[r]{Uniform random number.}
+    \uIf {$r < b$}{
+      $s_+ \leftarrow s_++1$ \;
+      $s_- \leftarrow -\lambda \mod n+1$ \;
+    }\uElseIf{$r < b+c$}{
+      $s_+ \leftarrow -\lambda \mod n+1$ \;
+      $s_- \leftarrow s_-+1$ \;
+    }\uElse{
+      $s_+ \leftarrow -\lambda \mod n+1$ \;
+      $s_- \leftarrow -\lambda \mod n+1$ \;
+    }
+}
+\eIf {$s_+ \geq \gamma$ or $s_- \geq \gamma$}{
+  return 1 \;
+}{
+  return 0 \;
+}
+\end{algorithm}
+
+\section{MEM seeds}
+
+Before going further, we need to move a practical consideration out of the
+way. It stands to reason that very short matches between the read and the
+genome are uninformative. For instance, $99.7\%$ of all the possible
+12-mers are present in the reference human genome, so an exact match of
+size 12 or lower says nothing about the location of the DNA fragment. In
+what follows, we will assume that subsequences of the read can only match
+the original DNA sequence and/or its duplicates, but not the rest of the
+genome. This will greatly simplify the exposition of the theory. We will
+discuss how to relax this assumption in section~\ref{sec:short_MEMs}.
+
 Observe that the rightmost MEM seed matches two genomic locations. This
 case motivates the following definition, which will play an important role
 for the development of the theory.
 
 \begin{definition}
-A \emph{strict} MEM seed has a single genomic match.
-A \emph{shared} MEM seed has several genomic matches.
+A \emph{strict} MEM seed has a single match in the genome.
+A \emph{shared} MEM seed has several matches in the genome.
 \end{definition}
 
 Without surprise, the principle of MEM seeding is to use the genomic
@@ -542,150 +1381,10 @@ construction of reads, but a construction of reads without good seeds. For
 this, we need to introduce a new set of tools.
 
 
-\section{Computational strategy}
-\label{sec:symbolic}
-
-We turn to the question of translating the extended MEM segment
-representation to a construction of reads without good seeds. For this, we
-use tools borrowed from analytic combinatorics. We give the minimum amount
-of background that is necessary to expose the theory. A more detailed
-account of the strategy to compute seeding probabilities with analytic
-combinatorics has been published
-elsewhere~\cite{filion2017analytic,filion2018analytic}. We refer the
-readers interested in learning more about analytic combinatorics to the
-textbooks~\cite{flajolet2009analytic,sedgewick2013introduction}.
-
-
-\subsection{Weighted generating functions}
-
-The central object of analytic combinatorics is the \emph{generating
-function}.
-
-\begin{definition}
-\label{def:GF}
-Let $\mathcal{A}$ be a set of combinatorial objects characterized by a
-size in $\mathbb{N}$ and a weight in $\mathbb{R}^+$. The weighted
-generating function of $\mathcal{A}$ is defined as
-
-\begin{equation}
-\label{eq:GF1}
-A(z) = \sum_{a \in \mathcal{A}} w(a) z^{|a|},
-\end{equation}
-where $|a|$ and $w(a)$ denote the size and weight of the object $a$,
-respectively. Expression (\ref{eq:GF1}) also defines a sequence $(a_k)_{k
-\geq 0}$ such that 
-
-\begin{equation*}
-A(z) = \sum_{k=0}^\infty a_k z^k.
-\end{equation*}
-
-By definition $a_k = \sum_{a \in A_k}w(a)$, where $A_k$ is the class of
-objects of size $k$ in $\mathcal{A}$. The number $a_k$ is the
-total weight of objects of size $k$.
-\end{definition}
-
-To give a concrete example, if the probability of the symbol
-$\downarrow_{/0}$ is $q$, the weighted generating function of a segment
-containing only this symbol is $qz$. In our case, we are interested in the
-weighted generating function of reads without good seeds, so that the
-coefficient $a_k$ is equal to the probability that a read of size $k$ has
-no good seed.
-
-The motivation for introducing weighted generating functions is that
-operations on combinatorial objects translate into operations on their
-weighted generating functions. If $A(z)$ and $B(z)$ are the weighted
-generating functions of two mutually exclusive sets $\mathcal{A}$ and
-$\mathcal{B}$, the weighted generating function of $\mathcal{A} \cup
-\mathcal{B}$ is $A(z) + B(z)$, as evident from expression (\ref{eq:GF1}).
-Size and weight can be defined for pairs of objects in $\mathcal{A} \times
-\mathcal{B}$ as $|(a,b)| = |a| + |b|$ and $w(a,b) = w(a)w(b)$. In other
-words the sizes are added and the weights are multiplied.  With this
-convention, the weighted generating function of the Cartesian product
-$\mathcal{A} \times \mathcal{B}$ is $A(z)B(z)$. This simply follows from
-expression (\ref{eq:GF1}) and from
-
-\begin{equation*}
-A(z)B(z) =
-\sum_{a\in \mathcal{A}}w(a)z^{|a|} \sum_{b\in \mathcal{B}}w(b)z^{|b|}
-= \sum_{(a,b) \in \mathcal{A} \times \mathcal{B}} w(a)w(b)z^{|a|+|b|}.
-\end{equation*}
-
-These two operations are all we need in order to compute the weighted
-generating functions of the reads of interest. Addition corresponds to
-creating a new family by merging reads from families $\mathcal{A}$ and
-$\mathcal{B}$. Multiplication corresponds to creating a new family by
-concatenating reads from families $\mathcal{A}$ and $\mathcal{B}$.
-
-\subsection{Analytic representation}
-
-The symbolic method is a strategy belonging to the general \emph{analytic
-combinatorics} framework. The idea is to combine simple combinatorial
-objects into more complex objects. Each combinatorial operation on the
-objects corresponds to a mathematical operation on their weighted
-generating functions. One can thus obtain the weighted generating function
-of complex objects, and from there extract their probability of
-occurrence.
-
-The combinatorial construction of reads using the extended MEM alphabet
-gives us a method to express their weighted generating function from the
-simpler generating function of segments. More specifically, we can
-describe complex sequences of segments through a so-called \emph{transfer
-matrix} $M(z)$ that specifies which pairs of consecutive segments are
-allowed and which are forbidden in the reads of interest.
-
-The segment types are identified by their terminators arranged in a
-predefined oder. The entry of $M(z)$ at coordinates $(i,j)$ is the
-weighted generating function of segments with the $j$-th terminator that
-can be inserted immediately after segments with the $i$-th terminator. The
-entries of the matrix $M(z) + M(z)^2 + \ldots = M(z) \cdot (I-M(z))^{-1}$
-are the weighted generating functions of the reads of all sizes using all
-the allowed combinations of segments.
-
-The entry of interest from $M(z)$ is the one that corresponds to the
-terminators $\downarrow_{/0}$ and $|$ because it represents the reads of
-any size whose first segment can be inserted after $\downarrow_{/0}$, and
-whose last segment is terminated by $|$. Indeed, the $|$ terminator marks
-the end of the read, so it must be the final symbol of every valid read.
-As for the first segment, observe that all the segments that can follow
-the $\downarrow_{/0}$ symbol are exactly those that can be at the frst
-postion of the read\footnote{One could have introduced a special start
-symbol. It is equivalent to an invisible $\downarrow_{/0}$ prepending
-the reads.}.
-
-In summary, the transfer matrix $M(z)$ contains the weighted generating
-function of interest. Our next task is thus to specify $M(z)$.
-
-
 
 \section{The transfer matrix}
 \label{sec:transfer_mat}
 
-
-\subsection{Error model and divergence of the duplicates}
-
-We assume that the target sequence has $N$ duplicates, so that there are
-$N$ off-target sequences. We further assume that duplication was
-instantaenous and that all $N+1$ sequences diverge independently of each
-other at a constant rate. In other words, we ignore the complications due
-to the genealogy of the duplication events and we simply assume that at
-each position, any given duplicate is identical to the target with
-probability $1-\mu$. If it is not, we assume that the duplicate has any of
-the remaining three nucleotides with equal probability (\textit{i.e.} each
-is found with probability $\mu/3$).
-
-We also assume that the sequencing instrument has a constant substitution
-rate $p$, and that insertions and deletions never occur. In case of a
-substitution, we again assume that the remaining three nucleotides are
-equally likely.
-
-Read errors are always mismatches against the target (because we assume
-that the target is the true sequence), and they match each off-target
-sequence with probability $\mu/3$. Correct nucleotides are always a match
-for the target, and they match each off-target sequence with probability
-$1-\mu$.
-
-We are now ready to describe the transfer matrix $M(z)$. We do this entry
-by entry, in order of increasing complexity.
 
 
 \subsection{Segments following $\uparrow_{/j}$}
@@ -917,7 +1616,7 @@ pz \sum_{i=\gamma}^\infty \Big(1 - \xi_i^m \cdot
 (1- \zeta_{i,m,n}) \Big) (qz)^i.
 \end{equation}
 
-\subsection{The expression of the transfer matrix}
+\subsection{Expression of the transfer matrix}
 \label{sec:expression_of_M}
 
 Collecting and arranging the results above, the final expression of the
@@ -975,6 +1674,21 @@ and where
 \xi_i^{n-r-q}.
 \end{gather}
 
+The special case $N=0$ is worth describing in detail. This implies that
+the target has no duplicate, so case $ii.$ is excluded (false positive),
+and only cases $i.$ and $iii.$ are possible (true positive and false
+negative, respectively). The transfer matrix $M(z)$ simplifies to the
+extent that we can directly compute the weighted generating function of
+reads without a good seed as
+\begin{equation}
+\tag{\ref{eq:F}}
+F(z) = \frac{1+qz+\ldots+(qz)^{\gamma-1}}
+  {1-pz \big(1+qz+\ldots+(qz)^{\gamma-1} \big)}.
+\end{equation}
+
+Expression (\ref{eq:F}) was shown in~\cite{filion2018analytic} to be the
+weighted generating function of
+
 
 \section{Computing the probabilities}
 \label{sec:compute}
@@ -990,7 +1704,10 @@ good seed.
 $F(z)$ is the entry of the matrix $M(z) \cdot (I-M(z))^{-1}$ at the first
 row and the last column, associated with terminators $\downarrow_{/0}$ and
 $|$. The expression of $M(z)$ is too complex to compute this function
-directly. Instead, we return to the definition $M(z) \cdot (I-M(z))^{-1} =
+directly.
+
+
+Instead, we return to the definition $M(z) \cdot (I-M(z))^{-1} =
 M(z) + M(z)^2 + \ldots$ and observe that the terms $M(z)^{k+2},
 M(z)^{k+3}, \ldots$ have no influence on the coefficients $a_0, a_1,
 \ldots, a_k$.
@@ -1093,15 +1810,15 @@ Kachitvichyanukul and Schmeiser~\cite{kachitvichyanukul1988binomial}.
 \label{alg:mcmc}
 \SetAlgoLined
 \KwResult {Sample a read at random. Return 1 if the read contains a
-good seed, otherwise return 0.}
-  $\lambda \leftarrow k$ \Comment*[r]{Size remaining to generate.}
+good MEM seed, otherwise return 0.}
+  $\lambda \leftarrow 0$ \Comment*[r]{Current read size.}
   $m \leftarrow 0$ \Comment*[r]{Current number of hard masks.}
-  \While {$\lambda > 0$}{
+  \While {$\lambda < k$}{
     $i \leftarrow geom(p)-1$ \Comment*[r]{Error-free nucleotides.}
-    \eIf {$i \geq \lambda$}{
-      \eIf{$\lambda < \gamma$} {
+    \eIf {$i \geq k-\lambda$}{
+      \eIf{$k-\lambda < \gamma$} {
         return 0\; }{
-        $h \leftarrow binom(m,(1-\mu)^\lambda)$
+        $h \leftarrow binom(m,(1-\mu)^{k-\lambda})$
             \Comment*[r]{Surviving hard masks.}
         return 1 if $h = 0$, otherwise return 0\; }
     }
@@ -1113,7 +1830,7 @@ good seed, otherwise return 0.}
       \eIf {$ i \geq \gamma$ and $h = 0$ and $s = 0$}{
         return 1\;}{
         $m \leftarrow s + binom(N-s, \mu/3)$\;
-        $\lambda \leftarrow \lambda - (i+1)$\;}
+        $\lambda \leftarrow \lambda + i+1$\;}
     }
  }
 \end{algorithm}
@@ -1129,6 +1846,12 @@ on the number of off-target sequences $N$. For values of $p$ around 0.01,
 the running time for 10,000,000 iterations is $1$-$10$ seconds on current
 hardware.
 
+Algorithm~\ref{alg:mcmc} is a major result. It gives a compact solution to
+the problem of estimating the probability that a read can be mapped when
+using MEM seeds. The algorithm is also much faster than the naive approach
+of sampling every nucleotide of every sequence, because it samples many
+nucleotidea from \emph{all} the sequences at each iteration.
+
 \section{False positives}
 
 So far we have designed a method to estimate the probability that a
@@ -1141,7 +1864,7 @@ Computing the probability of outcome $ii.$ is hard, but we can compute the
 probability that the read is not mapped at all, which is outcome $iii.$
 The probability of outcome $ii.$ is then found by subtraction.
 
-\subsection{The probability of outcome $iii.$}
+\subsection{Probability of outcome $iii.$}
 
 Outcome $iii.$ implies that the read contains no seed at all, neither
 on-target, nor off-target. This requires that there is no exact match of
@@ -1177,234 +1900,13 @@ elsewhere~\cite{filion2018analytic}. Here we only give the recurrence
 equation to compute $P(E_0)$. Assume that the probability of a sequencing
 error $p$ is known, that $q = 1-p$, and that $a_k$ is the probability that
 a read of size $k$ does not contain a match of size $\geq \gamma$ for the
-target. Then the following equation can be used to compute $a_k$ by
-recurrence:
-
-\begin{equation}
-\label{eq:PE0}
-a_k = 
-\begin{cases}
-1            &\quad\text{if } k < \gamma, \\
-1 -pq^\gamma &\quad\text{if } k = \gamma, \\
-a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
-\end{cases}
-\end{equation}
+target. This case was already treated in section~\ref{sec:example_exact}.
 
 Knowing the size of the read and the error rate of the sequencing
 instrument, we can thus compute $P(E_0)$ using expression (\ref{eq:PE0}).
 
-\subsection{Computing $P(E_0 \cap E_1)$}
-\label{sec:cPE0E1}
 
-The event $E_0 \cap E_1$ is that the read contains no match of size $\geq
-\gamma$ for either the target or the first off-target sequence (here
-``first'' refers to any fixed off-target sequence). We compute the
-probability of this event with the strategy described in
-section~\ref{sec:symbolic}: we first recode the reads using a different
-alphabet and then we specify the transfer matrix of the reads that have no
-match for any sequence. The powers of this matrix hold the weighted
-generating function of interest, from which we extract the coefficients
-that correspond to the terms $P(E_0 \cap E_1)$ for reads of different
-sizes.
-
-The reads are recoded as sequences of symbols from the so-called ``+/-
-alphabet'' $\mathcal{A}_{+/-} = \{\square, |, \downarrow_{/1}^-,
-\downarrow_{/2}^-, \ldots, \downarrow_{/1}^+, \downarrow_{/2}^+, \ldots,
-\Downarrow\}$. The symbols $\downarrow_{/j}^-$ signify that the nucleotide
-is a mismatch against the off-target sequence, the symbols
-$\downarrow_{/j}^+$ signify that it is a mismatch against the target, and
-the symbol $\Downarrow$ signifies that it is a mismatch against both. As
-before, every other nucleotide is replaced by the symbol $\square$, and
-the terminator $|$ is appended at the end of the read. We again define
-reads as sequences of segments, except that now the terminators are the
-symbols $\downarrow_{/j}^-$, $\downarrow_{/j}^+$, $\Downarrow$ and $|$.
-
-The number $j$ in the symbol $\downarrow_{/j}^-$ indicates the relative
-position of the last mismatch against the target. Likewise, the number $j$
-in the symbol $\downarrow_{/j}^+$ indicates the relative position of the
-last mismatch against the off-target sequence. In other words, the index
-$j$ is the size of the match for the sequence that does not have a
-mismatch. The terminators thus capture the local state of the read. For
-instance the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is a
-mismatch against the off-target sequence, that it is a match for the
-target, and that the six previous nucleotides were also a match for the
-target.
-
-\begin{figure}[h]
-\centering
-\includegraphics[scale=0.85]{sketch_dual.pdf}
-\caption{\textbf{The +/- encoding.}
-A example read is represented in the +/- alphabet. The symbols
-$\downarrow_{/j}^-$ represent a mismatch against the off-target sequence,
-the symbols $\downarrow_{/j}^+$ represent a mismatch against the target,
-and the symbol $\Downarrow$ represent a mismatch against both. The index
-$j$ is the number of matches since the last mismatch for the other
-sequence. Note the presence of the terminator $|$ at the end of the read.
-}
-\label{fig:dual}
-\end{figure}
-
-We use the same error model as before: for every nucleotide, the read
-differs from the target with a fixed probability $p$ and the sequences
-differ from each other with a fixed probability $\mu$. With these
-definitions, the probability of occurrence of the symbol $\square$ is $a =
-(1-p)(1-\mu)$. Likewise, the collective probability of occurrence of the
-symbols $\downarrow_{/j}^-$ is $b = (1-p)\mu$, that of the symbols
-$\downarrow_{/j}^+$ is $c = p\mu/3$, and the probability of occurrence of
-the symbol $\Downarrow$ is $d = p(1-\mu/3)$. It is easy to verify that
-$a+b+c+d=1$.
-
-These definitions allow us to specify the weighted generating function of
-the segments. For instance, the weighted generating function of the
-first segment of Fig.~\ref{fig:dual} is $(az)bz$, and that of the second is
-$(az)^5cz$.
-
-To specify the transfer matrix, we must ensure that we eliminate
-the concatenations of two segments that would create a match of size $\geq
-\gamma$ for any of the two sequences. After defining
-\begin{equation*}
-\begin{gathered}
-r_i^+(z) = (az)^icz, \\
-r_i^-(z) = (az)^ibz, \\
-R_i(z) = \big( 1 + az + \ldots + (az)^i \big)dz, \\
-F_i(z) = 1 + az + \ldots + (az)^i,
-\end{gathered}
-\end{equation*}
-we can verify that the expression of the transfer matrix $L(z)$ is
-
-\begin{equation*}
-\begin{blockarray}{ccccccccc}
-   & \scriptstyle{\Downarrow} & \scriptstyle{\downarrow_{/1}^+} & 
-    \ldots & \scriptstyle{\downarrow_{\gamma-1}^+} &
-    \scriptstyle{\downarrow_{/1}^-} & \ldots &
-    \scriptstyle{\downarrow_{/\gamma-1}^-} & \scriptstyle{|} \\
-\begin{block}{c[cccccccc]}
-\scriptstyle{\Downarrow} & R_{\gamma-1}(z)  & r_0^+(z) & \ldots &
-    r_{\gamma-2}^+(z) & r_0^-(z) & \ldots & r_{\gamma-2}^-(z) &
-    F_{\gamma-1}(z) \\
-\scriptstyle{\downarrow_{/1}^+} & R_{\gamma-2}(z) & & & & & & &
-    F_{\gamma-2}(z) \\
-\scriptstyle{\downarrow_{/2}^+} & R_{\gamma-3}(z) & & & & & & &
-    F_{\gamma-3}(z) \\
-\vdots & \vdots & & A(z) & & & B(z) & & \vdots \\
-\scriptstyle{\downarrow_{/\gamma-1}^+} & R_0(z) & & & & & & & F_0(z) \\
-\scriptstyle{\downarrow_{/1}^-} & R_{\gamma-2}(z) & & & & & & &
-    F_{\gamma-1}(z) \\
-\scriptstyle{\downarrow_{/2}^+} & R_{\gamma-3}(z) & & & & & & &
-    F_{\gamma-2}(z) \\
-\vdots & \vdots & & C(z) & & & D(z) & & \vdots \\
-\scriptstyle{\downarrow_{/\gamma-1}^+} & R_0(z) & & & & & & & F_0(z) \\
-\scriptstyle{|} & 0 & 0 & \ldots & 0 & 0 & \ldots & 0 & 0 \\
-\end{block}
-\end{blockarray},
-\end{equation*}
-where $A(z)$, $B(z)$, $C(z)$ and $D(z)$ are square matrices with
-$\gamma-1$ rows/columns, that are defined as
-
-\begin{equation*}
-A(z) = 
-\begin{blockarray}{cccccc}
-   & \scriptstyle{\downarrow_{/1}^+} & \scriptstyle{\downarrow_{/2}^+} &
-    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^+} &
-    \scriptstyle{\downarrow_{/\gamma-1}^+} \\
-\begin{block}{c[ccccc]}
-\scriptstyle{\downarrow_{/1}^+} & 0 & r_0^+(z) & \ldots &
-    r_{\gamma-4}^+(z) & r_{\gamma-3}^+(z) \\
-\scriptstyle{\downarrow_{/2}^+} & 0 & 0 & \ldots &
-    r_{\gamma-5}^+(z) & r_{\gamma-4}^+(z) \\
-\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-\scriptstyle{\downarrow_{/\gamma-2}^+} & 0 & 0 & \ldots & 0 & r_0^+(z) \\
-\scriptstyle{\downarrow_{/\gamma-1}^+} & 0 & 0 & \ldots & 0 & 0 \\
-\end{block}
-\end{blockarray},
-\end{equation*}
-
-\begin{equation*}
-B(z) = 
-\begin{blockarray}{cccccc}
-   & \scriptstyle{\downarrow_{/1}^-} & \scriptstyle{\downarrow_{/2}^-} &
-   \ldots & \scriptstyle{\downarrow_{/\gamma-2}^-} &
-   \scriptstyle{\downarrow_{/\gamma-1}^-} \\
-\begin{block}{c[ccccc]}
-\scriptstyle{\downarrow_{/1}^+} & r_0^-(z) & r_1^-(z) & \ldots &
-    r_{\gamma-3}^-(z) & r_{\gamma-2}^-(z) \\
-\scriptstyle{\downarrow_{/2}^+} & r_0^-(z) & r_1^-(z) & \ldots &
-    r_{\gamma-3}^-(z) & 0 \\
-\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-\scriptstyle{\downarrow_{/\gamma-2}^+} & r_0^-(z) & r_1^-(z) &
-    \ldots & 0 & 0 \\
-\scriptstyle{\downarrow_{/\gamma-1}^+} & r_0^-(z) & 0 & \ldots & 0 & 0 \\
-\end{block}
-\end{blockarray},
-\end{equation*}
-
-\begin{equation*}
-C(z) = 
-\begin{blockarray}{cccccc}
-   & \scriptstyle{\downarrow_{/1}^+} & \scriptstyle{\downarrow_{/2}^+} &
-    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^+} &
-    \scriptstyle{\downarrow_{/\gamma-1}^+} \\
-\begin{block}{c[ccccc]}
-\scriptstyle{\downarrow_{/1}^-} & r_0^+(z) & r_1^+(z) & \ldots &
-    r_{\gamma-3}^+(z) & r_{\gamma-2}^+(z) \\
-\scriptstyle{\downarrow_{/2}^-} & r_0^+(z) & r_1^+(z) & \ldots &
-    r_{\gamma-3}^+(z) & 0 \\
-\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-\scriptstyle{\downarrow_{/\gamma-2}^-} & r_0^+(z) & r_1^+(z) & \ldots &
-    0 & 0 \\
-\scriptstyle{\downarrow_{/\gamma-1}^-} & r_0^+(z) & 0 & \ldots & 0 & 0 \\
-\end{block}
-\end{blockarray},
-\end{equation*}
-
-\begin{equation*}
-D(z) = 
-\begin{blockarray}{cccccc}
-   & \scriptstyle{\downarrow_{/1}^-} & \scriptstyle{\downarrow_{/2}^-} &
-    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^-} &
-    \scriptstyle{\downarrow_{/\gamma-1}^-} \\
-\begin{block}{c[ccccc]}
-\scriptstyle{\downarrow_{/1}^-} & 0 & r_0^-(z) & \ldots &
-    r_{\gamma-4}^-(z) & r_{\gamma-3}^-(z) \\
-\scriptstyle{\downarrow_{/2}^-} & 0 & 0 & \ldots &
-    r_{\gamma-5}^-(z) & r_{\gamma-4}^-(z) \\
-\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-\scriptstyle{\downarrow_{/\gamma-2}^-} & 0 & 0 & \ldots & 0 & r_0^-(z) \\
-\scriptstyle{\downarrow_{/\gamma-1}^-} & 0 & 0 & \ldots & 0 & 0 \\
-\end{block}
-\end{blockarray}.
-\end{equation*}
-
-The matrix $L(z)$ is relatively sparse and most non-zero entries are
-monomials. In addition, the number of rows/columns is approximately
-$2\gamma$, so the dimension of the matrix rarely exceeds 50. This means
-that computing the powers of $L(z)$ is not prohibitive and we do not need
-to design a Monte Carlo sampling scheme as we did before.
-
-That being said, we do not need to compute all the powers up to $k$
-because the terms vanish and become negligible after a certain iteration.
-Indeed, the terms of $L(z)^n$ are the weighted generating function of the
-reads without a match for either sequences and that contain exactly $n$
-segments. Of those $n$ segments, $n-1$ are terminated by a mismatch
-against at least one of the sequences. Following the rationale of
-section~\ref{sec:extract}, we define $\tilde{p}$ as the upper bound on the
-probability of a mismatch $\tilde{p} = \max\{b,c,d\}$, and updating
-formula (\ref{eq:bound}) we bound the probability that a read of size $k$
-contains $m = n-1$ or more mismatches
-
-\begin{equation*}
-Pr(X \geq m) \leq \exp \left( (m-k)\log \frac{k-m}{k(1-\tilde{p})} -m\log
-\frac{m}{k\tilde{p}} \right).
-\end{equation*}
-
-The strategy is the same as in section~\ref{sec:extract}: we compute the
-sum of matrices $L(z) + L(z)^2 + \ldots + L(z)^n$ where the weighted
-generating functions have been replaced by truncated polynomials and we
-extract the entry at the first column and the last row. When the bound is
-lower than a set fraction $\varepsilon$ of the coefficient of $z^k$, we
-stop the computations.
-
-\subsection{The probability of false positives}
+\subsection{Probability of false positives}
 
 For given values of the parameters $p$, $\mu$ and $N$, we can now compute
 the probability of a false positive, which is outcome $ii$.
@@ -1414,6 +1916,37 @@ the powers of $M(z)$ or by Monte Carlo sampling as explained in
 section~\ref{sec:compute}. Next we compute the probability of outcome
 $iii.$ using expression (\ref{eq:PE0E1}), where the terms are computed as
 explained in sections~\ref{sec:cPE0E1} and \ref{sec:cPE0}.
+
+When the target has no duplicate sequence, there can be no false positive
+so this probability must be 0. In this case $N=0$ so according to formula
+(\ref{eq:PE0E1}) outcome $iii.$ has probability $P(E_0)$. 
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
+XXXX
+
 
 \section{Estimating the parameters}
 \label{sec:est}
@@ -1630,7 +2163,7 @@ is not straightforward to adjust the estimates accordingly. We do not
 adjust them at all and consider that this case is already implicitly
 accounted for.
 
-\subsection{MEM seeds at random locations}
+\subsection{MEM seeds for other sequences}
 \label{sec:short_MEMs}
 
 To simplify the problem, we have assumed that MEM seeds can match only the
@@ -1729,9 +2262,10 @@ be detected using Bayes formula.
 \section{Discussion}
 
 We have devised a method to compute the probability that the MEM seeding
-heuristic misguides the mapping algorithm so that it cannot find the true
-location of the read. The pillars of our strategy are borrowed from
-analytic combinatorics~\cite{flajolet2009analytic,
+heuristic fails and sets up the mapping process for a false positive. This
+fills a gap of theoretical knowledge to understand and calibrate the
+performance of the MEM seeding heuristic. The pillars of our strategy are
+borrowed from analytic combinatorics~\cite{flajolet2009analytic,
 sedgewick2013introduction}, even though we do not follow the standard
 programme. Constructing generating functions usually serves the purpose of
 finding their singularities in order to approximate the solution. In our

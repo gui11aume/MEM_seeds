@@ -1,4 +1,5 @@
 MEM.log
 MEM.pdf
+*.pyc
 *.swp
 *.o
