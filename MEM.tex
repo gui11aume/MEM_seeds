@@ -168,7 +168,6 @@ will relax this assumption in section section~\ref{sec:not_the_best}, but
 until then we will consider that the solution of the true location problem
 is the best location.
 
-
 \subsection{Seeding heuristics}
 \label{sec:seedheur}
 
@@ -1014,11 +1013,66 @@ D(z) =
 \end{blockarray}.
 \end{equation*}
 
+
 The matrix $L(z)$ is relatively sparse and most non-zero entries are
 monomials. In addition, the number of rows/columns is approximately
 $2\gamma$, so the dimension of the matrix rarely exceeds 50. This means
 that computing the powers of $L(z)$ is not prohibitive and we do not need
 to design a Monte Carlo sampling scheme as we did before.
+
+The most popular heuristic for this problem is to first identify short
+regions of high similiarity between the read and the genome, and then run
+an exact alignment algorithm locally at those regions. The first step is a
+filtration called ``seeding'' and the regions of high similarity are
+called ``seeds''. This is for instance the general strategy of the popular
+alignment algorithm BLAST~\cite{pmid2231712}.
+
+If seeds can be discovered fast, we can quickly zoom in on a small set of
+candidate locations and reduce the input size of the (slow) alignment
+algorithm. The disadvantage is that the target location is not always in
+the candidate set. In this case, it cannot be discovered and the outcome
+is either $ii.$ or $iii.$, which are both erroneous.
+
+The slowness of the alignment algorithm imposes a trade-off between speed
+and accuracy. If the seeding step is set to produce many candidates, the
+target is likely to be among them and it will be discovered. The downside
+is that this will take long. Conversely, if the seeding step is set to
+produce few candidates, the process will run faster but the target is less
+likely to be in the candidate list so it is less likely to be discovered.
+
+Importantly, the terms of this trade-off depend on the algorithm. Some
+seeding methods are better than others (see~\cite{pmid20460430,
+sun2005designing,pmid11934743,xu2006optimizing,pmid17044164,
+brejova2003vector,pmid18684737,pmid15359419} for examples of design,
+see~\cite{pmid16533404, pmid20460430} for comparisons and discussions, and
+see~\cite{navarro2001guided} for a more general review of filtration
+methods in pattern matching). The upshot is that we can develop faster
+mapping algorithms at no cost for accuracy if we find better seeding
+strategies.
+
+The seeding framework was developed for the best location problem, but it
+also applies to the true location problem. Actually, the process is
+exactly the same except that outcomes $i.$ and $ii.$ now refer to the true
+location. In outcome $i.$ called a ``true positive'', the DNA fragment is
+mapped to the \emph{true} location. In outcome $ii.$ called a ``false
+positive'', the DNA fragment is mapped to an incorrect location. Outcome
+$iii.$ called a ``false negative'' is the same as before and means that
+the DNA fragment is not mapped at all.
+
+We will make two assumptions that will simplify the discussion. The first
+is that the true location is always the best. We will further comment on
+this and explain how to relax this assumption in section
+section~\ref{sec:not_the_best}. Until then, we consider that the true
+location problem is the same as the best location problem. The second
+assumption is that the best location is always discovered if it is in the
+candidate set. This implies that outcomes $i.$, $ii.$ and $iii.$ are
+determined by the seeding process. For this reason, we will sometimes
+refer to them as the outcomes of the seeding step, even though strictly
+speaking they are the outcomes of the whole mapping pipeline\footnote{This
+can be confusing because some authors refer to the off-target seeds as
+false positives. When we say that the outcome of the seeding step is a
+false positive, we mean that \emph{all} the seeds are off-target.}.
+
 
 That being said, we do not need to compute all the powers up to $k$
 because the terms vanish and become negligible after a certain iteration.
@@ -1031,10 +1085,29 @@ probability of a mismatch $\tilde{p} = \max\{b,c,d\}$, and updating
 formula (\ref{eq:bound}) we bound the probability that a read of size $k$
 contains $m = n-1$ or more mismatches
 
+
 \begin{equation*}
 Pr(X \geq m) \leq \exp \left( (m-k)\log \frac{k-m}{k(1-\tilde{p})} -m\log
 \frac{m}{k\tilde{p}} \right).
 \end{equation*}
+
+In general, seeds do not have to be exact matches{}. For
+instance, the algorithm PatternHunter~\cite{pmid11934743} uses ``spaced
+seeds'' that tolerate mismatches\footnote{For the anecdote, the method is
+covered by a patent (reference US20070088510A1).}. However, in this
+document, we will always assume that a seed is an exact match with no gap.
+In other words, a seed is a perfect match between a part of the read and a
+genomic site.
+
+The rest of the document will focus on a seeding heuristic known as ``MEM
+seeding'' (where MEM stands for Maximal Exact Match). This approach gives
+good empirical results when mapping short reads (it is for instance the
+strategy\footnote{To be exact, BWA-MEM uses SMEM seeds (Super Maximal
+Exact Match seeds).} of the popular mapper BWA-MEM~\cite{li2013aligning})
+but there is presently no theory to justify its performance. A deeper
+understanding of MEM seeding would be useful to calibrate the
+speed/accuracy trade-off of this heurisitic.
+
 
 The strategy is the same as in section~\ref{sec:extract}: we compute the
 sum of matrices $L(z) + L(z)^2 + \ldots + L(z)^n$ where the weighted
