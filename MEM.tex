@@ -312,7 +312,7 @@ little relevance in the present context.
 
 The index is usually a hash table or a variant of the so-called
 FM-index~\cite{pmid20460430}. Hash tables are typically used to index
-$k$-mers, which makes them useful to search seeds of set size $k$,
+$k$-mers, which makes them useful to search seeds of set size $k$
 (see~\cite{pmid30346548} for a recent benchmark of $k$-mer hashing
 algorithms). In contrast, the FM-index has no set size so it can be used
 to search seeds of different lengths~\cite{ferragina2000opportunistic,
@@ -681,9 +681,9 @@ This recoding allows us to partition the read in am important way.
 \begin{definition}
 \label{def:seg}
 Every symbol of the alphabet that is different from $\square$ is called a
-terminator. A segment is a sequence of 0 or more symbols $\square$
-followed by a terminator. The last segment of the read is terminated by
-the symbol $|$ and is called the tail.
+terminator. A segment is a terminator preceded by 0 or more symbols $\square$.
+The last segment of the read is terminated by the symbol $|$ and is called the
+tail.
 \end{definition}
 
 Since the decomposition of the read in segments is unique, we can view a
@@ -894,26 +894,25 @@ J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
 
 The weighted generating function of interest is the top right entry of the
 matrix $M_n(z) + M_n(z)^2 + \ldots = M_n(z)\cdot(I-M_n(z))^{-1}$. To see
-why, observe that at the start of every read, the next nucleotide is a
+why, observe that, at the start of every read, the next nucleotide is a
 non-skipped position, so every read can be prepended by $\Downarrow_0$
 segments and only by those. Thus, reads are precisely the sequences of
 segments that can follow the symbol $\Downarrow_0$ and that are terminated
 by a tail, whose weighted generating function is the entry of the matrix
 associated with terminators $\Downarrow_0$ and $|$.
 
-$M_n(z)$ is too complex to compute a closed expression of $M_n(z) \cdot
-(I-M_n(z))^{-1}$. We return to the definition $M_n(z) + M_n(z)^2 + \ldots$
-and observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3}, \ldots$ have no
-influence on the coefficients of the weighted generating function $a_0,
-a_1, \ldots, a_k$.
+$M_n(z)$ is too complex to allow computing a closed expression of $M_n(z) \cdot
+(I-M_n(z))^{-1}$. We return to the definition $M_n(z) + M_n(z)^2 + \ldots$ and
+observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3}, \ldots$ have no influence on
+the coefficients of the weighted generating function $a_0, a_1, \ldots, a_k$.
 
-Indeed, a read of size $k$ has at most $k+1$ segments (including the
-obligatory tail). Since $M(z)^{s+1}$ contains the weighted generating
-functions of reads with exactly $s+1$ segments including the tail, $a_k$
-cannot depend on $M(z)^{k+2}, M(z)^{k+3}$. More formally, we can prove by
-induction that all the entries of $M(z)^k$ are divisible by $z^{k-1}$,
-showing that the contribution of $M(z)^{k+2} + M(z)^{k+3} + \ldots$ to
-$a_0 + a_1z + \ldots +a_kz^k$ is strictly $0$.
+Indeed, a read of size $k$ has at most $k+1$ segments (including the obligatory
+tail). Since $M(z)^{s+1}$ contains the weighted generating functions of reads
+with exactly $s+1$ segments including the tail, $a_k$ cannot depend on
+$M(z)^{k+2}, M(z)^{k+3}, \ldots$. More formally, we can prove by induction that
+all the entries of $M(z)^k$ are divisible by $z^{k-1}$, showing that the
+contribution of $M(z)^{k+2} + M(z)^{k+3} + \ldots$ to $a_0 + a_1z + \ldots
++a_kz^k$ is strictly $0$.
 
 So we can compute the matrix $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$,
 extract the entry of interest and then compute the terms of the Taylor
@@ -1034,7 +1033,7 @@ the symbol $|$.
 The number $i$ in the symbol $\downarrow_{/i}^-$ indicates the match
 length of the $+$ sequence. Likewise, the number $i$ in the symbol
 $\downarrow_{/i}^+$ indicates the match length of the $-$ sequence. For
-instance the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is a
+instance, the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is a
 mismatch against the $-$ sequence, that it is a match for the $+$
 sequence, and that the six previous nucleotides were also a match for the
 $+$ sequence. The terminators thus encode the local state of the read.
