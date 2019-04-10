@@ -891,6 +891,7 @@ H_{i,j}(z) &=& pz \cdot (qz)^x \cdot \big( 1 + (qz)^{n+1} +
   \frac{\gamma+i-1-x}{n+1} \right\rfloor, \\
 J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
 \end{eqnarray}
+where $\lfloor \ldots \rfloor$ denotes the ``floor'' function.
 
 The weighted generating function of interest is the top right entry of the
 matrix $M_n(z) + M_n(z)^2 + \ldots = M_n(z)\cdot(I-M_n(z))^{-1}$. To see
@@ -1187,7 +1188,7 @@ sequences of segments that can follow the symbol $\Downarrow$ and that are
 terminated by a tail, whose weighted generating function is the top right
 entry of the matrix.
 
-$\tilde{M}_0(z)$ is too complex to compute a closed expression of
+$\tilde{M}_0(z)$ is too complex to allow computing a closed expression of
 $\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. It is actually easier to
 proceed as in section~\ref{sec:example_skip} and to compute the powers of
 $\tilde{M}_0(z)$ (using the arithmetic of truncated polynomials) up to a
@@ -1644,7 +1645,7 @@ alphabet called the MEM alphabet $\mathring{\mathcal{A}} = \{\square, |,
 The symbols $\downarrow_{/m}$ indicate that the nucleotide is a sequencing
 error and $m \geq 0$ is the number of duplicates that \emph{match} the
 nucleotide. Since a sequencing error is always a mismatch against the
-target, the symbol $\downarrow_{/0}$ indicates that the ncleotide is a
+target, the symbol $\downarrow_{/0}$ indicates that the nucleotide is a
 mismatch against \emph{every} sequence. The symbols $\uparrow_{/i}$
 indicate a change in masking status: the nucleotide is not masked but the
 previous is. The index $i \geq 1$ is the number of nucleotides since the
@@ -1652,7 +1653,7 @@ last mismatch or since the beginning of the read. All the other
 nucleotides are represented by the symbol $\square$ and the symbol $|$ is
 appended to the end of the read as usual.
 
-Note that in the symbols $\downarrow_{/m}$ and $\downarrow_{/i}$, the
+Note that in the symbols $\downarrow_{/m}$ and $\uparrow_{/i}$, the
 numbers $m$ and $i$ have different meanings. In the symbol
 $\downarrow_{/m}$, the index $m$ is a number of sequences ($0 \leq m \leq
 N$ where $N$ is the number of duplicates); in the symbol $\uparrow_{/i}$,
@@ -1700,9 +1701,9 @@ $\uparrow_{/i}$ symbol, so it must be a shared on-target MEM seed.
 As before, the read is converted from a sequence of symbols to a sequence
 of segments that consist of 0 or more symbols $\square$ followed by a
 terminator. We then specify the weighted generating functions of those
-segments and fill the tansfer matrix $\mathring{M}_N(z)$ of the reads that
+segments and fill the transfer matrix $\mathring{M}_N(z)$ of the reads that
 do not contain an on-target MEM seed. We introduce the terms of the matrix
-by increasing oder of complexity.
+by increasing order of complexity.
 
 
 \subsection{Segments following $\uparrow_{/i}$}
@@ -1724,7 +1725,7 @@ nucleotide is a read error is
 \end{equation}
 \end{definition}
 
-The definition of $\omega_m$ is correct: if the nucleotide is an error,
+The expression for $\omega_m$ is exact: if the nucleotide is an error,
 the symbol is $\downarrow_{/m}$ for some $m$ between 0 and $N$. Each
 duplicate is a match with probability $\mu/3$, so $m$ has a Binomial
 distribution with parameters $(N, \mu/3)$.
@@ -1752,8 +1753,8 @@ E_i(z) = \sum_{j=0}^{\gamma-i-1} (qz)^j.
 
 The symbol $\downarrow_{/m}$ signifies that the nucleotide has $m$ hard
 masks and $N-m$ soft masks. If all the masks vanish before the first read
-error, the next terminator will be a sybmol $\uparrow_{/j}$, otherwise it
-will be the sybmol $|$ or a symbol $\downarrow_{/m}$. We separate the
+error, the next terminator will be a symbol $\uparrow_{/j}$, otherwise it
+will be the symbol $|$ or a symbol $\downarrow_{/m}$. We separate the
 cases based on the terminator of the segment.
 
 \subsubsection*{Case 1: the terminator is $\uparrow_{/j}$}
@@ -1769,9 +1770,9 @@ This is the probability that a hard or soft mask vanishes within $j$
 correct nucleotides.
 \end{definition}
 
-The definition of $\xi_j$ is correct: every nucleotide of the duplicate
+The expression for $\xi_j$ is exact: every nucleotide of the duplicate
 differs from the target with probability $\mu$. In the absence of
-sequencing error, this is also the probability that a nucleotide of the
+sequencing errors, this is also the probability that a nucleotide of the
 duplicate differs from the read. Given that there is no error, the
 probability that $j$ nucleotides in a row are identical to the read is
 thus $(1-\mu)^j$ and the probability that at least one of them is
@@ -1863,7 +1864,7 @@ seed. The positions marked with a question mark are irrelevant, they
 cannot change the fact that there is no on-target MEM seed. If the hard
 masks vanish, as in the right panel, then we need to look at the soft
 masks. If a soft mask covers the whole segment as indicated by the grey
-sqaures, then there can be no on-target seed. In all other cases there is
+squares, then there can be no on-target seed. In all other cases there is
 an on-target MEM seed.
 
 For a segment of size $j+1$, condition $i)$ has probability $\big(1 -
@@ -1886,7 +1887,7 @@ This is the probability that a hard or soft mask vanishes within $j$
 correct nucleotides followed by a sequencing error.
 \end{definition}
 
-The definition of $\eta_j$ is correct: the probability that there are $j$
+The expression for $\eta_j$ is exact: the probability that there are $j$
 matches between the duplicate and the target is $(1-\mu)^j$. If there are
 no sequencing errors, this is also the probability that there are $j$
 matches between the duplicate and the read. The probability that the
@@ -1902,7 +1903,7 @@ Let us for now consider a segment of fixed size $j+1$. From expressions
 \end{equation*}
 but we need to break up this term among all the possible terminators
 $\downarrow_{/n}$ ($0 \leq n \leq N$) in order to fill the different
-entries of the transfer matrix. For this, we split this term on the number
+entries of the transfer matrix. For this, we split this term in the number
 of soft masks that run until and including the terminator. From expression
 (\ref{eq:eta}), the probability that there are $r \geq 1$ such soft masks
 is
@@ -1928,7 +1929,7 @@ and it will match the terminator with probability $\mu/3$. But if the soft
 mask survived the first $j$ nucleotides, then it \emph{must} fail on the
 $j+1$-th and it cannot match the terminator. From expressions
 (\ref{eq:xi}) and (\ref{eq:eta}), the probability that a given soft mask
-fails withtin the first $j$ nucleotides is $\xi_j/\eta_j$ --- this is the
+fails within the first $j$ nucleotides is $\xi_j/\eta_j$ --- this is the
 conditional probability that it fails within the first $j$ nucleotides
 given that it fails within the segment. Finally the probability that such
 a soft mask matches the terminator is $\mu/3 \cdot \xi_j / \eta_j$.
@@ -1975,7 +1976,7 @@ generating function of the $\downarrow_{/n}$ segments following
 $\downarrow_{/m}$ is
 \begin{equation}
 \label{eq:A}
-A_{m,n} =
+A_{m,n}(z) =
 \omega_n pz \sum_{j=0}^{\gamma-1} \Big(1 - \xi_j^N \Big) (qz)^j + \omega_n
 pz \sum_{j=\gamma}^\infty \Big(1 - \xi_j^m \cdot
 (1- \zeta_{j,m,n}) \Big) (qz)^j.
@@ -2008,7 +2009,7 @@ expression of the transfer matrix $\mathring{M}_N(z)$ is
 where
 \begin{gather}
 \tag{\ref{eq:A}}
-A_{m,n} =
+A_{m,n}(z) =
 \omega_n pz \sum_{i=0}^{\gamma-1} \Big(1 - \xi_i^N \Big) (qz)^i + \omega_n
 pz \sum_{i=\gamma}^\infty \Big(1 - \xi_i^m \cdot
 (1- \zeta_{i,m,n}) \Big) (qz)^i \\
@@ -2064,7 +2065,7 @@ every read can be prepended by $\downarrow_{/0}$ segments and only by
 those, otherwise the read would start with fewer than $N$ soft masks.
 Thus, reads without an on-target MEM seed are precisely the sequences of
 segments that can be appended to the symbol $\downarrow_{/0}$ and that are
-terimated by a tail.
+terminated by a tail.
 
 To compute this term, we proceed as in section~\ref{sec:example_skip},
 \textit{i.e.}, we compute the powers of $\mathring{M}_N(z)$ in the
@@ -2204,7 +2205,7 @@ duplicates $N$ and their divergence rate $\mu$.
 \includegraphics[scale=0.65]{curves_mem.pdf}
 \caption{\textbf{Off target seeding probabilities (MEM seeds).}
 The curves show the probability that seeding is off target for skip-9
-seeds of size $\gamma=17$. Read size and erorr rate are the same as in
+seeds of size $\gamma=17$. Read size and error rate are the same as in
 Fig.~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each line
 shows a different number of duplicate sequences $N$ from 1 to 10 and the
 x-axis shows the divergence rate $\mu$, defined as the probability that a
