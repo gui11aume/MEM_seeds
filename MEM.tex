@@ -248,12 +248,8 @@ alignment algorithm).
 This observation is fundamental: in order to estimate the error rate of of
 a mapping algorithm, we must know how often the associated seeding
 heuristic is off target. For lack of theoretical framework, this
-information is missing for nearly % nearly, or all? this is important because if
-% there is at least one seeding algorithm that actually estimates correctly the
-% probabilities for the seeding heuristics, then all of the rest is much less
-% meaningful.
-all existing seeding methods, meaning
-that current mappers cannot be properly calibrated.
+information is missing, meaning that current mappers cannot be properly
+calibrated.
 
 Our focus here is to develop a theory to estimate the probability that
 seeding is off target, when using the most popular seeding heuristics for
@@ -889,7 +885,7 @@ H_{i,j}(z) &=& pz \cdot (qz)^x \cdot \big( 1 + (qz)^{n+1} +
   &\;& \text{where } x = i-j-1 \modulo{n+1},
   \text{ and } m = \left\lfloor
   \frac{\gamma+i-1-x}{n+1} \right\rfloor, \\
-J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
+J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1},
 \end{eqnarray}
 where $\lfloor \ldots \rfloor$ denotes the ``floor'' function.
 
@@ -902,18 +898,19 @@ segments that can follow the symbol $\Downarrow_0$ and that are terminated
 by a tail, whose weighted generating function is the entry of the matrix
 associated with terminators $\Downarrow_0$ and $|$.
 
-$M_n(z)$ is too complex to allow computing a closed expression of $M_n(z) \cdot
-(I-M_n(z))^{-1}$. We return to the definition $M_n(z) + M_n(z)^2 + \ldots$ and
-observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3}, \ldots$ have no influence on
-the coefficients of the weighted generating function $a_0, a_1, \ldots, a_k$.
+$M_n(z)$ is too complex to allow a closed expression of $M_n(z) \cdot
+(I-M_n(z))^{-1}$ to be computed. We return to the definition $M_n(z) +
+M_n(z)^2 + \ldots$ and observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3},
+\ldots$ have no influence on the coefficients of the weighted generating
+function $a_0, a_1, \ldots, a_k$.
 
-Indeed, a read of size $k$ has at most $k+1$ segments (including the obligatory
-tail). Since $M(z)^{s+1}$ contains the weighted generating functions of reads
-with exactly $s+1$ segments including the tail, $a_k$ cannot depend on
-$M(z)^{k+2}, M(z)^{k+3}, \ldots$. More formally, we can prove by induction that
-all the entries of $M(z)^k$ are divisible by $z^{k-1}$, showing that the
-contribution of $M(z)^{k+2} + M(z)^{k+3} + \ldots$ to $a_0 + a_1z + \ldots
-+a_kz^k$ is strictly $0$.
+Indeed, a read of size $k$ has at most $k+1$ segments (including the
+obligatory tail). Since $M(z)^{s+1}$ contains the weighted generating
+functions of reads with exactly $s+1$ segments including the tail, $a_k$
+cannot depend on $M(z)^{k+2}, M(z)^{k+3}, \ldots$. More formally, we can
+prove by induction that all the entries of $M(z)^k$ are divisible by
+$z^{k-1}$, showing that the contribution of $M(z)^{k+2} + M(z)^{k+3} +
+\ldots$ to $a_0 + a_1z + \ldots +a_kz^k$ is strictly $0$.
 
 So we can compute the matrix $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$,
 extract the entry of interest and then compute the terms of the Taylor
@@ -1188,15 +1185,16 @@ sequences of segments that can follow the symbol $\Downarrow$ and that are
 terminated by a tail, whose weighted generating function is the top right
 entry of the matrix.
 
-$\tilde{M}_0(z)$ is too complex to allow computing a closed expression of
-$\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. It is actually easier to
-proceed as in section~\ref{sec:example_skip} and to compute the powers of
-$\tilde{M}_0(z)$ (using the arithmetic of truncated polynomials) up to a
-given threshold value. Since each segment except the tail contains a
-mismatch against at least one sequence, we define $\tilde{p}$ as the upper
-bound on the probability of a mismatch $\tilde{p} = \max\{b,c,d\}$. The
-updated formula (\ref{eq:bound}) now gives an upper bound of the
-probability that a read of size $k$ contains $s$ or more mismatches as
+$\tilde{M}_0(z)$ is too complex to allow a closed expression of
+$\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$ to be computed. It is
+actually easier to proceed as in section~\ref{sec:example_skip} and to
+compute the powers of $\tilde{M}_0(z)$ (using the arithmetic of truncated
+polynomials) up to a given threshold value. Since each segment except the
+tail contains a mismatch against at least one sequence, we define
+$\tilde{p}$ as the upper bound on the probability of a mismatch $\tilde{p}
+= \max\{b,c,d\}$. The updated formula (\ref{eq:bound}) now gives an upper
+bound of the probability that a read of size $k$ contains $s$ or more
+mismatches as
 \begin{equation*}
 Pr(X \geq s) \leq \exp \left( (s-k)\log \frac{k-s}{k(1-\tilde{p})} -s\log
 \frac{s}{k\tilde{p}} \right).
@@ -2465,7 +2463,7 @@ Competitiveness (‘Centro de Excelencia Severo Ochoa 2013-2017’, Plan Naciona
 BFU2012-37168), of the CERCA Programme~/~Generalitat de Catalunya, and of the
 European Research Council (Synergy Grant 609989). R.~C.~ was supported by the
 People Programme (Marie Curie Actions) of the European Union's Seventh Framework
-Programme (FP7/2007-2013) under REA grant agreement n° 608959.
+Programme (FP7/2007-2013) under REA grant agreement 608959.
 
 %---------------------------------------------------------------
 %---------------------------------------------------------------
