@@ -11,6 +11,7 @@
 \usepackage{cite}
 \usepackage{enumerate}
 \usepackage{graphicx}
+\usepackage{url}
 
 \setlength{\thickmuskip}{2mu plus 3mu minus 1mu}
 \setlength{\medmuskip}{1mu plus 2mu minus 1mu}
@@ -64,7 +65,7 @@
 
 %---------------------------------------------------------------
 
-\title{Calibrating seed-based heuristics to map short DNA reads}
+\title{Calibrating seed-based alignment heuristics with Sesame}
 
 \author[1,2]{Guillaume J. Filion}
 \author[1]{Ruggero Cortini}
@@ -88,26 +89,31 @@ Science and Technology, Dr. Aiguader 88, Barcelona 08003, Spain.}
 The increasing throughput of DNA sequencing technologies creates a need
 for faster algorithms. The fate of most reads is to be mapped to a
 reference sequence, typically a genome. Modern mappers rely on heuristics
-to gain speed at a reasonable cost for accuracy. In the seeding approach,
+to gain speed at a reasonable cost for accuracy. In the seeding heuristic,
 short matches between the reads and the genome are used to narrow the
 search to a set of candidate locations. Several seeding variants used in
 modern mappers show good empirical performance but they are difficult to
 calibrate or to optimize for lack of theoretical results.
 % Summary of the results.
-Here we develop a theory to estimate the probability that reads are
-mapped to a wrong location due to limitations at the seeding step. We
-describe the properties of simple exact seeds, skip-seeds and MEM seeds
-(Maximal Exact Match).
+Here we develop a theory to estimate the probability that the correct
+location of a read is filtered out during seeding, resulting in mapping
+errors. We describe the properties of simple exact seeds, skip-seeds and
+MEM seeds (Maximal Exact Match seeds).
 % Innovation.
 The main innovation of this work is to use concepts from analytic
 combinatorics to represent reads as abstract sequences, and to specify
 their generative function to estimate the probabilities of interest.
 % Durability.
-We provide several algorithms, which combined together give a practical
-solution to the problem of calibrating seeding heuristics for short reads.
+We provide several algorithms, which combined together give a workable
+solution for the problem of calibrating seeding heuristics for short
+reads. We also provide a C implementation of these algorithms in a library
+called Sesame.
 % Scope.
 These results can improve current mapping algorithms and lay the
 foundation of a general strategy to tackle sequence alignment problems.
+% Availability
+The Sesame library is open source and available for download at
+\url{https://github.com/gui11aume/sesame}.
 \end{abstract}
 
 
@@ -262,13 +268,13 @@ requires taking into consideration the repeat structure of the genome.
 Here we address this problem in general terms and we provide a practical
 way to estimate the mismapping rate in complex genomes.
 
-The rest of this document is organized to present the content in a
-didactic manner. The order of the examples is meant to facilitate the
-acquisition of the main concepts, meaning that we sometimes go back and
-forth between different types of seeding strategies. We first give some
-background on the different types of seeding methods considered here; we
-then introduce the computational strategy based on transfer matrices;
-finally we delve into each specific seeding method.
+The rest of this document is not organized by logical units but by
+increasing level of difficulty. The order of the examples is meant to
+ease the acquisition of the main concepts, meaning that we sometimes go
+back and forth between different types of seeding strategies. We first
+give some background on the different types of seeding methods considered
+here; we then introduce the computational strategy based on transfer
+matrices; finally we delve into each specific seeding method.
 
 \section{Seeds}
 
@@ -304,15 +310,15 @@ reference genome is not indexed~\cite{faro2013exact}, but this case is of
 little relevance in the present context.
 
 The index is usually a hash table or a variant of the so-called
-FM-index~\cite{pmid20460430}. Hash tables are typically used to index
-$k$-mers, which makes them useful to search seeds of fixed size $k$
-(see~\cite{pmid30346548} for a recent benchmark of $k$-mer hashing
-algorithms). In contrast, some text-indexing structures have no set size
-so they can be used to search seeds of different lengths. For instance,
-the FM-index is a compact data structure based on the suffix
-array~\cite{manber1993suffix} and on the Burrows-Wheeler
-transform~\cite{burrows1994block}, emulating a suffix trie with a much
-smaller memory footprint~\cite{ferragina2000opportunistic,
+FM-index~\cite{ferragina2000opportunistic, ferragina2005indexing}. Hash
+tables are typically used to index $k$-mers, which makes them useful to
+search seeds of fixed size $k$ (see~\cite{pmid30346548} for a recent
+benchmark of $k$-mer hashing algorithms). In contrast, some text-indexing
+structures have no set size so they can be used to search seeds of
+different lengths. For instance, the FM-index is a compact data structure
+based on the suffix array~\cite{manber1993suffix} and on the
+Burrows-Wheeler transform~\cite{burrows1994block}, emulating a suffix trie
+with a much smaller memory footprint~\cite{ferragina2000opportunistic,
 ferragina2005indexing}.
 
 Other methods can be efficient (\textit{e.g.}, running a bisection on the
@@ -1234,13 +1240,9 @@ not mappable, especially when reads are relatively short.
 \subsection{Illustration}
 \label{sec:illdual}
 
-Using the method above, we can compute the probability that a seeding
-scheme using exact seeds is off target. This depends on the exact
-specifications of the problem, so for illustration purposes, we choose
-reads of size $k=50$ sequenced with an instrument with error rate
-$p=0.01$, and we use exact seeds of size $\gamma=17$. We then vary the
-number of duplicates $N$ and their divergence rate $\mu$, which both
-depend on the particular read being sequenced.
+We illustrate the strategy delineated above for reads of size $k=50$
+sequenced with an instrument with error rate $p=0.01$, when using exact
+seeds of size $\gamma=17$.
 
 \begin{figure}[h]
 \centering
@@ -1251,17 +1253,18 @@ of size $\gamma=17$ in reads of size $k=50$ nucleotides sequenced with an
 error rate $p=0.01$. Each line shows a different number of duplicate
 sequences $N$ from 1 to 10 and the x-axis shows the divergence rate $\mu$,
 defined as the probability that a given duplicate differs from the target
-at any nucleotide.}
+at any given position.}
 \label{fig:curves_exact}
 \end{figure}
 
-Fig.~\ref{fig:curves_exact} shows the result for $N$ from 1 to 10 and for
-$\mu$ from 0 to 0.20. The first observation is that the probability that
-seeding is off target increases with $N$. This is clearly visible from
-expression (\ref{eq:Poff}). This can also be understood intuitively
-because the probability of null seeding decreases when there are more
-potential candidates, and since the probability of on-target seeding does
-not change, the probability of off-target seeding must increase.
+Fig.~\ref{fig:curves_exact} shows the result for a number of duplicates
+$N$ from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The first
+observation is that the probability that seeding is off target increases
+with $N$. This is clearly visible from expression (\ref{eq:Poff}). This
+can also be understood intuitively because the probability of null seeding
+decreases when there are more potential candidates, and since the
+probability of on-target seeding does not change, the probability of
+off-target seeding must increase.
 
 The second observation is that there exists a ``worst'' value of $\mu$
 situated around 0.08. When $\mu$ is much smaller, the sequences of the
@@ -1529,11 +1532,9 @@ $\tilde{B}_n(z)$ and $\tilde{C}_n(z)$.
 \subsection{Illustration}
 \label{sec:illskipdual}
 
-Using the method above, we can compute the probability that a seeding
-scheme using skip seeds is off target. Using the same settings as in
-section~\ref{sec:illdual} ($k=50$, $p=0.01$ and $\gamma=17$), we decide to
-use skip-9 seeds and vary the number of duplicates $N$ and their
-divergence rate $\mu$.
+We illustrate the strategy delineated above Using the same settings as in
+section~\ref{sec:illdual} ($k=50$, $p=0.01$ and $\gamma=17$), except that
+we use skip-9 seeds instead of exact seeds.
 
 \begin{figure}[h]
 \centering
@@ -1544,19 +1545,20 @@ seeds of size $\gamma=17$. Read size and error rate are the same as in
 Fig.~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each line
 shows a different number of duplicate sequences $N$ from 1 to 10 and the
 x-axis shows the divergence rate $\mu$, defined as the probability that a
-given duplicate differs from the target at any nucleotide.}
+given duplicate differs from the target at any given position.}
 \label{fig:curves_skip}
 \end{figure}
 
-Fig.~\ref{fig:curves_skip} shows the result for $N$ from 1 to 10 and for
-$\mu$ from 0 to 0.20. The curves have the same general aspect as those of
-Fig.~\ref{fig:curves_exact}. The probability that seeding is off target
-increases with $N$. There is again a  worst value of $\mu$, because the
-maximum of $P(\overline{S}_0 \cap \overline{S}_1)$ minimizes expression
-(\ref{eq:Poff}) for every value of $N$. But the value is different from
-that of Fig.~\ref{fig:curves_exact} because $P(\overline{S}_0 \cap
-\overline{S}_1)$ is computed for skip-9 seeds instead of exact seeds (here
-the worst value of $\mu$ is approximately 0.07).
+Fig.~\ref{fig:curves_skip} shows the result for a number of duplicates $N$
+from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The curves
+have the same general aspect as those of Fig.~\ref{fig:curves_exact}. The
+probability that seeding is off target increases with $N$. There is again
+a  worst value of $\mu$, because the maximum of $P(\overline{S}_0 \cap
+\overline{S}_1)$ minimizes expression (\ref{eq:Poff}) for every value of
+$N$. But the value is different from that of Fig.~\ref{fig:curves_exact}
+because $P(\overline{S}_0 \cap \overline{S}_1)$ is computed for skip-9
+seeds instead of exact seeds (here the worst value of $\mu$ is
+approximately 0.07).
 
 Importantly, Fig.~\ref{fig:curves_skip} reveals that skipping 9
 nucleotides increases the chances that seeding is off target by a factor
@@ -2208,27 +2210,28 @@ duplicates.
 \subsection{Illustration}
 \label{sec:illmem}
 
-Using the same settings as in section~\ref{sec:illdual} ($k=50$, $p=0.01$
-and $\gamma=17$), we decide to use MEM seeds and vary the number of
-duplicates $N$ and their divergence rate $\mu$.
+We illustrate the strategy delineated above 
+using the same settings as in section~\ref{sec:illdual} ($k=50$, $p=0.01$
+and $\gamma=17$), except that we replace exact seed by MEM seeds.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.65]{curves_mem.pdf}
 \caption{\textbf{Off target seeding probabilities (MEM seeds).}
-The curves show the probability that seeding is off target for skip-9
-seeds of size $\gamma=17$. Read size and error rate are the same as in
-Fig.~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each line
-shows a different number of duplicate sequences $N$ from 1 to 10 and the
-x-axis shows the divergence rate $\mu$, defined as the probability that a
-given duplicate differs from the target at any nucleotide.}
+The curves show the probability that seeding is off target for MEM
+seeds of minimum size $\gamma=17$. Read size and error rate are the same
+as in Fig.~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each
+line shows a different number of duplicate sequences $N$ from 1 to 10 and
+the x-axis shows the divergence rate $\mu$, defined as the probability
+that a given duplicate differs from the target at any given position.}
 \label{fig:curves_mem}
 \end{figure}
 
-Fig.~\ref{fig:curves_mem} shows the result for $N$ from 1 to 10 and for
-$\mu$ from 0 to 0.20. The curves have the same general aspect as those of
-Fig.~\ref{fig:curves_exact}. The probability that seeding is off target
-increases with $N$, as shown by expression (\ref{eq:PMEM}).
+Fig.~\ref{fig:curves_mem} shows the result for a number of duplicates $N$
+from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The curves
+have the same general aspect as those of Fig.~\ref{fig:curves_exact}. The
+probability that seeding is off target increases with $N$, as shown by
+expression (\ref{eq:PMEM}).
 
 There is again a  worst value of $\mu$ but it is much lower than the
 previous two cases (here it is close to 0.026). In the case of MEM seeds,
@@ -2322,19 +2325,175 @@ cause for concern regarding false positives because they can easily be
 detected using Bayes formula, as shown in expression (\ref{eq:bayes}).
 
 
+\section{The Sesame library}
+\label{sec:sesame}
+
+We implemented the methods and algorithms presented here in an open-source
+C library to compute seeding probabilities. The library is called Sesame
+and is available at \url{https://github.com/gui11aume/sesame}.
+
+\subsection{Main features of Sesame}
+
+Sesame contains functions to compute the seeding probabilities described
+here. All the functions were tested against simulations to ensure that the
+implementation is accurate and the code was checked extensively by static
+analysis and unit testing.
+
+Computating seeding probabilities can take up to a few seconds, even when
+replacing iterative methods by Monte Carlo simulations. This is
+incompatible with the speeed requirements of modern mappers, so Sesame has
+an interface for computations that must be performed online. In this mode,
+Sesame uses a type of lazy evaluation where the results are computed only
+the first time, and stored in memory for reuse on subsequent calls.
+
+Storing the results in memory is an efficient strategy because three
+parameters are constant throughout the sequencing run: the minimum seed
+size $\gamma$, the read size $k$ and the error rate of the sequencer $p$
+(and when using skip seeds, the amount of skipping $n$ is also constant).
+Only two parameters depend on the read: the number of duplicates $N$ and
+their divergence rate $\mu$. In this mode, Sesame automatically switches
+to Monte Carlo sampling when $N$ is large to save time. Also, the input
+parameters are ``snapped'' to a predefined grid of set values for $N$ and
+$\mu$, so that few computations are performed and most of the calls are
+actually memory lookups. Sesame can thus be integrated in short read
+mappers without being a bottleneck.
+
+Alternatively, the probabilities of interest can be computed offline,
+saved to disk and loaded at run time. This is particularly useful if the
+sequencing runs follow some standard conditions with a known error rate,
+because the computations can be recycled between runs.
+
+Finally, Sesame also has an offline interface, where seeding probabilities
+are computed exactly as requested by the users, \textit{i.e.} without
+modifying the algorithm or the parameters, and also without storing the
+results in memory.
+
+The Sesame manual, available from the repository, contains additional
+information and explains in detail how to use the library.
+
+
+\subsection{Using Sesame to compare seeding strategies}
+
+As a tool to compute seeding probabilities, Sesame can be used to compare
+the merits of different strategies. The kind of insight that we can gain
+from such calculations was already showcased in
+Fig.~\ref{fig:curves_exact}, Fig.~\ref{fig:curves_skip} and
+Fig.~\ref{fig:curves_mem}, where the numbers were computed using Sesame.
+
+To further showcase the potential benefits of computing seeding
+probabilities, we use Sesame to compare the default seeding strategies of
+BWA-MEM~\cite{li2013aligning} and Bowtie2~\cite{pmid22388286}. Note that
+both mappers use advanced techniques to refine the seeds, so this
+comparison does not reflect the true performance of the mappers. It is
+nevertheless useful to know the baseline of each strategy. The default of
+BWA-MEM it to use MEM seeds of minimum size 19; that of Bowtie2 is to use
+skip-9 seeds of size 16.
+
+\begin{figure*}[t]
+\begin{center}
+\includegraphics[scale=.41]{mortal_kombat.pdf}
+\end{center}
+\caption{\textbf{Comparing seeding strategies with Sesame.} Left: MEM
+seeds with $\gamma=19$ and $\mu=0.06$. Right: skip-9 seeds with
+$\gamma=16$ and $\mu=0.06$. The probabilities that seeding is off target
+were computed using Sesame. Each curve represents the probability for a
+given number of duplicates ($N$). Estimates using iterative methods (skip
+seeds and MEM sees where $N \leq 20$) were computed to within 1\%
+accuracy. Estimates using Monte Carlo sampling (MEM seeds where $N > 20$)
+were computed as the average of 500 million simulations.
+}
+\label{fig_mortal_kombat}
+\end{figure*}
+
+The probabilities that seeding is off target for different read sizes $k$
+and different number of duplicates $N$ are plotted in
+Fig.~\ref{fig_mortal_kombat}. The left panel shows the results for MEM
+seeds and the right panel shows the results for skip seeds. Here the error
+rate $p$ is set to 1\%, close to the specifications the Illumina platform,
+and the divergence rate between duplicates $\mu$ is set to an arbirtarry
+value of 6\%.
+
+The behaviors of the two types of seeds are dramatically different. Let us
+start with MEM seeds. For every value of $N$, the probability initially
+increases with the read size, and then drops exponentially. The initial
+increase is a hallmark of MEM seeds; it is due to the fact that duplicates
+can mask the target. Note that the asymptotic decay depends on the number
+of duplicates $N$ because each duplicate can mask the target and thereby
+reduces the probability that it is discovered. Overall, these results show
+that the performance of MEM seeds is poor when the target has more than
+approximately 20 duplicates.
+
+Turning to skip seeds, we see that the curves have a staircase look with a
+drop every 10 nucleotides. This is so because seeding probabilities remain
+unchanged until there is space for another seed of size 16 on the read.
+The curves are otherwise decreasing with a steady exponential trend where
+the asymptotic decay does not depend on the number of duplicates $N$. The
+reason is that duplicates do not prevent the target from being discovered,
+they merely fool the mapper when the target was not found. This property
+makes the asymptotic decay of skip seeds substantially faster that of MEM
+seeds when $N$ is large.
+
+Those properties are self evident in retrospect, but they are not
+necessarily obvious from the definitions of MEM seeds and skip seeds.
+Keeping in mind that the asymptotic decay depends on $N$ for MEM seeds
+helps understand what their main limitation is.
+
+Fig.~\ref{fig_mortal_kombat} suggests that skip-9 seeds of size 16 are
+just better than MEM seeds of size 19. However, the gain in sensitivity
+comes at the cost of a larger candidate set, slowing down the mapping
+process. To remain competitive, Bowtie2 further filters the candidate set
+using a priority policy. But since some candidates are not checked, the
+probability that seeding is off target is larger than shown in
+Figure~\ref{fig_mortal_kombat}.
+
+\subsection{Key insights about MEM seeds}
+
+At least two key insights about MEM seeds can be gained from
+Fig.~\ref{fig_mortal_kombat}. The first is that it is probably not worth
+for a MEM-based mapper to check all the candidate loci when there are more
+than approximately 20 them. The mapper may find the correct location, but
+even if this is the case, the mapping quality will remain low because the
+prior chances of failure were high. A better strategy is to either bail
+out ot not waste time or to switch to a more sensitive seeding method (BWA
+opts for the second and uses a re-seeding policy). It is also important
+to note that this decision should be based on an estimated value of $N$
+and not, for instance, on the size of the seed or some other variable.
+
+A second insight is that for MEM seeds, the off-target rate is always
+above $10^{-3}$ for reads of 50 nucleotides or fewer. Here it is important
+to mention that the value $\mu=0.06$ is not even the worst for reads of
+this size when $p=0.01$ (according to Fig.~\ref{fig:curves_mem}, the worst
+value is around 0.02). So if $\mu$ is unknown and one wishes to be
+conservative, it seems that reads of 50 nucleotides cannot be mapped with
+confidence better than $1/1000$.
+
+However, this is not true for the reason that it is practically impossible
+to map an Illumina read of size 50 to the wrong location when $N=0$ (see
+section~\ref{sec:random_seeds}). This means that tweaking the seeding
+method to improve the mapping quality score will have less impact than
+checking whether $N$ is 0 (in other words, whether the target is a unique
+sequence).
+
+These insights suggest that there is a way to make MEM seeds more useful
+for short read mappers. We are currently working on a prototype based on
+these two ideas to increase the speed and the accuracy of short read
+mapping. This requires estimating $N$ and $\mu$ for every read and will be
+described in a separate work.
+
 
 \section{Discussion}
 
 We have devised a set of methods to compute the probability that seeding
-heuristics fail and commit the mapping process to an error. This
-fills a knowledge gap to understand and calibrate the performance of the
-seeding heuristics. The pillars of our strategy are borrowed from analytic
-combinatorics~\cite{flajolet2009analytic, sedgewick2013introduction}, even
-though we do not follow the complete programme. Constructing generating
-functions usually serves the purpose of finding their singularities in
-order to approximate the solution. In our case, however, the weighted
-generating functions cannot be computed so this strategy is not
-applicable.
+heuristics fail and commit the mapping process to an error. We have also
+implemented the solution as an open source C library to perform the
+computations. This fills a knowledge gap to understand and calibrate the
+performance of the seeding heuristics. The pillars of our strategy are
+borrowed from analytic combinatorics~\cite{flajolet2009analytic,
+sedgewick2013introduction}, even though we do not follow the complete
+programme. Constructing generating functions usually serves the purpose of
+finding their singularities in order to approximate the solution. In our
+case, however, the weighted generating functions cannot be computed so
+this strategy is not applicable.
 
 To find the probabilities of interest in the absence of a fully specified
 weighted generating function, we compute only the first terms using
@@ -2397,14 +2556,14 @@ different seeding methods, so it is possible in theory to construct
 opportunistic seeding strategies that pick the best method for every read.
 
 Another interesting fact is that skip seeds can have better performance
-than exact seeds in the sense that they can lower off-seeding
+than exact seeds in the sense that they can yield lower off-seeding
 probabilities. However, this always comes at the cost of accuracy because
 skipping nulceotides reduces the probability of on-target seeding.
 
 Finally, we also observed that MEM seeds cause a very serious increase in
 off-target seeding compared to exact seeds and skip seeds. This does not
 mean that MEM seeding is a bad strategy (it is usually faster than the
-other methods), but it is a good idea to keep the performance in check and
+other methods), but it is a good idea to keep an eye on performance and
 switch method or even skip the read altogether if the chances of
 discovering the target are too low.
 
@@ -2413,14 +2572,14 @@ algorithm~\ref{alg:mcmc} is relatively straightforward, so one may wonder
 why the approach with weighted generating functions is necessary for MEM
 seeds. The only reason is precision. To estimate the frequency of an event
 by Monte Carlo sampling, it must occur at least a few times in the
-simulation. For instance, with 10 million rounds of sampling, frequencies
-around $1/1,000,000$ or lower cannot be measured accurately. When one is
-interested only in frequent events, it is thus a perfectly reasonable
-strategy. On the other hand, for $N < 20$, the probability that MEM
-seeding is null or off-target is relatively small, so we need a method
-that is accurate in this range. Fortunately, the transfer matrix method is
-fast because the dimension of the matrix $\mathring{M}_N(z)$ is small and
-the computations are not prohibitive.
+simulation. For instance, with 1 million rounds of sampling, frequencies
+around $1/100,000$ or lower cannot be measured accurately. When one is
+interested only in frequent events, it is thus a reasonable strategy. On
+the other hand, for $N < 20$, the probability that MEM seeding is null or
+off-target is relatively small, so we need a method that is accurate in
+this range. Fortunately, the transfer matrix method is fast because the
+dimension of the matrix $\mathring{M}_N(z)$ is small and the computations
+are not prohibitive.
 
 The proposed methods meet the demand for speed. One needs to compute the
 probabilities only once for a given value of $N$ and $\mu$ (the error rate
@@ -2473,7 +2632,7 @@ technologies.
 
 We acknowledge the financial support of the Spanish Ministry of Economy,
 Industry and Competitiveness (`Centro de Excelencia Severo Ochoa
-2013-2017', Plan Nacional BFU2012-37168), of the CERCA
+2013-2017', Plan Estatal PGC2018-099807-B-I00), of the CERCA
 Programme~/~Generalitat de Catalunya, and of the European Research Council
 (Synergy Grant 609989). R.~C. was supported by the People Programme
 (Marie Curie Actions) of the European Union's Seventh Framework Programme
