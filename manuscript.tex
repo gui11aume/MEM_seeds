@@ -67,12 +67,14 @@
 
 \title{Calibrating seed-based alignment heuristics with Sesame}
 
-\author[1,2]{Guillaume J. Filion}
+\author[1,2,3]{Guillaume J. Filion}
 \author[1]{Ruggero Cortini}
 \author[1]{Eduard Zorita}
 \affil[1]{Center for Genomic Regulation (CRG), The Barcelona Institute of
 Science and Technology, Dr. Aiguader 88, Barcelona 08003, Spain.}
 \affil[2]{University Pompeu Fabra (UPF), Barcelona, Spain.}
+\affil[3]{Present address: Dept. Biological Sciences, University of
+Toronto Scarborough}
 
 \date{\today}
 
@@ -104,10 +106,9 @@ The main innovation of this work is to use concepts from analytic
 combinatorics to represent reads as abstract sequences, and to specify
 their generative function to estimate the probabilities of interest.
 % Durability.
-We provide several algorithms, which combined together give a workable
-solution for the problem of calibrating seeding heuristics for short
-reads. We also provide a C implementation of these algorithms in a library
-called Sesame.
+We provide several algorithms, which together give a workable solution for
+the problem of calibrating seeding heuristics for short reads. We also
+provide a C implementation of these algorithms in a library called Sesame.
 % Scope.
 These results can improve current mapping algorithms and lay the
 foundation of a general strategy to tackle sequence alignment problems.
@@ -124,166 +125,170 @@ The Sesame library is open source and available for download at
 
 \subsection{Mapping reads to genomes}
 
-Suppose that we use and imperfect instrument to sequence a DNA fragment
-drawn at random from a known genome; how can we identify the location of
-the fragment in the genome?
+Say we use an imperfect instrument to sequence a small fragment of DNA. If
+we know its genome of origin, how can we find the location of the fragment
+in this genome?
 
-We will refer to this question as the \emph{true location problem}.
-It has applications in countless domains, like discovering
-disease-causing mutations; diagnosing viral, bacterial or fungal
-infections; diagnosing cancer and choosing appropriate therapies;
-selecting breeds of interest in agriculture; tracing human migrations from
-ancient bones; diagnosing genetic diseases at birth; finding compatible
-graft donors \textit{etc}.
+The advent of high-throughput sequencing has put this question at the
+center of countless applications in genetics, such as discovering
+disease-causing mutations, selecting breeds of interest in agriculture or
+tracing human migrations.
 
-At first sight, whether a read can be mapped to its correct location seems
-to depend only on its length and on the error rate of the sequencer.
-However, there is another important factor to consider: most genomes
-contain repeated sequences, \textit{i.e.} relatively large subsequences
-that are present at more than one location. For instance, we cannot map
-the fragment with certainty if there exists an exact copy of the sequence
-somewhere else in the genome, because we cannot know which of the two
-copies was sequenced.
+We will refer to this as the \emph{true location problem}. The answer to
+the problem depends on the length of the read, on the error rate of the
+sequencer and on one key feature of the genome: its repeat structure.
+Most genomes contain repetitive sequences, \textit{i.e.}, relatively large
+subsequences that are present at multiple locations. If the sequenced DNA
+fragment comes from a repetitive sequence, it may be impossible to map the
+read with certainty.
 
-This case is rare though. Repeated sequences are in general not identical
-but merely homologous --- meaning that their similarity is unlikely to
-occur by chance. So when the DNA fragment has one or more duplicates in
-the genome, we can still map it, as long as we can distinguish the
-duplicates. This in turn depends on their similarity with the target
-fragment and on the error rate of the sequencer.
+In general, repetitive sequences are not identical but merely
+homologous---meaning that their similarity is very unlikely to occur by
+chance. So if the sequenced DNA fragment originates from a repetitive
+sequence, we can map the read only if we can rule out all the candidates
+except one. This, in turn, depends on the similarity between the
+duplicates and on the error rate of the sequencer.
 
-Since repeats play a central role in the problem at hand, we give the
+Since repetitive sequences play a central role in the problem, we give the
 terms ``targets'' and ``duplicates'' a meaning that will facilitate the
 exposition of the theory.
 
 \begin{definition}
-The target is the DNA fragment that was sequenced. Duplicates are
-sequences of the genome that are homologous to the target.
+The target is the DNA fragment that was actually sequenced. Duplicates are
+sequences of the genome that share homology with the target (in genetics
+they are often referred to as paralogs).
 \end{definition}
 
-Because sequencing errors can convert the sequence of the target into one
-of its duplicates, the \emph{true} location of a DNA fragment is not
-always the \emph{best} candidate (as measured by the identity between the
-sequence and the candidate location). This leads to the following
-question: how can we identify the \emph{best} location of the fragment in
-the genome? 
+The difficulty of the true location problem is due to sequencing errors.
+Occasionally, the sequence of a DNA fragment can be closer to one of the
+duplicates than to the target. So the \emph{true} location of a DNA
+fragment is not always the \emph{best} (as measured by the identity
+between the sequence and the candidate location). This naturally leads to
+ask how we can identify the \emph{best} location of the fragment in
+the genome.
 
-We will refer to this task as the \emph{best location problem}. It amounts
-to finding the optimal alignment between two sequences, and for this
-reason has received substantial attention in bioinformatics. For
-simplicity we will assume that the true location is always the best, and
-we will often confound these two ideas.
+We will refer to this as the \emph{best location problem}. It amounts to
+finding the optimal alignment between two sequences, and for this reason
+has received substantial attention in bioinformatics. For the purpose of
+developing a theory rooted in statistics, our main concern is to address
+the true location problem, but for simplicity, we will assume that the
+true location is also the best. When applicable, we will clarify the
+implications of this hypothesis in the relevant sections, and we will show
+in section~\ref{sec:truevsbest} that this simplifying assumption is harmless for
+the present theory.
+
 
 \subsection{Seeding heuristics}
 \label{sec:seedheur}
 
-There exist algorithms to solve the best location
-problem~\cite{pmid7265238,pmid5420325}, but they are too slow to process
+Exact alignment algorithms were designed to solve the best location
+problem~\cite{pmid7265238, pmid5420325}, but they are too slow to process
 the large amount of data generated by modern sequencers. Instead, one uses
-heuristic methods, \textit{i.e.} algorithms that run faster, but that may
+heuristic methods, \textit{i.e.}, algorithms that run faster but may
 return an incorrect result~\cite{Waterman1984}.
 
-The most popular heuristic for the best location problem is a filtration
-method called ``seeding''. The principle is to first identify short
-regions of high similiarity between the read and the genome, and then run
-an exact alignment algorithm at the candidate locations. This is for
-instance the general strategy of the popular alignment algorithm
-BLAST~\cite{pmid2231712}.
+The most popular heuristic for mapping DNA sequences is a filtration
+method called seeding. The principle is to first identify seeds,
+defined as short regions of high similarity between the read and the
+genome, and then use an exact alignment algorithm at the candidate
+locations to identify the optimum. This strategy was first proposed in
+FASTA~\cite{pmid2983426} and BLAST~\cite{pmid2231712} to to search for
+homology in sequence databases.
 
-If seeding is fast, we can quickly zoom in on a small set of candidate
-locations and reduce the input size of the (slow) alignment algorithm. The
-disadvantage is that the target location is not always detected and
-included in the candidate set. When that happens, the read cannot be
-mapped to the true location because it has been filtered out at the
-seeding step.
+There are efficient methods to extract seeds, so it is possible to quickly
+hone in on a small set of candidates and to reduce the search space of the
+alignment algorithm. The disadvantage is that the target may not be in the
+candidate set, in which case the read cannot be mapped correctly.
 
-The slowness of exact alignment algorithms imposes a trade-off between
-speed and accuracy: If the seeding step is set to produce many candidates,
-it is likely to retrieve the true location. The downside is that
-processing all the candidates would take long. Conversely, if the seeding
-step is set to produce few candidates, the process would run faster but
-the target is less likely to be in the candidate set.
+As a consequence, seeding methods induce a trade-off between speed and
+accuracy: If the filtration is set to produce a large candidate set, the
+target is likely to be discovered, with the downside that checking all the
+candidates with an exact alignment algorithm will take long. Conversely,
+if the filtration is set to produce a small candidate set, the process
+will run faster but the target is more likely to be missed.
 
 Importantly, the trade-off depends on the seeding method. This means that
-we can develop faster mapping algorithms at no cost for accuracy, as long
-as we can find better seeding strategies. Progress on this line of
-research has largely benefited from the improvement of computer hardware
-and from the development of indexing algorithms. Literature on this topic
-is already abundant. Some examples of seeding algorithms are given in
-references~\cite{sun2005designing, pmid11934743, xu2006optimizing,
-kucherov2005multiseed, brejova2003vector, pmid18684737, pmid15359419}.
-References~\cite{pmid16533404} and~\cite{pmid20460430} present high-level
-comparisons of different designs, and reference~\cite{navarro2001guided}
-gives a global overview of filtration methods in pattern matching.
+mapping algorithms can run faster at no cost for accuracy if we can find
+better seeding strategies. Progress on this line of research has largely
+benefited from the improvement of computer hardware and from the
+development of optimized data structures. There already exists a large
+body of literature on the design of seeding algorithms; the interested
+reader can find examples of those in references~\cite{sun2005designing,
+pmid11934743, xu2006optimizing, kucherov2005multiseed, brejova2003vector,
+pmid18684737, pmid15359419}. References~\cite{pmid16533404}
+and~\cite{pmid20460430} present high-level comparisons of different
+designs, and reference~\cite{navarro2001guided} gives a global overview of
+filtration methods in pattern matching.
 
 \subsection{The two types of seeding failure}
 \label{sec:twotypes}
 
-Filtering methods are considered to fail whenever the target is not in the
-candidate set. For seeding heuristics, we need to distinguish two
-different kinds of failure. In the first kind, the candidate set contains 
-a duplicate of the target but does not contain the target itself; in the
-second kind, the candidate set contains neither.
+Filtering heuristics are considered to fail whenever the target is not in
+the candidate set, but here we must be more specific and distinguish two
+kinds of failure: In the first kind, the candidate set contains a
+duplicate of the target but does not contain the target itself; in the
+second kind, the candidate set contains neither the target nor any
+duplicate.
 
-The distinction is important because duplicates of the target are similar
-to the read (due to their similarity to the target), so a failure of the
-first kind is difficult to distinguish from a success. A failure of the
-second kind is easier to recognize because in this case the best hit is
-not similar to the read, as we will highlight in
-section~\ref{sec:random_seeds}.
+The distinction is important because the duplicates of the target are
+similar to the read (due to their similarity to the target), so a failure
+of the first kind often looks like a success. In contrast, a failure of
+the second kind is easier to flag because in this case the candidates are
+not similar to the read. We will simply assume that seeding failures of
+the second kind are always detected (as explained in
+section~\ref{sec:random_seeds}), so that we can focus on the more
+difficult case of seeding failures of the first kind.
 
-Before going further, we introduce some nomenclature that will be useful
-to simplify the exposition of the theory.
+Before going further, we introduce three terms that will simplify the
+exposition.
 
 \begin{definition}
-The seeding process is said to be
+The candidate set obtained at the seeding step is said to be
 \begin{enumerate}[i)]
-\item ``on target'' if the candidate set contains the target,
-\item ``off target'' if the candidate set contains a duplicate but
-not the target, 
-\item ``null'' if the candidate set contains neither.
+\item ``on target'' if it contains the target,
+\item ``off target'' if it contains a duplicate but not the target, 
+\item ``null'' if it contains neither.
 \end{enumerate}
 \end{definition}
 
-If a seed-based mapping algorithm returns an incorrect location, then it
-must be the case that the best location was never tested in the
-post-filtration phase (otherwise it would have been found by the exact
-alignment algorithm).
+With our assumptions, a read is mapped to the wrong location if and only
+if the candidate set is off target. Indeed, if the candidate set is null,
+the read is not mapped, and if the candidate set is on target, the correct
+location is discovered at the alignment step. The equivalence is granted
+by the assumption that the true location is also the best, reducing the
+mapping problem to a seeding problem. That being said, the true location
+is not always the best in practical applications. We will show in
+section~\ref{sec:truevsbest} that off-target seeding is responsible for
+most of the mapping errors even without the assumption above, but for now
+we maintain the strict equivalence between mapping errors and off-target
+seeding.
 
-This observation is fundamental: in order to estimate the error rate of a
-mapping algorithm, we must know how often the associated seeding heuristic
-is off target. For lack of theoretical framework, this information is
-missing, meaning that current mappers are not properly calibrated.
-
-Our focus here is to develop a theory to estimate the probability that
-seeding is off target, when using the most popular seeding heuristics for
-short reads. Previous work pioneered a method to compute seeding
-probabilities but it did not distinguish off-target from null
+Focusing on popular heuristics to map short reads, our aim is to develop a
+method to estimate the probability that the candidate set is off target.
+Previous work pioneered a method to compute seeding probabilities but it
+did not distinguish off-target from null
 seeding~\cite{filion2017analytic,filion2018analytic}, and therefore did
 not provide a way to estimate the frequency of mapping errors. Other
 authors investigated the reliability of mapping
-algorithms~\cite{pmid23872968}, but they focused on the probability that
-random sequences have a single hit, recognizing that solving the problem
+algorithms~\cite{pmid23872968}, but they focused on the probabilities of
+random hits, recognizing that addressing the problem of incorrect mapping
 requires taking into consideration the repeat structure of the genome.
-Here we address this problem in general terms and we provide a practical
-way to estimate the mismapping rate in complex genomes.
 
-The rest of this document is not organized by logical units but by
-increasing level of difficulty. The order of the examples is meant to
-ease the acquisition of the main concepts, meaning that we sometimes go
-back and forth between different types of seeding strategies. We first
-give some background on the different types of seeding methods considered
-here; we then introduce the computational strategy based on transfer
-matrices; finally we delve into each specific seeding method.
+The rest of this document is organized so as to present the concepts by
+increasing level of complexity, meaning that we sometimes go back and
+forth between different types of seeding strategies. We first provide some
+background knowledge on different types of seeding methods, we then
+introduce the computational strategy based on transfer matrices, and
+finally we delve into each specific seeding method.
 
 \section{Seeds}
 
-The term ``seed'' changes meaning with different authors. It can designate
-a part of the read, a part of the genome, a particular sequence motif or a
-structured pattern of matches. Also, the term does not always imply an
-exact match. For instance, the algorithm PatternHunter~\cite{pmid11934743}
-uses ``spaced seeds'' that tolerate mismatches. To avoid potential
-confusion, we will adopt the following convention:
+The term ``seed'' has different meanings in computational biology. It can
+designate a part of the read, a part of the genome, a particular sequence
+motif, or a structured pattern of matches. Also, a seed does not always
+refer to an exact match. For instance, the algorithm
+PatternHunter~\cite{pmid11934743} uses ``spaced seeds'' that tolerate
+mismatches. To avoid any confusion, we will adopt the convention below.
 
 \begin{definition}
 A seed is a subsequence of the read that has size at least $\gamma$
@@ -291,15 +296,15 @@ A seed is a subsequence of the read that has size at least $\gamma$
 match in the reference genome.
 \end{definition}
 
-When a seed matches a particular location of the genome, we say that it is
-a ``seed for that location''. For instance, we often use expressions such
-as ``a seed for the target'' or ``a seed for a duplicate''.
+When a seed matches a given location of the genome, we say that it is a
+seed for that location. This is particularly useful in expressions such as
+``seed for the target'' or ``seed for a duplicate''.
 
 This definition presents a computational challenge: to know if a given
-subsequence is a seed we need to know if it exists somewhere in the
-genome. This is a non trivial problem in itself, but fortunately we can
-use practical methods to solve it, even when the reference genome is very
-large.
+subsequence of a read is a seed we need to know if it exists somewhere in
+the genome. This is a non trivial problem in itself, but fortunately we
+can use practical methods to solve it, even when the reference genome is
+very large.
 
 These algorithms are crucial for the present theory, but describing them
 in depth is outside the scope of this document. Let us just mention that
@@ -312,9 +317,9 @@ little relevance in the present context.
 The index is usually a hash table or a variant of the so-called
 FM-index~\cite{ferragina2000opportunistic, ferragina2005indexing}. Hash
 tables are typically used to index $k$-mers, which makes them useful to
-search seeds of fixed size $k$ (see~\cite{pmid30346548} for a recent
+search for seeds of fixed size $k$ (see~\cite{pmid30346548} for a recent
 benchmark of $k$-mer hashing algorithms). In contrast, some text-indexing
-structures have no set size so they can be used to search seeds of
+structures have no set size so they can be used to search for seeds of
 different lengths. For instance, the FM-index is a compact data structure
 based on the suffix array~\cite{manber1993suffix} and on the
 Burrows-Wheeler transform~\cite{burrows1994block}, emulating a suffix trie
@@ -323,57 +328,56 @@ ferragina2005indexing}.
 
 Other methods can be efficient (\textit{e.g.}, running a bisection on the
 suffix array~\cite{dobin2013star}) but the FM-index is currently the most
-popular choice for seeding methods. For MEM seeds, it is even the only
-practical option~\cite{pmid24336412, pmid25399029, pmid23349213,
-pmid19389736}. However, the detail is of little interest here: we simply
-assume that seeds are known at all times without ambiguity because this
-problem has several practical solutions.
+popular choice for seeding methods. For MEM seeds defined below, it is
+even the only practical option~\cite{pmid24336412, pmid25399029,
+pmid23349213, pmid19389736}. Overall, the detail is of little interest for
+the theory. We simply assume that seeds are known at all times without
+ambiguity because this problem has several practical solutions.
 
 
 \subsection{Exact seeds}
 
-Exact seeds have a fixed size $\gamma$. When using exact seeds, all the
-perfect matches of size $\gamma$ are collected to constitute the candidate
-set. This seeding heuristic was used in the first version of
-BLASTN~\cite{pmid2231712}, but is no longer used because it produces many
-overlapping matches within the same regions.
+Exact seeds are seeds of fixed size $\gamma$. In other words, when using
+exact seeds, the candidate set consists of all the genomic locations for
+which there is a perfect match of size $\gamma$ in the read. This seeding
+heuristic was used in the first version of BLASTN~\cite{pmid2231712}, but
+it has become unpopular for producing many redundant hits within the same
+regions of the read and of the genome.
 
-Fig.~\ref{fig:exact_seed_example} shows a read produced by an imperfect
-sequencer. The sequenced DNA fragment comes from a region of the genome
-that has three duplicates and the read has three miscalled nucleotides
-(indicated by stars).
+Figure~\ref{fig:exact_seed_example} shows the exact seeds from an example
+a read with three miscalled nucleotides. The sequenced DNA fragment has
+three duplicates so the seeds can match four possible locations.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1]{exact_seed_example.pdf}
-\caption{\textbf{Example of exact seeds.}
+\caption{\textbf{Exact seeding.}
 A sequenced DNA fragment (Read) is shown above the actual molecule
-(Target), and above homologous sequences also present in the genome
-(Duplicates). Sequencing errors are indicated by a star (each marked
-\texttt{T} was actually an \texttt{A} that was misread). The mismatches
-between the genomic sequences and the read are indicated in bold. The
-exact seeds of size $\gamma = 7$ are indicated as horizontal grey lines
-above the read. The matching regions in the genomic sequences are
-shadowed in grey. Several overlapping seeds accumulate at the center of
-the read, which is typical for this seeding method.}
+(Target), and above three paralogs of the target (Duplicates). Sequencing
+errors are indicated by stars (all three are \texttt{A} misread as
+\texttt{T}). The mismatches between the genomic sequences and the read are
+indicated in bold. The exact seeds of size $\gamma = 7$ are indicated as
+horizontal grey lines above the read. Matching regions in the genomic
+sequences are shadowed in grey. Several overlapping seeds accumulate at
+the center of the read, which is typical of exact seeds.}
 \label{fig:exact_seed_example}
 \end{figure}
 
 Observe that erroneous nucleotides can belong to exact seeds because they
-sometimes match one of the duplicates. For instance, the first sequencing
-error matches all the duplicates and belongs to an off-target seed.
-However, sequencing errors that are mismatches for \emph{all} the
-sequences cannot belong to a seed. This is the case of the second
-sequencing error in this example, where there is a local deficit of seeds.
+sometimes match a duplicate. For instance, the first sequencing error
+matches all the duplicates and belongs to an off-target seed for the first
+duplicate. However, sequencing errors that are mismatches for \emph{all}
+the sequences cannot belong to a seed. This is the case of the second
+sequencing error in the example, creating a local deficit of seeds.
 
-The middle of the read shows some clutter where consecutive seeds
-match consecutive sequences at the same location. This is typical for
-exact seeds and constitutes a nuisance for the implementation. Indeed, it
-is a waste of computer resources to discover matches in sequences that are
+Note the clutter in the middle of the read, where consecutive seeds match
+consecutive sequences at the same location. This is typical for exact
+seeds and is considered a nuisance for the implementation. Indeed, it is a
+waste of computer resources to discover matches in sequences that are
 already in the candidate set. In addition, this seeding method is not
 particularly sensitive compared to spaced seeds~\cite{pmid11934743} so it
-is used only in few specific applications. Nevertheless, it will be
-extremely useful for the development of the present theory.
+is used only in a few specific applications. Nevertheless, it will be
+useful for the development of the present theory.
 
 
 \subsection{Skip seeds}
@@ -392,15 +396,15 @@ skipped). We will refer to seeds where $n$ nucleotides are skipped as
 \includegraphics[scale=1]{skip_seed_example.pdf}
 \caption{\textbf{Example of skip seeds.}
 The sequences and the annotations are the same as in
-Fig.~\ref{fig:exact_seed_example}, but here we use skip-1 seeds. In other
+Figure~\ref{fig:exact_seed_example}, but here we use skip-1 seeds. In other
 words, seeds can never start at nucleotides 2, 4, 6 \textit{etc}. To
-highlight the difference with Fig.~\ref{fig:exact_seed_example}, the
+highlight the difference with Figure~\ref{fig:exact_seed_example}, the
 missing seeds are represented by dotted lines.}
 \label{fig:skip_seed_example}
 \end{figure}
 
-Fig.~\ref{fig:skip_seed_example} shows what happens when exact seeds are
-replaced by skip-1 seeds on the read of Fig.~\ref{fig:exact_seed_example}.
+Figure~\ref{fig:skip_seed_example} shows what happens when exact seeds are
+replaced by skip-1 seeds on the read of Figure~\ref{fig:exact_seed_example}.
 Here the size is still $\gamma=7$ but 1 nucleotide is skipped between
 seeds. This amounts to removing every second seed. The consequence is that
 there are fewer overlapping matches at the center of the read, but the
@@ -431,8 +435,8 @@ read ends or because the extended subsequence is not in the genome.
 \end{definition}
 
 A \emph{MEM seed} is simply a MEM of size size $\gamma$ or greater.
-Fig.~\ref{fig:MEM_example} shows what happens when using MEM seeds on the
-read of Fig.~\ref{fig:exact_seed_example}. Observe that the clutter at the
+Figure~\ref{fig:MEM_example} shows what happens when using MEM seeds on the
+read of Figure~\ref{fig:exact_seed_example}. Observe that the clutter at the
 center of the read has disappeared because consecutive matches are fused
 into a few MEM seeds.
 
@@ -441,7 +445,7 @@ into a few MEM seeds.
 \includegraphics[scale=1]{MEM_example.pdf}
 \caption{\textbf{Example of MEM seeds.}
 The sequences and the annotations are the same as in
-Fig.~\ref{fig:exact_seed_example}, but here we use MEM seeds of minimum
+Figure~\ref{fig:exact_seed_example}, but here we use MEM seeds of minimum
 size $\gamma=7$. The clutter at the center of the read has disappeared and
 there is at least one seed for each sequence.}
 \label{fig:MEM_example}
@@ -466,7 +470,7 @@ A \emph{shared} MEM seed has several matches in the genome.
 Compared to seeds of fixed size, MEM seeds have two counter-intuitive
 properties. The first is that there are cases where there cannot be any
 on-target seed, even when changing the sensitivity parameter $\gamma$.
-Fig.~\ref{fig:full_masking_example} shows such an example. Even though
+Figure~\ref{fig:full_masking_example} shows such an example. Even though
 there is a single sequencing error, the read has no MEM seed for the
 target. Lowering $\gamma$ does not change this, so there is no way to
 discover the true location using MEM seeds (even though it is the best
@@ -477,7 +481,7 @@ location).
 \includegraphics[scale=1]{full_masking_example.pdf}
 \caption{\textbf{Issues with MEM seeds: inaccessible targets.}
 The read, the MEM seeds and the sequences are represented as in
-Fig.~\ref{fig:MEM_example}. The MEM seeds matching the two duplicates
+Figure~\ref{fig:MEM_example}. The MEM seeds matching the two duplicates
 at the bottom effectively hide the target, so it cannot be discovered.
 This can occur even when the true location is the best candidate and when
 there is a single error on the read.}
@@ -485,7 +489,7 @@ there is a single error on the read.}
 \end{figure}
 
 The second counter-intuitive property is that shortening a read can
-sometimes generate a MEM seed for the target. Fig.~\ref{fig:short_vs_long}
+sometimes generate a MEM seed for the target. Figure~\ref{fig:short_vs_long}
 shows an example of this case. There is no MEM seed for the target, but
 there would be if the read were two nucleotides shorter on the right
 side. Indeed, in this case there would be a shared MEM seed matching the
@@ -497,7 +501,7 @@ the target and the first duplicate (provided $\gamma \leq 12$).
 \includegraphics[scale=1]{short_vs_long_example.pdf}
 \caption{\textbf{Issues with MEM seeds: too long reads.}
 The read, the MEM seeds and the sequences are represented as in
-Fig.~\ref{fig:MEM_example}. There would be a good seed (shared) if the
+Figure~\ref{fig:MEM_example}. There would be a good seed (shared) if the
 read were two nucleotides shorter. The true location is hidden by
 the last two nucleotides.}
 \label{fig:short_vs_long}
@@ -689,7 +693,7 @@ tail.
 
 Since the decomposition of the read in segments is unique, we can view a
 read as a sequence of segments with a tail, instead of a sequence of
-nucleotides. Fig.~\ref{fig:simple} shows an example of decomposition in
+nucleotides. Figure~\ref{fig:simple} shows an example of decomposition in
 segments. On-target seeds cannot contain sequencing errors, therefore they
 must be completely embedded inside a segment. So the sizes of the segments
 indicate whether the read contains an on-target seed or not.
@@ -830,22 +834,22 @@ As per definition~\ref{def:seg}, segments in this alphabet are sequences
 of 0 or more symbols $\square$ followed by any of the symbols
 $\Downarrow_i$ or by the symbol $|$. Given that this decomposition is
 unique, we can again view a read as a sequence of segments with a tail.
-The example of Fig.~\ref{fig:simple} is shown again in
-Fig.~\ref{fig:skip}, where segments in the mismatch alphabet have been
+The example of Figure~\ref{fig:simple} is shown again in
+Figure~\ref{fig:skip}, where segments in the mismatch alphabet have been
 replaced by segments in the skip-3 alphabet.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.85]{sketch_skip.pdf}
 \caption{\textbf{The skip encoding.}
-The read of Fig.~\ref{fig:simple} is represented in the skip-3 alphabet.
+The read of Figure~\ref{fig:simple} is represented in the skip-3 alphabet.
 The symbols $\Downarrow_i (i = 1,2,3)$ represent mismatches against the
 target (they are erroneous nucleotides) and the symbol $\square$
 represents a match (it is a correct nucleotide). The vertical bars
 indicate non-skipped positions (the potential start of a seed). The number
 $i$ in $\Downarrow_i$ indicates the number of nucleotides till the next
 non-skipped position. For $i=0$ the next nucleotide is not skipped.
-Other features are as in Fig.~\ref{fig:simple}.}
+Other features are as in Figure~\ref{fig:simple}.}
 \label{fig:skip}
 \end{figure}
 
@@ -1051,7 +1055,7 @@ mismatch against the $-$ sequence, that it is a match for the $+$
 sequence, and that the six previous nucleotides were also a match for the
 $+$ sequence. The terminators thus encode the local state of the read.
 
-Fig.~\ref{fig:dual} shows an example of read in the dual encoding. The $+$
+Figure~\ref{fig:dual} shows an example of read in the dual encoding. The $+$
 and $-$ sequences are represented below the read, with matches represented
 as open squares and mismatches as closed squares. It is visible from this
 example that symbols $\downarrow^-_{/i}$ and $\downarrow^+_{/i}$ alternate
@@ -1257,7 +1261,7 @@ at any given position.}
 \label{fig:curves_exact}
 \end{figure}
 
-Fig.~\ref{fig:curves_exact} shows the result for a number of duplicates
+Figure~\ref{fig:curves_exact} shows the result for a number of duplicates
 $N$ from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The first
 observation is that the probability that seeding is off target increases
 with $N$. This is clearly visible from expression (\ref{eq:Poff}). This
@@ -1310,9 +1314,9 @@ the dual alphabet of section~\ref{sec:dual}. The symbols $\Downarrow_i$
 indicate that both sequences have match length 0 and that the next
 non-skipped position is $i$ nucleotides downstream.
  
-Fig.~\ref{fig:skip_dual} shows the read from Fig.~\ref{fig:dual}
+Figure~\ref{fig:skip_dual} shows the read from Figure~\ref{fig:dual}
 represented in the skip-3 dual encoding. It is important to note several
-differences with Fig.~\ref{fig:dual}. The first is that the symbols
+differences with Figure~\ref{fig:dual}. The first is that the symbols
 $\Downarrow_i$ are not always associated with double mismatches. For
 instance, the symbol $\Downarrow_0$ on the right side of the read
 corresponds to a mismatch for the $+$ sequence only. This happens whenever
@@ -1324,13 +1328,13 @@ nucleotide).
 \centering
 \includegraphics[scale=0.85]{sketch_skip_dual.pdf}
 \caption{\textbf{Example skip dual encoding.}
-The read of Fig.~\ref{fig:dual} is represented in the skip dual alphabet.
+The read of Figure~\ref{fig:dual} is represented in the skip dual alphabet.
 The vertical bars above the read indicate non-skipped positions. The
 symbols $\downarrow_{/i}^-$ and $\downarrow_{/i}^+$ have the same meaning
 as in the dual alphabet. The symbols $\Downarrow_i$ indicate that both
 sequences have match length 0 and that the next non-skipped position is
 located $i$ nucleotides downstream. Other features are as in
-Fig.~\ref{fig:dual}.}
+Figure~\ref{fig:dual}.}
 \label{fig:skip_dual}
 \end{figure}
 
@@ -1542,27 +1546,27 @@ we use skip-9 seeds instead of exact seeds.
 \caption{\textbf{Off target seeding probabilities (skip seeds).}
 The curves show the probability that seeding is off target for skip-9
 seeds of size $\gamma=17$. Read size and error rate are the same as in
-Fig.~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each line
+Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each line
 shows a different number of duplicate sequences $N$ from 1 to 10 and the
 x-axis shows the divergence rate $\mu$, defined as the probability that a
 given duplicate differs from the target at any given position.}
 \label{fig:curves_skip}
 \end{figure}
 
-Fig.~\ref{fig:curves_skip} shows the result for a number of duplicates $N$
+Figure~\ref{fig:curves_skip} shows the result for a number of duplicates $N$
 from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The curves
-have the same general aspect as those of Fig.~\ref{fig:curves_exact}. The
+have the same general aspect as those of Figure~\ref{fig:curves_exact}. The
 probability that seeding is off target increases with $N$. There is again
 a  worst value of $\mu$, because the maximum of $P(\overline{S}_0 \cap
 \overline{S}_1)$ minimizes expression (\ref{eq:Poff}) for every value of
-$N$. But the value is different from that of Fig.~\ref{fig:curves_exact}
+$N$. But the value is different from that of Figure~\ref{fig:curves_exact}
 because $P(\overline{S}_0 \cap \overline{S}_1)$ is computed for skip-9
 seeds instead of exact seeds (here the worst value of $\mu$ is
 approximately 0.07).
 
-Importantly, Fig.~\ref{fig:curves_skip} reveals that skipping 9
+Importantly, Figure~\ref{fig:curves_skip} reveals that skipping 9
 nucleotides increases the chances that seeding is off target by a factor
-approximately 4 (compare with Fig.~\ref{fig:curves_exact}). It is not
+approximately 4 (compare with Figure~\ref{fig:curves_exact}). It is not
 obvious why this should be the case: skip seeds reduce the probability of
 on-target seeding (skipping positions implies fewer on-target seeds) but
 increase the probability of null seeding (skipping positions implies fewer
@@ -1571,7 +1575,7 @@ seeds overall). So the net effect on off-target seeding is not intuitive.
 And indeed, there are cases that skip seeds are \emph{less} prone to
 off-target seeding than exact seeds. This is the case for instance when
 $p=0.1$, where the ranking is inverted for the whole range of values
-considered in Fig.~\ref{fig:curves_skip}.
+considered in Figure~\ref{fig:curves_skip}.
 
 This information is critical for choosing the best seeding strategy. The
 off-target seeding probability is not the only criterion, though. Equally
@@ -1600,7 +1604,7 @@ of the target. A duplicate is a \emph{soft mask} if it has the same match
 length as the target.
 \end{definition}
 
-Fig.~\ref{fig:hard_vs_soft_masks} gives a graphical intuition of hard and
+Figure~\ref{fig:hard_vs_soft_masks} gives a graphical intuition of hard and
 soft masks. It is important to bear in mind that hard and soft masks
 depend on the position of interest: a sequence can be a mask at the left
 end of the read and not at the right end, or the opposite.
@@ -1621,9 +1625,9 @@ a mask because its match length is $2<7$.}
 \end{figure}
 
 Hard and soft masks explain the counter-intuitive properties of MEM seeds.
-For instance, in Fig.~\ref{fig:full_masking_example} the target cannot be
+For instance, in Figure~\ref{fig:full_masking_example} the target cannot be
 discovered because every nucleotide of the read has a hard mask. In
-Fig.~\ref{fig:short_vs_long}, the target could be discovered if the read
+Figure~\ref{fig:short_vs_long}, the target could be discovered if the read
 were shorter because a hard mask would turn into a soft one.
 
 From the definition, we see that the last nucleotide of every strict
@@ -1660,20 +1664,20 @@ Note that in the symbols $\downarrow_{/m}$ and $\uparrow_{/i}$, the
 numbers $m$ and $i$ have different meanings. In the symbol
 $\downarrow_{/m}$, the index $m$ is a number of sequences ($0 \leq m \leq
 N$ where $N$ is the number of duplicates); in the symbol $\uparrow_{/i}$,
-the index $i$ is a number of nucleotides. Fig.~\ref{fig:sketch_extended}
+the index $i$ is a number of nucleotides. Figure~\ref{fig:sketch_extended}
 shows the encoding of a read in the MEM alphabet.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=.84]{sketch_extended.pdf}
 \caption{\textbf{The MEM encoding}.
-The read of Fig.~\ref{fig:MEM_example} is represented in the MEM alphabet.
+The read of Figure~\ref{fig:MEM_example} is represented in the MEM alphabet.
 The arrows departing from the numbers help understand their meaning. The
 symbol $\downarrow_{/m}$ is indexed by the number $m$ of locations that
 match the nucleotide. The symbol $\uparrow_{/i}$ is indexed by the number
 $i$ of nucleotides from the last error or from the beginning of the read.
 The grey squares in the symbolic sequences represent MEM seed matches.
-Other features are as in Fig.~\ref{fig:dual}.}
+Other features are as in Figure~\ref{fig:dual}.}
 \label{fig:sketch_extended}
 \end{figure}
 
@@ -1856,7 +1860,7 @@ The two conditions are mutually exclusive by construction. They are
 graphically represented in the diagram below. The left panel corresponds
 to case $i)$ and the right panel to case $ii)$. The top row represents the
 target, and the bottom rows represent duplicates (using the same symbols
-as in Fig.~\ref{fig:sketch_extended}).
+as in Figure~\ref{fig:sketch_extended}).
 \begin{inset}
 \includegraphics{masks.pdf}
 \end{inset}
@@ -2220,16 +2224,16 @@ and $\gamma=17$), except that we replace exact seed by MEM seeds.
 \caption{\textbf{Off target seeding probabilities (MEM seeds).}
 The curves show the probability that seeding is off target for MEM
 seeds of minimum size $\gamma=17$. Read size and error rate are the same
-as in Fig.~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each
+as in Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each
 line shows a different number of duplicate sequences $N$ from 1 to 10 and
 the x-axis shows the divergence rate $\mu$, defined as the probability
 that a given duplicate differs from the target at any given position.}
 \label{fig:curves_mem}
 \end{figure}
 
-Fig.~\ref{fig:curves_mem} shows the result for a number of duplicates $N$
+Figure~\ref{fig:curves_mem} shows the result for a number of duplicates $N$
 from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The curves
-have the same general aspect as those of Fig.~\ref{fig:curves_exact}. The
+have the same general aspect as those of Figure~\ref{fig:curves_exact}. The
 probability that seeding is off target increases with $N$, as shown by
 expression (\ref{eq:PMEM}).
 
@@ -2239,9 +2243,9 @@ it is not obvious why the same value of $\mu$ maximizes (\ref{eq:PMEM})
 for all values of $N$ because both $P(\overline{M}_0)$ and
 $P(\overline{S}_0 \cap \overline{S}_1)$ depend on $\mu$.
 
-Fig.~\ref{fig:curves_mem} reveals that in this concrete case, MEM seeds
+Figure~\ref{fig:curves_mem} reveals that in this concrete case, MEM seeds
 increase the chances that seeding is off target by a factor up to 40
-compared to exact seeds (see Fig.~\ref{fig:curves_exact}). On this
+compared to exact seeds (see Figure~\ref{fig:curves_exact}). On this
 criterion, MEM seeds are always inferior to exact seeds with the same
 specifications. The reason is that every read triggering an off-target
 seeding with exact seeds will also trigger an off-target seeding with MEM
@@ -2255,8 +2259,8 @@ risk when using MEM seeds.
 \section{Random seeds}
 \label{sec:random_seeds}
 
-We have assumed throughout that seeds can match only the target or one of
-its duplicates. In practice, seeds can match many random locations of the
+We have assumed that seeds can match only the target or one of its
+duplicates. In practice, seeds can match many random locations of the
 genome and not just the target and the duplicates.
 
 It is important for the validity of the theory that all the sequences that
@@ -2325,6 +2329,43 @@ cause for concern regarding false positives because they can easily be
 detected using Bayes formula, as shown in expression (\ref{eq:bayes}).
 
 
+\section{True versus best location}
+\label{sec:truevsbest}
+
+TODO: mention that this is MEM seeds only. What happens for other seed
+types by the way?
+
+Early in the development of the theory, we made the assumption that the
+true location is alo the best. This hypothesis was required to claim that
+a read is mapped to the true location whenever seeding is on target.
+Indeed, if the target is in the candidate set, the exact nature of the
+alignment algorithms ensures that the read will be mapped correctly. This
+assumption is thus critical because it says that all mapping errors are
+caused by off-target seeding.
+
+To know how reasonable this statement is, we have to evaluate how often
+the read is mapped incorrectly when seeding is on target. More accurately,
+we have to consider the probability that the candidate set contains the
+target plus a candidate that is more similar to the read than the target.
+
+The key insight is to realize that MEM seeds tend to exclude the target
+from the candidate set if it is not the best location. To develop an
+intuition as to why this is the case, consider a read with one sequencing
+error. If this is not the best location, then there exists a candidate
+location that is a perfect match for the read. But in that case, the read
+is covered by a single MEM seed and the target is masked so it cannot be
+in the candidate set.
+
+Using simulations, we can show that off-target seeding is much more
+frequent than mapping errors after on-target seeding (Table~XXX). In other
+words, for the vast majority of mapping errors, the target is not seeded.
+This means that, the initial assumption that the true location is always
+the best, although incorrect, does not appreciably modify the accuracy of
+the estimates for MEM seeds.
+
+For exact and skip-seeds, the conclusions are different.
+
+
 \section{The Sesame library}
 \label{sec:sesame}
 
@@ -2341,7 +2382,7 @@ analysis and unit testing.
 
 Computating seeding probabilities can take up to a few seconds, even when
 replacing iterative methods by Monte Carlo simulations. This is
-incompatible with the speeed requirements of modern mappers, so Sesame has
+incompatible with the speed requirements of modern mappers, so Sesame has
 an interface for computations that must be performed online. In this mode,
 Sesame uses a type of lazy evaluation where the results are computed only
 the first time, and stored in memory for reuse on subsequent calls.
@@ -2377,8 +2418,8 @@ information and explains in detail how to use the library.
 As a tool to compute seeding probabilities, Sesame can be used to compare
 the merits of different strategies. The kind of insight that we can gain
 from such calculations was already showcased in
-Fig.~\ref{fig:curves_exact}, Fig.~\ref{fig:curves_skip} and
-Fig.~\ref{fig:curves_mem}, where the numbers were computed using Sesame.
+Figure~\ref{fig:curves_exact}, Figure~\ref{fig:curves_skip} and
+Figure~\ref{fig:curves_mem}, where the numbers were computed using Sesame.
 
 To further showcase the potential benefits of computing seeding
 probabilities, we use Sesame to compare the default seeding strategies of
@@ -2407,10 +2448,10 @@ were computed as the average of 500 million simulations.
 
 The probabilities that seeding is off target for different read sizes $k$
 and different number of duplicates $N$ are plotted in
-Fig.~\ref{fig_mortal_kombat}. The left panel shows the results for MEM
+Figure~\ref{fig_mortal_kombat}. The left panel shows the results for MEM
 seeds and the right panel shows the results for skip seeds. Here the error
 rate $p$ is set to 1\%, close to the specifications the Illumina platform,
-and the divergence rate between duplicates $\mu$ is set to an arbirtarry
+and the divergence rate between duplicates $\mu$ is set to an arbitrary
 value of 6\%.
 
 The behaviors of the two types of seeds are dramatically different. Let us
@@ -2435,10 +2476,10 @@ seeds when $N$ is large.
 
 Those properties are self evident in retrospect, but they are not
 necessarily obvious from the definitions of MEM seeds and skip seeds.
-Keeping in mind that the asymptotic decay depends on $N$ for MEM seeds
-helps understand what their main limitation is.
+The main limitations of the MEM seeds are best understood by keeping in
+mind that their asymptotic decay bepends on $N$.
 
-Fig.~\ref{fig_mortal_kombat} suggests that skip-9 seeds of size 16 are
+Figure~\ref{fig_mortal_kombat} suggests that skip-9 seeds of size 16 are
 just better than MEM seeds of size 19. However, the gain in sensitivity
 comes at the cost of a larger candidate set, slowing down the mapping
 process. To remain competitive, Bowtie2 further filters the candidate set
@@ -2449,7 +2490,7 @@ Figure~\ref{fig_mortal_kombat}.
 \subsection{Key insights about MEM seeds}
 
 At least two key insights about MEM seeds can be gained from
-Fig.~\ref{fig_mortal_kombat}. The first is that it is probably not worth
+Figure~\ref{fig_mortal_kombat}. The first is that it is probably not worth
 for a MEM-based mapper to check all the candidate loci when there are more
 than approximately 20 them. The mapper may find the correct location, but
 even if this is the case, the mapping quality will remain low because the
@@ -2462,7 +2503,7 @@ and not, for instance, on the size of the seed or some other variable.
 A second insight is that for MEM seeds, the off-target rate is always
 above $10^{-3}$ for reads of 50 nucleotides or fewer. Here it is important
 to mention that the value $\mu=0.06$ is not even the worst for reads of
-this size when $p=0.01$ (according to Fig.~\ref{fig:curves_mem}, the worst
+this size when $p=0.01$ (according to Figure~\ref{fig:curves_mem}, the worst
 value is around 0.02). So if $\mu$ is unknown and one wishes to be
 conservative, it seems that reads of 50 nucleotides cannot be mapped with
 confidence better than $1/1000$.
