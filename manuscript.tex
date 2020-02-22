@@ -2332,38 +2332,120 @@ detected using Bayes formula, as shown in expression (\ref{eq:bayes}).
 \section{True versus best location}
 \label{sec:truevsbest}
 
-TODO: mention that this is MEM seeds only. What happens for other seed
-types by the way?
+Early in the development of the theory, we distinguished the true location
+from the best location, but we assumed that they are identical in order to
+eliminate some practical considerations that would otherwise clutter the
+exposition. Here we have presented a framework to compute the probability
+that the \emph{true} location is in the candidate set. We have not said
+anything about the probability that the best location is in the candidate
+set, so our results do not help address the best location problem. Now it
+remains to see whether they help address the true location problem.
 
-Early in the development of the theory, we made the assumption that the
-true location is alo the best. This hypothesis was required to claim that
-a read is mapped to the true location whenever seeding is on target.
-Indeed, if the target is in the candidate set, the exact nature of the
-alignment algorithms ensures that the read will be mapped correctly. This
-assumption is thus critical because it says that all mapping errors are
-caused by off-target seeding.
+The issue at hand is that the candidates are tested with an alignment
+algorithm that returns the best location. So even if the target is in the
+candidate set, the read may be mapped to another location. The question is
+thus how often this happens. If this case is rare, our results give a good
+approximation of the mapping errors (where errors are failures to map the
+reads to their true location). Otherwise the estimates may not be so
+useful in practice.
 
-To know how reasonable this statement is, we have to evaluate how often
-the read is mapped incorrectly when seeding is on target. More accurately,
-we have to consider the probability that the candidate set contains the
-target plus a candidate that is more similar to the read than the target.
+The answer depends on the seed type. We start with MEM seeds because they
+will allow us to better explain what happens. The key insight is that MEM
+seeds tend to exclude the target from the candidate set if it is not the
+best location. To develop an intuition as to why this is the case,
+consider a read with a single sequencing error. We claim that the target
+was never in the candidate set if the read is mapped to an incorrect
+location (\textit{i.e.} not the true location).
 
-The key insight is to realize that MEM seeds tend to exclude the target
-from the candidate set if it is not the best location. To develop an
-intuition as to why this is the case, consider a read with one sequencing
-error. If this is not the best location, then there exists a candidate
-location that is a perfect match for the read. But in that case, the read
-is covered by a single MEM seed and the target is masked so it cannot be
-in the candidate set.
+The argument goes as follows: if the target were in the candidate set,
+then there would exist a candidate that is a perfect match for the read.
+But then the read would be covered by a single MEM seed, the target would
+be masked and it could not be in the candidate set, leading to a
+contradiction.
 
-Using simulations, we can show that off-target seeding is much more
-frequent than mapping errors after on-target seeding (Table~XXX). In other
-words, for the vast majority of mapping errors, the target is not seeded.
-This means that, the initial assumption that the true location is always
-the best, although incorrect, does not appreciably modify the accuracy of
-the estimates for MEM seeds.
+\begin{table}
+% MEM seeds.
+\renewcommand{\arraystretch}{1.1}
+\centering
+\begin{tabular}{ccccc}
+k & N & Prob. seeding error & Prob. other error & \% seeding \\
+\hline
+50  &  1  & $7.8 \cdot 10^{-4}$ & $9.5 \cdot 10^{-5}$ & $89.1\%$ \\
+50  & 10  & $7.8 \cdot 10^{-3}$ & $9.1 \cdot 10^{-4}$ & $89.6\%$ \\
+50  & 100 & $7.6 \cdot 10^{-2}$ & $5.7 \cdot 10^{-3}$ & $93.0\%$ \\
+100 &  1  & $2.1 \cdot 10^{-5}$ & $7.6 \cdot 10^{-6}$ & $73.7\%$ \\
+100 & 10  & $2.6 \cdot 10^{-4}$ & $7.1 \cdot 10^{-5}$ & $78.1\%$ \\
+100 & 100 & $5.3 \cdot 10^{-3}$ & $5.9 \cdot 10^{-4}$ & $90.1\%$
+\end{tabular}
+\caption{My favorite table. $p = 0.01$ and $\mu = 0.06$.}
+\label{table_mem}
+\end{table}
 
-For exact and skip-seeds, the conclusions are different.
+In short, either seeding is on target and the read is mapped to the true
+location, or seeding is off target (and the read is of course mapped
+somewhere else). When there are more than one errors, the strict
+equivalence breaks, but the trend remains the same. We can show this
+using simulations for realistic sequencing conditions
+(Table~\ref{table_mem}). For MEM seeds, the probability that the read is
+not mapped to the true location is approximately the same as the
+probability that the seeding is off target.
+
+For exact and skip-seeds, the conclusions are different. The situation is
+even the opposite if we consider reads with a single sequencing error. In
+this case the target is always in the candidate set (if the read size is
+greater than $2\gamma$, where $\gamma$ is the minimum seed length), so
+mapping errors are never due to failures of the seeding heuristic.
+Instead, mapping errors happen only when the true location is not the
+best.
+
+The trend can reverse for a high number of errors (most of the errors may
+be due to seeding errors), but because these reads are rare, the mapping
+errors are in general not due to failures of the seeding heuristic.
+
+\begin{table}
+% Exact seeds.
+\renewcommand{\arraystretch}{1.1}
+\centering
+\begin{tabular}{ccccc}
+k & N & Prob. seeding error & Prob. other error & \% seeding \\
+\hline
+50  &  1  & $3.3 \cdot 10^{-5}$  & $5.1 \cdot 10^{-4}$ & $6.0\%$ \\
+50  & 10  & $2.9 \cdot 10^{-4}$  & $5.0 \cdot 10^{-3}$ & $5.4\%$ \\
+50  & 100 & $1.0 \cdot 10^{-3}$  & $4.6 \cdot 10^{-2}$ & $2.2\%$ \\
+100 &  1  & $1.5 \cdot 10^{-10}$ & $2.3 \cdot 10^{-5}$ & $< 0.1\%$ \\
+100 & 10  & $1.2 \cdot 10^{-9}$  & $2.3 \cdot 10^{-4}$ & $< 0.1\%$ \\
+100 & 100 & $2.6 \cdot 10^{-9}$  & $2.3 \cdot 10^{-3}$ & $< 0.1\%$
+\end{tabular}
+\caption{My least favorite table.}
+\label{table_exact}
+\end{table}
+
+\begin{table}
+% Skip-9 seeds.
+\renewcommand{\arraystretch}{1.1}
+\centering
+\begin{tabular}{ccccc}
+k & N & Prob. seeding error & Prob. other error & \% seeding \\
+\hline
+50  &  1  & $1.3 \cdot 10^{-4}$ & $4.9 \cdot 10^{-4}$ & $20.1\%$ \\
+50  & 10  & $1.2 \cdot 10^{-3}$ & $4.8 \cdot 10^{-3}$ & $19.7\%$ \\
+50  & 100 & $5.5 \cdot 10^{-3}$ & $4.5 \cdot 10^{-2}$ & $10.9\%$ \\
+100 &  1  & $2.0 \cdot 10^{-8}$ & $2.3 \cdot 10^{-5}$ & $< 0.1\%$ \\
+100 & 10  & $1.5 \cdot 10^{-7}$ & $2.3 \cdot 10^{-4}$ & $< 0.1\%$ \\
+100 & 100 & $3.9 \cdot 10^{-7}$ & $2.3 \cdot 10^{-3}$ & $< 0.1\%$
+\end{tabular}
+\caption{My not so favorite table.}
+\label{table_skip}
+\end{table}
+
+Tables~\ref{table_exact} and \ref{table_skip} shows the result of numeric
+simulations for exact and skip-9 seeds, respectively. It appears that in
+these cases, the probability that probability of mapping the read to an
+incorrect location (\textit{i.e.} not the true location) is substantially
+higher than the probability that seeding is off target. As a consequence,
+seeding probabilities are not very useful to address true mapping problem
+when exact and skip seeds are used. In this case, it is more accurate to
+use the probabilities that the true location is not the best.
 
 
 \section{The Sesame library}
@@ -2503,8 +2585,8 @@ and not, for instance, on the size of the seed or some other variable.
 A second insight is that for MEM seeds, the off-target rate is always
 above $10^{-3}$ for reads of 50 nucleotides or fewer. Here it is important
 to mention that the value $\mu=0.06$ is not even the worst for reads of
-this size when $p=0.01$ (according to Figure~\ref{fig:curves_mem}, the worst
-value is around 0.02). So if $\mu$ is unknown and one wishes to be
+this size when $p=0.01$ (according to Figure~\ref{fig:curves_mem}, the
+worst value is around 0.02). So if $\mu$ is unknown and one wishes to be
 conservative, it seems that reads of 50 nucleotides cannot be mapped with
 confidence better than $1/1000$.
 
