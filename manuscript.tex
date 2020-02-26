@@ -469,7 +469,7 @@ A \emph{shared} MEM seed has several matches in the genome.
 
 Compared to seeds of fixed size, MEM seeds have two counter-intuitive
 properties. The first is that there are cases where there cannot be any
-on-target seed, even when changing the sensitivity parameter $\gamma$.
+on-target seed, even when changing the minimum seed size $\gamma$.
 Figure~\ref{fig:full_masking_example} shows such an example. Even though
 there is a single sequencing error, the read has no MEM seed for the
 target. Lowering $\gamma$ does not change this, so there is no way to
@@ -685,17 +685,17 @@ This recoding allows us to partition the read in an important way.
 
 \begin{definition}
 \label{def:seg}
-Every symbol of the alphabet that is different from $\square$ is called a
-terminator. A segment is a terminator preceded by 0 or more symbols $\square$.
-The last segment of the read is terminated by the symbol $|$ and is called the
-tail.
+A terminator is any symbol that is different from the symbol $\square$. A
+segment is a sequence of 0 or more symbols $\square$ followed by a
+terminator. The tail is the last segment of the read, where the terminator
+is always the special symbol $|$.
 \end{definition}
 
 Since the decomposition of the read in segments is unique, we can view a
 read as a sequence of segments with a tail, instead of a sequence of
 nucleotides. Figure~\ref{fig:simple} shows an example of decomposition in
 segments. On-target seeds cannot contain sequencing errors, therefore they
-must be completely embedded inside a segment. So the sizes of the segments
+must be completely embedded in a segment. So the sizes of the segments
 indicate whether the read contains an on-target seed or not.
 
 \begin{figure}[h]
@@ -712,76 +712,65 @@ stands for a match and a closed square stands for a mismatch.}
 \end{figure}
 
 The probability of occurrence of the symbol $\Downarrow$ is $p$ (the error
-rate of the sequencer) and the probability of occurrence of the symbol
-$\square$ is thus $1-p = q$. Both symbols have size 1, so their respective
+rate of the sequencer) so the probability of occurrence of the symbol
+$\square$ is $1-p = q$. Both symbols have size 1, so their respective
 weighted generating function are $pz$ and $qz$. Using the rule for
-concatenation, we see that the weighted generating function of a segment
-with $i$ symbols $\square$ is $(qz)^ipz$. The symbol $|$ has size 0, so
-the weighted generating function of a tail segment with $i$ symbols
-$\square$ is $(qz)^i$.
+concatenation, we see that a segment of $i$ symbols $\square$ followed by
+a terminator has weighted generating function $(qz)^ipz$. The final symbol
+$|$ has size 0, so a tail segment of $i$ symbols $\square$ followed by the
+symbol $|$ has weighted generating function $(qz)^i$.
 
-The key insight is that reads without on-target seed are exactly the reads
-that are made of segments with fewer than $\gamma$ symbols $\square$. The
-weighted generating function of such segments is $pz \cdot \big(
-1+qz+\ldots+(qz)^{\gamma-1} \big)$, and that of the tail is
-$1+qz+\ldots+(qz)^{\gamma-1}$. This gives a construction plan that can be
-encoded in a transfer matrix.
+The key insight is that the reads without on-target seed are exactly the
+reads that are made of segments with fewer than $\gamma$ symbols
+$\square$, where $\gamma$ is the minimum seed size. The weighted
+generating function of such segments is $\big( 1+qz+\ldots+(qz)^{\gamma-1}
+\big) pz$, and that of the tail is $1+qz+\ldots+(qz)^{\gamma-1}$. This
+gives a construction plan that can be encoded in a transfer matrix.
 
-There are two kinds of objects: the $\Downarrow$ segments and the tails,
-so the dimension of the transfer matrix is $2 \times 2$. A $\Downarrow$
-segment can be followed by another $\Downarrow$ segment or by the tail.
-The tail cannot be followed by anything. The expression of the transfer
-matrix $M_0(z)$ is thus
+Reads consist of only two kinds of objects: the segments terminated by
+$\Downarrow$ (or $\Downarrow$-segments for short) and the tails, so the
+dimension of the transfer matrix is $2 \times 2$. A $\Downarrow$-segment
+can be followed by another $\Downarrow$-segment or by the tail. The tail
+cannot be followed by anything. The expression of the transfer matrix
+$M_0(z)$ is thus
 \begin{equation*}
 \begin{blockarray}{ccc}
    & \scriptstyle{\Downarrow} & \scriptstyle{|} \\
 \begin{block}{c[cc]}
-\scriptstyle{\Downarrow} & pz \cdot \big( 1+qz+\ldots+(qz)^{\gamma-1}
-\big)  & 1+qz+\ldots+(qz)^{\gamma-1} \\
+\scriptstyle{\Downarrow} & \big( 1+qz+\ldots+(qz)^{\gamma-1}
+\big) pz  & 1+qz+\ldots+(qz)^{\gamma-1} \\
 \scriptstyle{|} & 0 & 0 \\
 \end{block}
 \end{blockarray}.
 \end{equation*}
 
-In the representation above, the different types of objects are identified
-by their terminator. The terminators are written in the margins of the
-transfer matrix for readability.
+In the representation above, the different types of segments are
+identified by their terminator. The terminators are written in the margins
+of the transfer matrix for readability.
 
 We can compute the matrix $M_0(z) + M_0(z)^2 + \ldots = M_0(z) \cdot
 (I-M_0(z))^{-1}$ and extract the entry of interest, which is the top right
-term --- associated with terminators $\Downarrow$ and $|$. To see why,
-observe that every read can be prepended by $\Downarrow$ segments and only
+term---associated with terminators $\Downarrow$ and $|$. To see why,
+observe that every read can be prepended by $\Downarrow$-segments and only
 by those (not by a tail). Thus, reads are precisely the sequences of
 segments that can follow the symbol $\Downarrow$ and that are terminated
 by a tail, whose weighted generating function is the top right entry of
-the matrix. It is easy to check that this term is equal to
+the matrix. In appendix~\ref{app_ex1}, we show that this term is equal to
 \begin{equation}
 \label{eq:F}
 \frac{1+qz+\ldots+(qz)^{\gamma-1}}
-  {1-pz \big(1+qz+\ldots+(qz)^{\gamma-1} \big)}.
+  {1-\big(1+qz+\ldots+(qz)^{\gamma-1} \big) pz}.
 \end{equation}
 
 This function can be expanded as a Taylor series $a_0 + a_1z + a_2z^2 +
 \ldots$, but the coefficients $a_0, a_1, a_2, \ldots$ are unknown. By
 construction, $a_k$ is the quantity of interest, \textit{i.e.} it is the
-probability that a read of size $k$ does not contain an on-target seed, so
-we now need to extract the coefficients from expression (\ref{eq:F}).
-There are several methods to do so; the one we choose here is to build a
-recurrence equation to compute $a_k$ from the previous terms of the series
-$a_0, a_1, \ldots, a_{k-1}$. For this, we observe that for $z \neq 1/q$,
-equation
-\begin{equation*}
-\frac{1+qz+\ldots+(qz)^{\gamma-1}}
-  {1-pz \big(1+qz+\ldots+(qz)^{\gamma-1} \big)} =
-  a_0 + a_1z +a_2z^2 + \ldots
-\end{equation*}
-is equivalent to
-\begin{equation*}
-(1-qz) \left(1-pz \big(1+qz+\ldots+(qz)^{\gamma-1} \big)\right)
-(a_0 + a_1z +a_2z^2 + \ldots) = 1-(qz)^\gamma.
-\end{equation*}
-Balancing the terms of same degree on both sides of the equation leads
-to the following relationship between the coefficients of the series:
+probability that a read of size $k$ does not contain an on-target seed of
+minimum size $\gamma$, so we now need to extract the Taylor coefficients
+from expression (\ref{eq:F}). There are several methods to do so; the one
+we choose here is to build a recurrence equation. In
+appendix~\ref{app_rec}, we show that
+
 \begin{equation}
 \label{eq:recur}
 a_k = 
@@ -792,10 +781,9 @@ a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
 \end{cases}
 \end{equation}
 
-These results are consistent: for $k < \gamma$, the read is too short so
-the probability that it contains no seed is 1; for $k = \gamma$, the
-read contains a seed if and only if it has no error, which occurs with
-probability $q^\gamma$.
+Note that for $k < \gamma$, the read is too short so the probability that
+it contains no seed is 1; for $k = \gamma$, the read contains a seed if
+and only if it has no error, which occurs with probability $q^\gamma$.
 
 The terms of interest can be computed recursively using expression
 (\ref{eq:recur}). This approach is very efficient because every iteration
@@ -2368,7 +2356,7 @@ contradiction.
 \renewcommand{\arraystretch}{1.1}
 \centering
 \begin{tabular}{ccccc}
-k & N & Prob. seeding error & Prob. other error & \% seeding \\
+k & N & Not seeded & Seeded, not best & \% seed failure \\
 \hline
 50  &  1  & $7.8 \cdot 10^{-4}$ & $9.5 \cdot 10^{-5}$ & $89.1\%$ \\
 50  & 10  & $7.8 \cdot 10^{-3}$ & $9.1 \cdot 10^{-4}$ & $89.6\%$ \\
@@ -2377,7 +2365,14 @@ k & N & Prob. seeding error & Prob. other error & \% seeding \\
 100 & 10  & $2.6 \cdot 10^{-4}$ & $7.1 \cdot 10^{-5}$ & $78.1\%$ \\
 100 & 100 & $5.3 \cdot 10^{-3}$ & $5.9 \cdot 10^{-4}$ & $90.1\%$
 \end{tabular}
-\caption{My favorite table. $p = 0.01$ and $\mu = 0.06$.}
+\caption{Numerical simulating of mapping errors with MEM seeds. Reads are
+mapped incorrectly if either the true location is not in the candidate set
+(not seeded) or it is in the candidate set but is not the best location
+(seeded, not best). Ideal reads were randomly generated 1,000,000 times
+with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$,
+varying the read size $k$ and number $N$ of duplicates as indicated in the
+table. Mapping errors of both types were recorded, and the fraction of the
+first to the total was computed.}
 \label{table_mem}
 \end{table}
 
@@ -2445,7 +2440,13 @@ incorrect location (\textit{i.e.} not the true location) is substantially
 higher than the probability that seeding is off target. As a consequence,
 seeding probabilities are not very useful to address true mapping problem
 when exact and skip seeds are used. In this case, it is more accurate to
-use the probabilities that the true location is not the best.
+use the probabilities that the true location is not the best, because
+they are in general much higher.
+
+In conclusion, the true location problem can be calibrated using the
+methods presented here when using MEM seeds, and by computing the
+probability that the true location is not the best when using exact or
+skip-seeds.
 
 
 \section{The Sesame library}
@@ -2770,6 +2771,102 @@ the EMBL partnership.
 \bibliographystyle{unsrt}
 
 %----------------------------------------------------------------
+
+\appendix
+\section{Appendix}
+\subsection{Derivation of expression~(\ref{eq:F})}
+\label{app_ex1}
+
+In section~\ref{sec:example_exact}, we had to compute the top right entry
+of the matrix $M_*(z)$ defined as $M_*(z) = M_0(z) + M_0(z)^2 + \ldots =
+M_0(z) \cdot (I-M_0(z))^{-1}$, where
+\begin{equation*}
+M_0(z) =
+\begin{bmatrix}
+\big( 1+qz+\ldots+(qz)^{\gamma-1}
+\big) pz  & 1+qz+\ldots+(qz)^{\gamma-1} \\
+0 & 0 \\
+\end{bmatrix}.
+\end{equation*}
+
+Since $I-M_0(z)$ is a $2\times2$ matrix, we can invert it analytically.
+Observing that the determinant of $I-M_0(z)$ is $\Delta(z) = 1-\big(
+1+qz+\ldots+(qz)^{\gamma-1}\big) pz$, we find
+\begin{equation*}
+(I-M_0(z))^{-1} = \frac{1}{\Delta(z)}
+\begin{bmatrix}
+1 & 1+qz+\ldots+(qz)^{\gamma-1} \\
+0 & 1-\big( 1+qz+\ldots+(qz)^{\gamma-1} \big) pz
+\end{bmatrix}.
+\end{equation*}
+
+Premultiplying by $M_0(z)$, we finally obtain
+\begin{equation*}
+M_*(z) = \frac{1}{\Delta(z)}
+\begin{bmatrix}
+\big( 1+qz+\ldots+(qz)^{\gamma-1} \big) pz &
+1+qz+\ldots+(qz)^{\gamma-1} \\
+0 & 0 \end{bmatrix},
+\end{equation*}
+where the top right term is equal to
+\begin{equation}
+\tag{\ref{eq:F}}
+\frac{1+qz+\ldots+(qz)^{\gamma-1}}
+{1-\big( 1+qz+\ldots+(qz)^{\gamma-1} \big) pz}.
+\end{equation}
+
+
+\subsection{Derivation of expression~(\ref{eq:recur})}
+\label{app_rec}
+
+In section~\ref{sec:example_exact}, we had to extract the Taylor
+coefficients $a_0, a_1, a_2 \ldots$ of the function
+\begin{equation*}
+\frac{1+qz+\ldots+(qz)^{\gamma-1}}
+  {1-\big(1+qz+\ldots+(qz)^{\gamma-1} \big) pz} =
+  a_0 + a_1z +a_2z^2 + \ldots
+\end{equation*}
+
+Multipying both terms of the equation by $1-pz
+\big(1+qz+\ldots+(qz)^{\gamma-1} \big)$ we obtain
+\begin{equation*}
+1+qz+\ldots+(qz)^{\gamma-1} =
+\left(1-\big(1+qz+\ldots+(qz)^{\gamma-1} \big) pz\right)
+(a_0 + a_1z +a_2z^2 + \ldots).
+\end{equation*}
+
+Multiplying again both terms of the equation by $1-qz$, we find
+\begin{eqnarray*}
+1-(qz)^\gamma &=& (1-qz) \left(1- \big(1+qz+\ldots+(qz)^{\gamma-1}
+\big) pz\right) (a_0 + a_1z +a_2z^2 + \ldots) \\
+&=& (1-z+pq^\gamma \cdot z^{\gamma+1}) (a_0 + a_1z +a_2z^2 + \ldots) \\
+&=& a_0 + \sum_{k=1}^{\gamma} (a_k-a_{k-1})z^k +
+  \sum_{k=\gamma+1}^{\infty} (a_k-a_{k-1}+ pq^\gamma \cdot
+a_{k-\gamma-1})z^k.
+\end{eqnarray*}
+
+Balancing the terms of degree 0 on both sides of the equation forces $a_0
+= 1$. The terms of degree 1 to degree $\gamma-1$ are null on the left
+side, which implies $a_k - a_{k-1} = 0$ and consequently $a_k = a_0 = 1$
+for $k = 1, 2, \ldots, \gamma-1$. The term of degree $\gamma$ is
+$-q^\gamma$ on the left side, so $a_\gamma-a_{\gamma-1} = -q^\gamma$, or
+$a_\gamma = 1-q^\gamma$. Finally, all the other terms on the left side
+are null, which implies $a_k-a_{k-1}+ pq^\gamma \cdot a_{k-\gamma-1} = 0$,
+or $a_k = a_{k-1}-pq^\gamma\cdot a_{k-\gamma-1}$ for $k = \gamma+1,
+\gamma+2 \ldots$
+
+In comclusion, the Taylor coefficients $a_0, a_1, a_2, \ldots$ satisfy the
+recurrence equation
+\begin{equation}
+\tag{\ref{eq:recur}}
+a_k = 
+\begin{cases}
+1            &\quad\text{if } k < \gamma, \\
+1 -q^\gamma &\quad\text{if } k = \gamma, \\
+a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
+\end{cases}
+\end{equation}
+
 
 \end{document}
 
