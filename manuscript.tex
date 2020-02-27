@@ -99,7 +99,7 @@ calibrate or to optimize for lack of theoretical results.
 % Summary of the results.
 Here we develop a theory to estimate the probability that the correct
 location of a read is filtered out during seeding, resulting in mapping
-errors. We describe the properties of simple exact seeds, skip-seeds and
+errors. We describe the properties of simple exact seeds, skip seeds and
 MEM seeds (Maximal Exact Match seeds).
 % Innovation.
 The main innovation of this work is to use concepts from analytic
@@ -686,7 +686,7 @@ This recoding allows us to partition the read in an important way.
 \begin{definition}
 \label{def:seg}
 A terminator is any symbol that is different from the symbol $\square$. A
-segment is a sequence of 0 or more symbols $\square$ followed by a
+segment is a sequence of 0 or more $\square$ symbols followed by a
 terminator. The tail is the last segment of the read, where the terminator
 is always the special symbol $|$.
 \end{definition}
@@ -712,8 +712,8 @@ stands for a match and a closed square stands for a mismatch.}
 \end{figure}
 
 The probability of occurrence of the symbol $\Downarrow$ is $p$ (the error
-rate of the sequencer) so the probability of occurrence of the symbol
-$\square$ is $1-p = q$. Both symbols have size 1, so their respective
+rate of the sequencer) so the probability of occurrence of the $\square$
+symbol is $1-p = q$. Both symbols have size 1, so their respective
 weighted generating function are $pz$ and $qz$. Using the rule for
 concatenation, we see that a segment of $i$ symbols $\square$ followed by
 a terminator has weighted generating function $(qz)^ipz$. The final symbol
@@ -745,8 +745,7 @@ $M_0(z)$ is thus
 \end{equation*}
 
 In the representation above, the different types of segments are
-identified by their terminator. The terminators are written in the margins
-of the transfer matrix for readability.
+identified by their terminator, indicated in the margins for clarity.
 
 We can compute the matrix $M_0(z) + M_0(z)^2 + \ldots = M_0(z) \cdot
 (I-M_0(z))^{-1}$ and extract the entry of interest, which is the top right
@@ -806,21 +805,20 @@ compute the probability that a read contains no on-target skip seed. Using
 the same strategy as in the previous example, we start by recoding the
 reads using a specialized alphabet to solve this problem.
 
-As in the previous example, we need to know whether a nucleotide is a
-sequencing error, but this time we also need to know its phase in the
-repeated cycles of skipped positions. For this, we define the skip-$n$
-alphabet $\mathcal{A}_n = \{\square, |, \Downarrow_0, \Downarrow_1,
-\ldots, \Downarrow_n \}$. Again, the symbol $\square$ represents a correct
-nucleotide and the symbol $|$ is a terminator added at the end of the
-read. The symbols $\Downarrow_i$ ($i \in \mathbb{N}$) represent sequencing
-errors and $i$ indicates the number of nucleotides till the next
-non-skipped position (\textit{i.e.} $i=0$ for nucleotides immediately
-before a non-skipped position and $i=n$ for nucleotides at a non-skipped
-position).
+We need to know whether a nucleotide is a sequencing error, but this time
+we also need to know its phase in the repeated cycles of skipped
+positions. For this, we define the skip-$n$ alphabet $\mathcal{A}_n =
+\{\square, |, \Downarrow_0, \Downarrow_1, \ldots, \Downarrow_n \}$. Again,
+the symbol $\square$ represents a correct nucleotide and the symbol $|$ is
+a terminator added at the end of the read. The symbols $\Downarrow_j$ ($j
+\in \mathbb{N}$) represent sequencing errors and $j$ indicates the number
+of nucleotides till the next non-skipped position (\textit{i.e.} $j=0$ for
+nucleotides immediately before a non-skipped position and $j=n$ for
+nucleotides at a non-skipped position).
 
 As per definition~\ref{def:seg}, segments in this alphabet are sequences
-of 0 or more symbols $\square$ followed by any of the symbols
-$\Downarrow_i$ or by the symbol $|$. Given that this decomposition is
+of 0 or more $\square$ symbols followed by any of the symbols
+$\Downarrow_j$ or by the symbol $|$. Given that this decomposition is
 unique, we can again view a read as a sequence of segments with a tail.
 The example of Figure~\ref{fig:simple} is shown again in
 Figure~\ref{fig:skip}, where segments in the mismatch alphabet have been
@@ -831,49 +829,96 @@ replaced by segments in the skip-3 alphabet.
 \includegraphics[scale=0.85]{sketch_skip.pdf}
 \caption{\textbf{The skip encoding.}
 The read of Figure~\ref{fig:simple} is represented in the skip-3 alphabet.
-The symbols $\Downarrow_i (i = 1,2,3)$ represent mismatches against the
-target (they are erroneous nucleotides) and the symbol $\square$
+The symbols $\Downarrow_j (j = 1,2,3)$ represent mismatches against the
+target (they are erroneous nucleotides) and the $\square$ symbol
 represents a match (it is a correct nucleotide). The vertical bars
 indicate non-skipped positions (the potential start of a seed). The number
-$i$ in $\Downarrow_i$ indicates the number of nucleotides till the next
-non-skipped position. For $i=0$ the next nucleotide is not skipped.
+$j$ in $\Downarrow_j$ indicates the number of nucleotides till the next
+non-skipped position. For $j=0$ the next nucleotide is not skipped.
 Other features are as in Figure~\ref{fig:simple}.}
 \label{fig:skip}
 \end{figure}
 
 The probability of occurrence of a sequencing error is $p$, so every
-symbol $\Downarrow_i$ has the same weighted generating function $pz$ ---
-implicitly assuming that the next non-skipped position is at distance $i$,
+symbol $\Downarrow_j$ has the same weighted generating function
+$pz$---provided the next non-skipped position is at distance $j$,
 otherwise the weighted generating function is 0. The weighted generating
-function of the symbol $\square$ is again $qz$, and so the weighted
-generating function of a segment with $i$ symbols $\square$ is $(qz)^ipz$.
-Likewise, the weighted generating function of a tail with $i$ symbols
-$\square$ is $(qz)^i$.
+function of the symbol $\square$ is again $qz$, so a segment with $i$
+symbols $\square$ followed by the symbol $\Downarrow_j$ has weighted
+generating function $(qz)^ipz$---if the next non-skipped position is at
+distance $j$, otherwise it is 0. As in the previous example, a tail
+segment with $i$ symbols $\square$ followed by the symbol $|$ has weighted
+generating function $(qz)^i$.
 
-Reads that do not contain any on-target skip seed can contain segments
-with $\gamma$ or more symbols $\square$, so this case is more complex than
-the previous one. For instance, if there is a sequencing error $i$
-nucleotides before the next non-skipped position, the status of the next
-$i$ nucleotides does not have any influence on the presence of an
-on-target seed. Indeed, there is no on-target seed upstream of the error
-(by construction) and the next seed is scheduled to start $i$ nucleotides
-downstream, so there can be up to $\gamma+i-1$ symbols $\square$ in a row.
-In order to enforce the absence of on-target seeds, we thus have to adjust
-the maximum size of the segments depending on the preceding terminator.
+This case is more complex than the previous one: reads without on-target
+skip seed of minimum size $\gamma$ can contain segments with $\gamma$ or
+more $\square$ symbols. For instance, the read shown in
+Figure~\ref{fig:skip} contains a stretch of 9 nucleotides without errors
+but it has no seed of minimum size $\gamma=9$. More generally, if there is
+a sequencing error $i$ nucleotides before the next non-skipped position,
+there can be up to $\gamma+i-1$ symbols $\square$ in a row.
 
-In the skip-$n$ alphabet, reads are composed of segments terminated by the
-$n+1$ symbols $\Downarrow_0, \Downarrow_1, \ldots, \Downarrow_n$, plus the
-tail. The dimensions of the transfer matrix are thus $(n+2) \times (n+2)$.
+Expressed in different words, it is possible to append segments with up to
+$\gamma+i-1$ symbols $\square$ after segments terminated by $\Downarrow_i$
+($\Downarrow_i$-segments for short). Each of those $\gamma+i$ possible
+segments is associated with a different terminator, depending on how far
+ahead the next non-skipped position lies. In Figure~\ref{fig:skip}, for
+instance, the second segment is terminated by $\Downarrow_1$ because there
+is 1 nucleotide before the next non-skipped position. If the segment were
+1 nucleotide longer, the terminator would have to be $\Downarrow_0$.
 
-As mentioned above, after the terminator $\Downarrow_i$, we can append
-segments with up to $\gamma+i-1$ symbols $\square$. The terminators of
-those $\gamma+i$ possible segments are distributed according to the laws
-of the arithmetic modulo $n+1$. When $i > 0$, for instance, if the next
-segment has no symbol $\square$ then it is terminated by
-$\Downarrow_{i-1}$. But the same goes if the segment has $n+1$ symbols
-$\square$ (assuming $n+1 < \gamma$). Specifying the transfer matrix thus
-involves a substantial amount of bookkeeping. One can check that the
-expression of the transfer matrix $M_n(z)$ is
+The main issue is that segments of different lengths can be terminated by
+the same symbol. Going back to Figure~\ref{fig:skip}, the third segment
+has length 10 and is terminated by $\Downarrow_3$. It would also be
+terminated by $\Downarrow_3$ if it had length 2 or length 6. In the
+general case, the entries of the transfer matrix show some periodicity
+modulo $n+1$.
+
+Denote $H_{i,j}(z)$ the weighted generating function of
+$\Downarrow_j$-segments that can follow a $\Downarrow_i$-segment. The
+total number of segments that can follow a $\Downarrow_i$-segment is
+$\gamma+i$. Among them, the shortest $\Downarrow_j$-segment has size
+$\ell_0$ to be determined below, and the others have sizes $\ell_0+(n+1),
+\ell_0+2(n+1), \ldots, \ell_0+m(n+1)$, for some integer $m$. This $m$ is
+the largest number such that $\ell_0+m(n+1) \leq \gamma+i$, so $m =
+\lfloor (\gamma+i-\ell_0)/(n+1)\rfloor$, where $\lfloor \ldots \rfloor$ is
+the ``floor'' function.
+
+Those segments follow a $\Downarrow_i$-segment, so they start $i$
+nucleotides in front of the next non-skipped position. The shortest
+following segment that ends $j$ nucleotides before a non-skipped position
+has length $\ell_0 = i-j$ if $i > j$, and $n+1-j+i$ otherwise. This is
+equivalent to defining $x$ as the number of $\square$ symbols of the
+shortest $\Downarrow_j$-segment, with $x = i-j-1 \modulo{n+1}$ and $\ell_0
+= x+1$.
+
+The shortest $\Downarrow_j$-segment consists of $x$ symbols $\square$
+followed by the $\Downarrow_j$ terminator, so it has weighted generating
+function $(qz)^xpz$. The other segments have a multiple of $n+1$
+additional $\square$ symbols so their weighted generating functions are
+$(qz)^{x+(n+1)}pz, (qz)^{x+2(n+1)}pz, \ldots, (qz)^{x+m(n+1)}pz$. Summing
+over those cases, we finally obtain
+\begin{eqnarray}
+H_{i,j}(z) &=& (qz)^xpz \cdot \big( 1 + (qz)^{n+1} +
+  \ldots + (qz)^{m(n+1)} \big), \\
+\notag
+  &\;& \text{where } x = i-j-1 \modulo{n+1},
+  \text{ and } m = \left\lfloor
+  \frac{\gamma+i-1-x}{n+1} \right\rfloor.
+\end{eqnarray}
+
+Denote $J_i(z)$ the weighted generating function of tails that can follow
+a $\Downarrow_i$-segment. There are $\gamma+i$ of them, each consisting of
+0 to $\gamma+i-1$ symbols $\square$ followed by the special $|$
+terminator for the end of the read. The $|$ has size 0 so its weighted
+generating function is 1. Once again summing over the different cases, we
+obtain
+\begin{eqnarray}
+J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
+\end{eqnarray}
+
+Finally, the expression of $M_n(z)$ the transfer matrix of reads in the
+skip-$n$ alphabet is
 \begin{equation*}
 \begin{blockarray}{cccccc}
    & \Dn{0} & \Dn{1} & \ldots & \Dn{n} & \nd \\
@@ -884,49 +929,36 @@ expression of the transfer matrix $M_n(z)$ is
 \Dn{n} & H_{n,0}(z) & H_{n,1}(z) & \ldots & H_{n,n}(z) & J_n(z) \\
 \nd & 0 & 0 & \ldots & 0 & 0 \\
 \end{block}
-\end{blockarray},
+\end{blockarray}.
 \end{equation*}
-\begin{eqnarray}
-H_{i,j}(z) &=& pz \cdot (qz)^x \cdot \big( 1 + (qz)^{n+1} +
-  \ldots + (qz)^{m(n+1)} \big), \\
-\notag
-  &\;& \text{where } x = i-j-1 \modulo{n+1},
-  \text{ and } m = \left\lfloor
-  \frac{\gamma+i-1-x}{n+1} \right\rfloor, \\
-J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1},
-\end{eqnarray}
-where $\lfloor \ldots \rfloor$ denotes the ``floor'' function.
 
 The weighted generating function of interest is the top right entry of the
 matrix $M_n(z) + M_n(z)^2 + \ldots = M_n(z)\cdot(I-M_n(z))^{-1}$. To see
 why, observe that, at the start of every read, the next nucleotide is a
-non-skipped position, so every read can be prepended by $\Downarrow_0$
-segments and only by those. Thus, reads are precisely the sequences of
-segments that can follow the symbol $\Downarrow_0$ and that are terminated
-by a tail, whose weighted generating function is the entry of the matrix
-associated with terminators $\Downarrow_0$ and $|$.
+non-skipped position, so every read can be prepended by
+$\Downarrow_0$-segments and only by those. Thus, reads are precisely the
+sequences of segments that can follow the symbol $\Downarrow_0$ and that
+are terminated by a tail, whose weighted generating function is the entry
+of the matrix associated with terminators $\Downarrow_0$ and $|$.
 
-$M_n(z)$ is too complex to allow a closed expression of $M_n(z) \cdot
-(I-M_n(z))^{-1}$ to be computed. We return to the definition $M_n(z) +
-M_n(z)^2 + \ldots$ and observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3},
-\ldots$ have no influence on the coefficients of the weighted generating
-function $a_0, a_1, \ldots, a_k$.
+By construction, the Taylor expansion of the top right term of the matrix
+$M_n(z)\cdot(I-M_n(z))^{-1}$ contains the the probabilities of interest.
+More specifically, $a_k$, the coefficient of $z^k$ in the series is the
+probability that a read of size $k$ contains no skip-$n$ seed of minimum
+size $\gamma$.
 
-Indeed, a read of size $k$ has at most $k+1$ segments (including the
-obligatory tail). Since $M(z)^{s+1}$ contains the weighted generating
-functions of reads with exactly $s+1$ segments including the tail, $a_k$
-cannot depend on $M(z)^{k+2}, M(z)^{k+3}, \ldots$. More formally, we can
-prove by induction that all the entries of $M(z)^k$ are divisible by
-$z^{k-1}$, showing that the contribution of $M(z)^{k+2} + M(z)^{k+3} +
-\ldots$ to $a_0 + a_1z + \ldots +a_kz^k$ is strictly $0$.
+But $M_n(z)$ is too complex to find a closed expression for $M_n(z) \cdot
+(I-M_n(z))^{-1}$. Instead, we return to the definition $M_n(z) + M_n(z)^2
++ \ldots$ and show in appendix~\ref{app_skip} that the coefficient of
+interest, $a_k$, only depends on the first $k+1$ terms of the sum. So for
+reads of size $k$ or lower, we only need to compute the matrix $M_n(z) +
+M_n(z)^2 + \ldots + M_n(z)^{k+1}$ and work out the Taylor expansion of the
+top right term.
 
-So we can compute the matrix $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$,
-extract the entry of interest and then compute the terms of the Taylor
-expansion up to order $k$. But we can do better: since we are only
-interested in the coefficients up to order $k$, we can perform all
-algebraic operations on truncated polynomials of order $k$, \textit{i.e.}
-we discard the coefficients of order $k+1$ or greater when multiplying two
-polynomials.
+But we can do better: since we are only interested in the coefficients up
+to order $k$, we can perform all algebraic operations on truncated
+polynomials of order $k$, \textit{i.e.} we discard the coefficients of
+order $k+1$ or greater when multiplying two polynomials.
 
 But we can do even better: a read with $s+1$ segments contains $s$ errors,
 so all the entries of $M_n(z)^{s+1}$ are dominated by $p^s$ and they
@@ -2385,7 +2417,7 @@ using simulations for realistic sequencing conditions
 not mapped to the true location is approximately the same as the
 probability that the seeding is off target.
 
-For exact and skip-seeds, the conclusions are different. The situation is
+For exact and skip seeds, the conclusions are different. The situation is
 even the opposite if we consider reads with a single sequencing error. In
 this case the target is always in the candidate set (if the read size is
 greater than $2\gamma$, where $\gamma$ is the minimum seed length), so
@@ -2446,7 +2478,7 @@ they are in general much higher.
 In conclusion, the true location problem can be calibrated using the
 methods presented here when using MEM seeds, and by computing the
 probability that the true location is not the best when using exact or
-skip-seeds.
+skip seeds.
 
 
 \section{The Sesame library}
@@ -2867,6 +2899,23 @@ a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
 \end{cases}
 \end{equation}
 
+\subsection{Derivation of something important}
+\label{app_skip}
+
+Easy.
+
+observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3},
+\ldots$ have no influence on the coefficients of the weighted generating
+function $a_0, a_1, \ldots, a_k$.
+
+Indeed, a read of size $k$ has at most $k+1$ segments (including the
+obligatory tail, which can have size 0). Since $M(z)^{s+1}$ contains the
+weighted generating functions of reads with exactly $s+1$ segments
+including the tail, $a_k$ cannot depend on $M(z)^{k+2}, M(z)^{k+3},
+\ldots$ More formally, we can prove by induction that all the entries of
+$M(z)^k$ are divisible by $z^{k-1}$, showing that the contribution of
+$M(z)^{k+2} + M(z)^{k+3} + \ldots$ to $a_0 + a_1z + \ldots +a_kz^k$ is
+strictly $0$.
 
 \end{document}
 
