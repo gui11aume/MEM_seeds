@@ -810,8 +810,8 @@ we also need to know its phase in the repeated cycles of skipped
 positions. For this, we define the skip-$n$ alphabet $\mathcal{A}_n =
 \{\square, |, \Downarrow_0, \Downarrow_1, \ldots, \Downarrow_n \}$. Again,
 the symbol $\square$ represents a correct nucleotide and the symbol $|$ is
-a terminator added at the end of the read. The symbols $\Downarrow_j$ ($j
-\in \mathbb{N}$) represent sequencing errors and $j$ indicates the number
+a terminator added at the end of the read. The symbols $\Downarrow_j$ ($ 0
+\leq j \leq n$) represent sequencing errors and $j$ indicates the number
 of nucleotides till the next non-skipped position (\textit{i.e.} $j=0$ for
 nucleotides immediately before a non-skipped position and $j=n$ for
 nucleotides at a non-skipped position).
@@ -919,7 +919,8 @@ J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
 
 Finally, the expression of $M_n(z)$ the transfer matrix of reads in the
 skip-$n$ alphabet is
-\begin{equation*}
+\begin{equation}
+\label{eq_matrix_Mn}
 \begin{blockarray}{cccccc}
    & \Dn{0} & \Dn{1} & \ldots & \Dn{n} & \nd \\
 \begin{block}{c[ccccc]}
@@ -930,7 +931,7 @@ skip-$n$ alphabet is
 \nd & 0 & 0 & \ldots & 0 & 0 \\
 \end{block}
 \end{blockarray}.
-\end{equation*}
+\end{equation}
 
 The weighted generating function of interest is the top right entry of the
 matrix $M_n(z) + M_n(z)^2 + \ldots = M_n(z)\cdot(I-M_n(z))^{-1}$. To see
@@ -941,19 +942,19 @@ sequences of segments that can follow the symbol $\Downarrow_0$ and that
 are terminated by a tail, whose weighted generating function is the entry
 of the matrix associated with terminators $\Downarrow_0$ and $|$.
 
-By construction, the Taylor expansion of the top right term of the matrix
+By construction, the Taylor expansion of the top right term in the matrix
 $M_n(z)\cdot(I-M_n(z))^{-1}$ contains the the probabilities of interest.
-More specifically, $a_k$, the coefficient of $z^k$ in the series is the
-probability that a read of size $k$ contains no skip-$n$ seed of minimum
-size $\gamma$.
+More specifically, if the Taylor series of this term is $a_0 + a_1 z + a_2
+z^2 + \ldots$, then $a_k$ is the probability that a read of size $k$
+contains no skip-$n$ seed of minimum size $\gamma$.
 
 But $M_n(z)$ is too complex to find a closed expression for $M_n(z) \cdot
-(I-M_n(z))^{-1}$. Instead, we return to the definition $M_n(z) + M_n(z)^2
-+ \ldots$ and show in appendix~\ref{app_skip} that the coefficient of
-interest, $a_k$, only depends on the first $k+1$ terms of the sum. So for
-reads of size $k$ or lower, we only need to compute the matrix $M_n(z) +
-M_n(z)^2 + \ldots + M_n(z)^{k+1}$ and work out the Taylor expansion of the
-top right term.
+(I-M_n(z))^{-1}$ or its top right term. Instead, we return to the
+definition $M_n(z) + M_n(z)^2 + \ldots$ and show in
+appendix~\ref{app_skip} that the coefficient of interest, $a_k$, only
+depends on the first $k+1$ terms of the sum. So for reads of size $k$ or
+lower, we only need to compute the matrix $M_n(z) + M_n(z)^2 + \ldots +
+M_n(z)^{k+1}$ and work out the Taylor expansion of the top right term.
 
 But we can do better: since we are only interested in the coefficients up
 to order $k$, we can perform all algebraic operations on truncated
@@ -978,13 +979,14 @@ Pr(X \geq s) \leq \exp \left( (s-k)\log \frac{k-s}{k(1-p)} -s\log
 \end{equation}
 
 Using the formula above, we can thus bound the probability that a read has
-$s+1$ segments or more. We compute $M_n(z) + M_n(z)^2 + \ldots
+$s+1$ or more segments. We compute $M_n(z) + M_n(z)^2 + \ldots
 +M_n(z)^{s+1}$ where the weighted generating functions have been replaced
 by truncated polynomials and we extract the top right entry. When the
-bound is lower than a set fraction $\varepsilon$ of the current value of
-$a_k$, we stop the computations. Typically $\varepsilon = 0.01$ so this
-method ensures that the probabilities that a read of size $k$ has no
-on-target skip seed are accurate to within 1\%.
+right-hand side of expression (\ref{eq:bound}) is lower than a set
+fraction $\varepsilon$ of the current value of $a_k$, we stop the
+computations. Typically $\varepsilon = 0.01$ so this method ensures that
+the probabilities that a read of size $k$ has no on-target skip seed are
+accurate to within 1\%.
 
 \begin{remark}
 Observe that when $n=0$ the matrix $M_n(z)$ is identical to the matrix
@@ -996,17 +998,18 @@ fact that exact seeds are skip-$0$ seeds.
 \label{sec:offexact}
 
 We now turn our attention to the problem of computing the probability that
-the seeding process is off target when using exact seeds --- recall from
+the seeding process is off target when using exact seeds---recall from
 section~\ref{sec:twotypes} that off-target seeding means that the
 candidate set contains a duplicate but not the target.
 
-If there is $N = 0$ duplicate, seeding cannot be off target, it can only
-be on target or null. So from here we assume that the target has $N \geq
-1$ duplicates. Let $S_0$ denote the event that there is an on-target seed
-and let $S_j$ denote the event that there is a seed for the $j$-th
-duplicate. We are thus interested in computing $P\big(\overline{S}_0 \cap
-(S_1 \cup \ldots \cup S_N)\big)$, where $\overline{S}_j$ denotes the
-complement of the event $S_j$. For this, we first observe that
+If there is no duplicate (\textit{i.e.} $N = 0$), seeding cannot be off
+target, it can only be on target or null. So from here we assume that the
+target has $N \geq 1$ duplicates. Let $S_0$ denote the event that there is
+an on-target seed and let $S_j$ denote the event that there is a seed for
+the $j$-th duplicate. We are thus interested in computing
+$P\big(\overline{S}_0 \cap (S_1 \cup \ldots \cup S_N)\big)$, where
+$\overline{S}_j$ denotes the complement of the event $S_j$. First observe
+that
 \begin{equation}
 \label{eq:pcomp}
 P\big(\overline{S}_0 \cap (S_1 \cup \ldots \cup S_N)\big) =
@@ -1015,10 +1018,9 @@ P(\overline{S}_0) - P\big(\overline{S}_0 \cap \overline{S}_1 \cap \ldots
 \end{equation}
 
 Since the duplicates are assumed to evolve independently of each other and
-through the same mutagenesis process, the events are conditionally
-independent (we do not have full independence because $S_0$ only depends
-on sequencing errors whereas the events $S_j$ depend on sequencing errors
-and on the divergence between duplicates). We can thus write
+through the same mutagenesis process, the events $S_j$ ($1 \leq j \leq N$)
+are independent and identically distributed conditionally on
+$\overline{S}_0$. We can thus write
 \begin{eqnarray}
 \notag
 P(\overline{S}_0 \cap \ldots \cap \overline{S}_N) &=&
@@ -1037,18 +1039,31 @@ P(\overline{S}_0) - P(\overline{S}_0) \cdot \left( \frac{P(\overline{S}_0
 \cap \overline{S}_1)}{P(\overline{S}_0)} \right)^N.
 \end{equation}
 
-Hence, the probability that seeding is off target is a function of two
-quantitites. We have already seen how to compute $P(\overline{S}_0)$ in
+Hence, the probability that seeding is off target is a function of just
+two quantitites: $P(\overline{S}_0)$ and $P(\overline{S}_0 \cap
+\overline{S}_1)$. The first is the probability that the read has no seed
+for the target, which we have already computed in
 section~\ref{sec:example_exact} using recursive expression
 (\ref{eq:recur}). We now need to find a way to compute $P(\overline{S}_0
 \cap \overline{S}_1)$.
 
+\begin{remark}
+Observe that expression (\ref{eq:Pnull}) is the probability of null
+seeding (the read contains no seed for the target or any of its
+duplicates). Since it is also a function of just $P(\overline{S}_0)$ and
+$P(\overline{S}_0 \cap \overline{S}_1)$, it can be computed at no
+additional cost. This probablity is less relevant than the probabilities
+that the seeding process is on target or off target, but at times, it may
+be useful to know the probability that a read is not mappable, especially
+when reads are relatively short.
+\end{remark}
+
 \subsection{The dual encoding}
 \label{sec:dual}
 
-The event $\overline{S}_0 \cap \overline{S}_1$ is that the read contains
-no seed for either the target or for the first duplicate --- numbering is
-arbitrary here, we simply chose a duplicate and stick to it. As
+$P(\overline{S}_0 \cap \overline{S}_1)$ is the probability that the read
+has no seed for the target or for the first duplicate---numbering is
+arbitrary here, the first duplicate can be any fixed duplicate. As
 illustrated in section~\ref{sec:symbolic}, we first recode the reads using
 a specialized alphabet to simplify the problem.
 
@@ -1058,28 +1073,30 @@ stands for the target and that the $-$ sequence stands for its duplicate.
 We then define the dual alphabet $\tilde{\mathcal{A}}_0 = \{\square, |,
 \downarrow_{/1}^-, \downarrow_{/2}^-, \ldots, \downarrow_{/1}^+,
 \downarrow_{/2}^+, \ldots, \Downarrow\}$. The symbols $\downarrow_{/i}^-$
-signify that the nucleotide is a mismatch against the $-$ sequence only,
-the symbols $\downarrow_{/i}^+$ signify that it is a mismatch against the
-$+$ only, and the symbol $\Downarrow$ signifies that it is a mismatch
-against both. As before, every other nucleotide is replaced by the symbol
-$\square$, and the terminator $|$ is appended to the end of the read. We
-again define reads as sequences of segments, except that now the
-terminators are the symbols $\downarrow_{/j}^-$, $\downarrow_{/j}^+$ and
-$\Downarrow$. The tail, as usual, is terminated by the symbol $|$.
+($i \geq 1$) signify that the nucleotide is a mismatch against the $-$
+sequence only, the symbols $\downarrow_{/i}^+$ ($i \geq 1$) signify that
+it is a mismatch against the $+$ sequence only, and the symbol
+$\Downarrow$ signifies that it is a mismatch against both. As before,
+every other nucleotide is replaced by the symbol $\square$, and the
+terminator $|$ is appended to the end of the read. We again define reads
+as sequences of segments, except that now the terminators are the symbols
+$\downarrow_{/i}^-$, $\downarrow_{/i}^+$ and $\Downarrow$ ($i \geq 1$).
+The tail, as usual, is terminated by the symbol $|$.
 
-The number $i$ in the symbol $\downarrow_{/i}^-$ indicates the match
-length of the $+$ sequence. Likewise, the number $i$ in the symbol
+The index $i$ in the symbol $\downarrow_{/i}^-$ indicates the match
+length of the $+$ sequence. Likewise, the index $i$ in the symbol
 $\downarrow_{/i}^+$ indicates the match length of the $-$ sequence. For
 instance, the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is a
 mismatch against the $-$ sequence, that it is a match for the $+$
-sequence, and that the six previous nucleotides were also a match for the
-$+$ sequence. The terminators thus encode the local state of the read.
+sequence, and that the six preceding nucleotides were also a match for the
+$+$ sequence (but the nucleotide before that was a mismatch against the
+$+$ sequence). The terminators thus encode the local state of the read.
 
-Figure~\ref{fig:dual} shows an example of read in the dual encoding. The $+$
-and $-$ sequences are represented below the read, with matches represented
+Figure~\ref{fig:dual} shows an example of read in the dual encoding. The
+$+$ and $-$ sequences are shown below the read, with matches represented
 as open squares and mismatches as closed squares. It is visible from this
 example that symbols $\downarrow^-_{/i}$ and $\downarrow^+_{/i}$ alternate
-whenever the mismatches hit different sequences . The symbol $\Downarrow$
+whenever the mismatches hit different sequences. The symbol $\Downarrow$
 occurs only when a nucleotide is a double mismatch.
 
 \begin{figure}[h]
@@ -1096,20 +1113,20 @@ stands for a match and a closed square stands for a mismatch.}
 \label{fig:dual}
 \end{figure}
 
-We assume that for each nucleotide, $a$ is the probability that the read
-matches both sequences, $b$ is the probability that it matches only the
-$+$ sequence, $c$ is the probability that it matches only the $-$ sequence
-and $d$ is the probability that it matches none. Obviously $a+b+c+d=1$.
-These definitions allow us to specify the weighted generating function of
-the symbols and of the segments. To specify the transfer matrix, we only
-have to make sure that we eliminate the combinations that create a match
-of size $\gamma$ or more for any of the two sequences. For notational
-convenience, we define
+Let us assume that for each nucleotide, $a$ is the probability that the
+read matches both sequences, $b$ is the probability that it matches only
+the $+$ sequence, $c$ is the probability that it matches only the $-$
+sequence and $d$ is the probability that it matches neither. Obviously
+$a+b+c+d=1$. These definitions allow us to specify the weighted generating
+function of the symbols and of the segments. To specify the transfer
+matrix, we only have to make sure that we eliminate the combinations that
+create a match of size $\gamma$ or more for any of the two sequences. For
+notational convenience, we define
 \begin{equation*}
 \begin{gathered}
-r_i^+(z) = cz \cdot (az)^i, \\
-r_i^-(z) = bz \cdot (az)^i, \\
-R_i(z) = dz \cdot \big( 1 + az + \ldots + (az)^i \big), \\
+r_i^+(z) = (az)^i cz, \\
+r_i^-(z) = (az)^i bz, \\
+R_i(z) = \big( 1 + az + \ldots + (az)^i \big) dz, \\
 F_i(z) = 1 + az + \ldots + (az)^i,
 \end{gathered}
 \end{equation*}
@@ -1215,25 +1232,25 @@ that are defined as
 \end{blockarray}.
 \end{equation*}
 
-The term of interest is the top right entry of
+As before, the term of interest is the top right entry of
 $\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. To see why, observe that
 every read can be prepended by $\Downarrow$ segments and only by those
 (every other terminator would imply that one of the two sequences has a
 nonzero match size at the start of the read). Thus reads are precisely the
 sequences of segments that can follow the symbol $\Downarrow$ and that are
-terminated by a tail, whose weighted generating function is the top right
-entry of the matrix.
+terminated by a tail, the weighted generating function of which is located
+in the top right entry of the matrix.
 
-$\tilde{M}_0(z)$ is too complex to allow a closed expression of
-$\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$ to be computed. It is
-actually easier to proceed as in section~\ref{sec:example_skip} and to
-compute the powers of $\tilde{M}_0(z)$ (using the arithmetic of truncated
-polynomials) up to a given threshold value. Since each segment except the
-tail contains a mismatch against at least one sequence, we define
-$\tilde{p}$ as the upper bound on the probability of a mismatch $\tilde{p}
-= \max\{b,c,d\}$. The updated formula (\ref{eq:bound}) now gives an upper
-bound of the probability that a read of size $k$ contains $s$ or more
-mismatches as
+$\tilde{M}_0(z)$ is too complex to compute a closed expression of
+$\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. It is actually easier to
+proceed as in section~\ref{sec:example_skip} and to compute the powers of
+$\tilde{M}_0(z)$ up to a finite value. This is done once again using the
+arithmetic of truncated polynomials. Since each segment except the tail
+contains a mismatch against at least one sequence, we define $\tilde{p}$
+as the upper bound on the probability of a mismatch, \textit{i.e.}
+$\tilde{p} = \max\{b,c,d\}$. The updated formula (\ref{eq:bound}) now
+gives an upper bound of the probability that a read of size $k$ contains
+$s$ or more mismatches as
 \begin{equation*}
 Pr(X \geq s) \leq \exp \left( (s-k)\log \frac{k-s}{k(1-\tilde{p})} -s\log
 \frac{s}{k\tilde{p}} \right).
@@ -1246,19 +1263,11 @@ presented in section~\ref{sec:error}, this implies that $a =
 (1-p)(1-\mu)$, $b = (1-p)\mu$, $c = p\mu/3$, and $d = p(1-\mu/3)$.
 
 With these values, we can fully specify the matrix $\tilde{M}_0(z)$, and
-compute its powers until the upper bound is lower than a set fraction
-$\varepsilon$ of the current value of $a_k$, which gives an accurate
-estimate of $P(\overline{S}_0 \cap \overline{S}_1)$.
+compute its powers until the right-hand side of the expression above is
+lower than a set fraction $\varepsilon$ of the current value of $a_k$,
+which gives an accurate estimate of $P(\overline{S}_0 \cap
+\overline{S}_1)$.
 
-
-\begin{remark}
-Observe that expression (\ref{eq:Pnull}) is the probability of null
-seeding. The method described above thus allows us to compute this
-probability at no additional cost. This probablity is less relevant than
-the probabilities that the seeding process is on target or off target, but
-at times, it may be useful to know the probability that a read is
-not mappable, especially when reads are relatively short.
-\end{remark}
 
 
 \subsection{Illustration}
@@ -1315,8 +1324,9 @@ To compute the probability that the seeding process is off target when
 using skip seeds, we observe that the logic of section~\ref{sec:offexact}
 can be transposed with few modifications. In particular, the probability
 can be computed through expression (\ref{eq:Poff}), where $S_0$ is the
-event that the read has a \emph{skip} seed for the target and $S_1$ that
-it has a \emph{skip} seed for the first duplicate.
+event that the read has a \emph{skip} seed for the target (instead of an
+exact seed) and $S_1$ is the event that it has a \emph{skip} seed for the
+first duplicate (instead of an exact seed).
 
 We have already seen how to compute $P(\overline{S}_0)$ in
 section~\ref{sec:example_skip}, we now need to find a way to compute
@@ -1329,10 +1339,11 @@ define the skip-$n$ dual alphabet $\tilde{\mathcal{A}}_n = \{\square, |,
 \Downarrow_0, \Downarrow_1, \Downarrow_2, \ldots, \Downarrow_n,
 \downarrow^-_{/1}, \downarrow^-_{/2}, \ldots, \downarrow^+_{/1},
 \downarrow^+_{/2}, \ldots\}$. The symbols $\square$, $|$,
-$\downarrow^-_{/i}$ and $\downarrow^+_{/i}$ have the same meaning as in
-the dual alphabet of section~\ref{sec:dual}. The symbols $\Downarrow_i$
-indicate that both sequences have match length 0 and that the next
-non-skipped position is $i$ nucleotides downstream.
+$\downarrow^-_{/i}$ and $\downarrow^+_{/i}$ ($i \geq 1$) have the same
+meaning as in the dual alphabet of section~\ref{sec:dual}. The symbols
+$\Downarrow_i$ ($0 \leq i \leq n$) indicate that both sequences have match
+length 0 and that the next non-skipped position is $i$ nucleotides
+downstream.
  
 Figure~\ref{fig:skip_dual} shows the read from Figure~\ref{fig:dual}
 represented in the skip-3 dual encoding. It is important to note several
@@ -2275,81 +2286,9 @@ process, but this comes at the cost of an increase in the false positive
 rate. The methods presented here are thus very useful to balance the
 risk when using MEM seeds.
 
+\section{Practical considerations}
 
-\section{Random seeds}
-\label{sec:random_seeds}
-
-We have assumed that seeds can match only the target or one of its
-duplicates. In practice, seeds can match many random locations of the
-genome and not just the target and the duplicates.
-
-It is important for the validity of the theory that all the sequences that
-have a seed are considered candidate locations (as long as the seed is
-above the threshold $\gamma$). If not, the final estimates are biased. The
-hope is that spurious matches are shorter than $\gamma$ so that they are
-filtered out, but this is not always the case. And if they qualify as a
-seed we need to verify the candidate location.
-
-Such random hits can be problematic for two reasons: First, the time spent
-verifying them is wasted. Second, they can cause false positives.
-Fortunately, both issues can be addressed.
-
-To save time during the alignment phase, we can prioritize the seeds so
-that the best hit is likely to be discovered first, allowing us to bail
-out from other alignments as early as possible. We can even bound the
-maximum quality of some candidates so that the alignment can be skipped
-altogether. These considerations depend on the implementation of the
-mapper so we will not develop this further. What matters is that random
-hits do not impose a significant burden on the time needed to verify the
-candidates.
-
-The second issue is that random hits can generate false positives. Such
-cases occur when seeding is null (meaning that there is no seed for the
-target nor for its duplicates). Since the hits are not homologous to the
-read, the alignment score is extreme, which makes it easy to detect.
-
-Indeed, if the candidate location is random, mismatches occur with
-probability 3/4. If it is the true location, mismatches occur with
-probability $p$. We discard the seed because it is an automatic match of
-size $\gamma$ (and possibly larger in the case of MEM seeds). Say that
-there remain $L$ nucleotides and that $m$ of them are mismatches for the
-candidate location. From Bayes formula, the probability that the location
-is random given the number of mismatches is
-\begin{equation}
-\label{eq:bayes}
-\frac{1}{1 + 4^L(p/3)^mq^{L-m}(1-\beta)/\beta},
-\end{equation}
-where $q=1-p$ and $\beta$ is the prior probability that the hit is
-random.
-
-The value of $\beta$ has little importance if $p$ is small. Say that
-$p=0.01$ and that a read generates a hit in the genome such that 33
-nucleotides need to be aligned after seeding. If the hit is random there
-is a 99.99\% chance that at least 15 are mismatches. The denominator of
-expression (\ref{eq:bayes}) is approximately $1 +
-4.3\cdot10^{-18}(1-\beta)/\beta$. So unless $\beta < 10^{-17}$, the
-support for the hypothesis that the hit is random is overwhelming.
-Conversely, if the hit is not random, there is a 99.99\% chance that 4 or
-fewer nucleotides are mismathes. In this case, the denominator is
-approximately $1+6.8\cdot10^9(1-\beta)/\beta$, so unless $1-\beta <
-10^{-9}$, the support for the hypothesis that the hit is not random is
-overwhelming. If $p$ is small, we do not need to worry about the value of
-$\beta$, one can choose for instance $\beta=1/2$ so that the term
-$(1-\beta)/\beta$ disappears from expression (\ref{eq:bayes}).
-
-Since the probability that the best candidate is a random sequence is
-either very small or very large, it has no influence in the first case,
-or it dominates the probability of a false positive in the secondi case.
-For every read, we can use as confidence score the maximum of this
-probability and of the estimated probability that seeding is off target.
-
-In summary, seeds in random sequences happen relatively frequently, but it
-is possible to minimize their computational burden. Also, they are no
-cause for concern regarding false positives because they can easily be
-detected using Bayes formula, as shown in expression (\ref{eq:bayes}).
-
-
-\section{True versus best location}
+\subsection{True versus best location}
 \label{sec:truevsbest}
 
 Early in the development of the theory, we distinguished the true location
@@ -2479,6 +2418,85 @@ In conclusion, the true location problem can be calibrated using the
 methods presented here when using MEM seeds, and by computing the
 probability that the true location is not the best when using exact or
 skip seeds.
+
+
+\subsection{Non-specific seeds}
+\label{sec:random_seeds}
+
+We have assumed that seeds can match only the target or one of its
+duplicates. In practice, seeds can match many random locations of the
+genome and not just the target and the duplicates.
+
+It is important for the validity of the theory that all the sequences that
+have a seed are considered candidate locations (as long as the seed is
+above the threshold $\gamma$). If not, the final estimates are biased. The
+hope is that spurious matches are shorter than $\gamma$ so that they are
+filtered out, but this is not always the case. And if they qualify as a
+seed we need to verify the candidate location.
+
+Such random hits can be problematic for two reasons: First, the time spent
+verifying them is wasted. Second, they can cause false positives.
+Fortunately, both issues can be addressed.
+
+To save time during the alignment phase, we can prioritize the seeds so
+that the best hit is likely to be discovered first, allowing us to bail
+out from other alignments as early as possible. We can even bound the
+maximum quality of some candidates so that the alignment can be skipped
+altogether. These considerations depend on the implementation of the
+mapper so we will not develop this further. What matters is that random
+hits do not impose a significant burden on the time needed to verify the
+candidates.
+
+The second issue is that random hits can generate false positives. Such
+cases occur when seeding is null (meaning that there is no seed for the
+target nor for its duplicates). Since the hits are not homologous to the
+read, the alignment score is extreme, which makes it easy to detect.
+
+Indeed, if the candidate location is random, mismatches occur with
+probability 3/4. If it is the true location, mismatches occur with
+probability $p$. We discard the seed because it is an automatic match of
+size $\gamma$ (and possibly larger in the case of MEM seeds). Say that
+there remain $L$ nucleotides and that $m$ of them are mismatches for the
+candidate location. From Bayes formula, the probability that the location
+is random given the number of mismatches is
+\begin{equation}
+\label{eq:bayes}
+\frac{1}{1 + 4^L(p/3)^mq^{L-m}(1-\beta)/\beta},
+\end{equation}
+where $q=1-p$ and $\beta$ is the prior probability that the hit is
+random.
+
+The value of $\beta$ has little importance if $p$ is small. Say that
+$p=0.01$ and that a read generates a hit in the genome such that 33
+nucleotides need to be aligned after seeding. If the hit is random there
+is a 99.99\% chance that at least 15 are mismatches. The denominator of
+expression (\ref{eq:bayes}) is approximately $1 +
+4.3\cdot10^{-18}(1-\beta)/\beta$. So unless $\beta < 10^{-17}$, the
+support for the hypothesis that the hit is random is overwhelming.
+Conversely, if the hit is not random, there is a 99.99\% chance that 4 or
+fewer nucleotides are mismathes. In this case, the denominator is
+approximately $1+6.8\cdot10^9(1-\beta)/\beta$, so unless $1-\beta <
+10^{-9}$, the support for the hypothesis that the hit is not random is
+overwhelming. If $p$ is small, we do not need to worry about the value of
+$\beta$, one can choose for instance $\beta=1/2$ so that the term
+$(1-\beta)/\beta$ disappears from expression (\ref{eq:bayes}).
+
+Since the probability that the best candidate is a random sequence is
+either very small or very large, it has no influence in the first case,
+or it dominates the probability of a false positive in the secondi case.
+For every read, we can use as confidence score the maximum of this
+probability and of the estimated probability that seeding is off target.
+
+In summary, seeds in random sequences happen relatively frequently, but it
+is possible to minimize their computational burden. Also, they are no
+cause for concern regarding false positives because they can easily be
+detected using Bayes formula, as shown in expression (\ref{eq:bayes}).
+
+
+\subsection{Realistic error patterns}
+
+This section will come later.
+
 
 
 \section{The Sesame library}
@@ -2899,23 +2917,38 @@ a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
 \end{cases}
 \end{equation}
 
-\subsection{Derivation of something important}
+\subsection{Proof that $a_k$ is independent of $M_n(z)^m$ for $m > k+1$}
 \label{app_skip}
 
-Easy.
+In section~\ref{sec:example_skip} we considered the transfer matrix
+$M_n(z)$ of reads containing no skip-$n$ seed. The quantity of interest
+$a_k$ is the coefficent of $z^k$ in the Taylor expansion of the top right
+term of $M_n(z) + M_n(z)^2 + M_n(z)^3 + \ldots$ We claimed that the
+coefficients $a_0, a_1, \ldots, a_k$ are independent of $M_n(z)^{k+2},
+M_n(z)^{k+3}, \ldots$ so that they can be computed from the finite sum
+$M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$.
 
-observe that the terms $M_n(z)^{k+2}, M_n(z)^{k+3},
-\ldots$ have no influence on the coefficients of the weighted generating
-function $a_0, a_1, \ldots, a_k$.
+We proceed by induction and show that for $k \geq 1$ all the entries of
+$M_n(z)^k$ are mutliples of $z^{k-1}$. For $k = 1$ the statement is
+trivial and there is nothing to show. Now assume that for some $k > 1$,
+all the entries of $M_n(z)^k$ are multiples of $z^{k-1}$. Observe that
+from the definition of $M_n(z)$ in expression (\ref{eq_matrix_Mn}), the
+last row of $M_n(z)^m$ consists of zeros only for all $m \geq 1$. So in
+the matrix product $M_n(z) \cdot M_n(z)^k$, the polynomials $J_0(z),
+\ldots, J_n(z)$ in the last column of $M_n(z)$ are all multiplied by 0.
+The remaining terms of $M_n(z)$ are multiples of $z$, so applying the
+induction hypothesis shows that all the terms of $M_n(z)^{k+1}$ are
+multiples of $z^k$.
 
-Indeed, a read of size $k$ has at most $k+1$ segments (including the
-obligatory tail, which can have size 0). Since $M(z)^{s+1}$ contains the
-weighted generating functions of reads with exactly $s+1$ segments
-including the tail, $a_k$ cannot depend on $M(z)^{k+2}, M(z)^{k+3},
-\ldots$ More formally, we can prove by induction that all the entries of
-$M(z)^k$ are divisible by $z^{k-1}$, showing that the contribution of
-$M(z)^{k+2} + M(z)^{k+3} + \ldots$ to $a_0 + a_1z + \ldots +a_kz^k$ is
-strictly $0$.
+Since all the terms of $M(z)^m$ are multiples of $z^{k+1}$ for $m \geq
+k+1$, the coefficient of $z^k$ is 0 in the top right term of every matrix
+$M(z)^m$ for $m \geq k+1$. As a result, the coefficient of $z^k$ in the
+top right entry of $M_n(z) + M_n(z)^2 + M_n(z)^3 + \ldots$ is the same as
+in $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$, as we had to demonstrate.
+The same rationale holds for the coefficients of $z^m$ $(0 \leq m < k)$,
+so finally the coefficients $a_0, a_1, \ldots, a_k$ can all be computed
+from the top right entry of $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$ as
+claimed.
 
 \end{document}
 
