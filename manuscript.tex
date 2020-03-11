@@ -1072,22 +1072,24 @@ have two sequences of interest labelled $+$ and $-$. The $+$ sequence
 stands for the target and that the $-$ sequence stands for its duplicate.
 We then define the dual alphabet $\tilde{\mathcal{A}}_0 = \{\square, |,
 \downarrow_{/1}^-, \downarrow_{/2}^-, \ldots, \downarrow_{/1}^+,
-\downarrow_{/2}^+, \ldots, \Downarrow\}$. The symbols $\downarrow_{/i}^-$
-($i \geq 1$) signify that the nucleotide is a mismatch against the $-$
-sequence only, the symbols $\downarrow_{/i}^+$ ($i \geq 1$) signify that
+\downarrow_{/2}^+, \ldots, \Downarrow\}$. The symbols $\downarrow_{/j}^-$
+($j \geq 1$) signify that the nucleotide is a mismatch against the $-$
+sequence only, the symbols $\downarrow_{/j}^+$ ($j \geq 1$) signify that
 it is a mismatch against the $+$ sequence only, and the symbol
 $\Downarrow$ signifies that it is a mismatch against both. As before,
 every other nucleotide is replaced by the symbol $\square$, and the
 terminator $|$ is appended to the end of the read. We again define reads
-as sequences of segments, except that now the terminators are the symbols
-$\downarrow_{/i}^-$, $\downarrow_{/i}^+$ and $\Downarrow$ ($i \geq 1$).
+as sequences of segments (zero or more $\square$ symbols followed by a
+terminator), except that now the terminators are the symbols
+$\downarrow_{/j}^-$, $\downarrow_{/j}^+$ and $\Downarrow$ ($j \geq 1$).
 The tail, as usual, is terminated by the symbol $|$.
 
-The index $i$ in the symbol $\downarrow_{/i}^-$ indicates the match
-length of the $+$ sequence. Likewise, the index $i$ in the symbol
-$\downarrow_{/i}^+$ indicates the match length of the $-$ sequence. For
-instance, the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is a
-mismatch against the $-$ sequence, that it is a match for the $+$
+The index $j$ in the symbol $\downarrow_{/j}^-$ indicates the match length
+of the $+$ sequence (note that this is not the same as the number of
+$\square$ symbols in the segment). Likewise, the index $j$ in the symbol
+$\downarrow_{/j}^+$ indicates the match length of the $-$ sequence. For
+instance, the symbol $\downarrow_{/7}^-$ indicates that the nucleotide is
+a mismatch against the $-$ sequence, that it is a match for the $+$
 sequence, and that the six preceding nucleotides were also a match for the
 $+$ sequence (but the nucleotide before that was a mismatch against the
 $+$ sequence). The terminators thus encode the local state of the read.
@@ -1095,7 +1097,7 @@ $+$ sequence). The terminators thus encode the local state of the read.
 Figure~\ref{fig:dual} shows an example of read in the dual encoding. The
 $+$ and $-$ sequences are shown below the read, with matches represented
 as open squares and mismatches as closed squares. It is visible from this
-example that symbols $\downarrow^-_{/i}$ and $\downarrow^+_{/i}$ alternate
+example that symbols $\downarrow^-_{/j}$ and $\downarrow^+_{/j}$ alternate
 whenever the mismatches hit different sequences. The symbol $\Downarrow$
 occurs only when a nucleotide is a double mismatch.
 
@@ -1104,34 +1106,108 @@ occurs only when a nucleotide is a double mismatch.
 \includegraphics[scale=0.85]{sketch_dual.pdf}
 \caption{\textbf{Example of dual encoding.}
 An example of read is represented in the dual alphabet. The symbols
-$\downarrow_{/i}^-$ represent a mismatch against the $-$ sequence, the
-symbols $\downarrow_{/i}^+$ represent a mismatch against the $+$ sequence,
-and the symbol $\Downarrow$ represent a mismatch against both. The index
-$i$ is the match length of the sequence that is not mismatched. The
-symbolic $+$ and $-$ sequences are represented below, where an open square
-stands for a match and a closed square stands for a mismatch.}
+$\downarrow_{/j}^-$ ($j \geq 1$) represent a mismatch against the $-$
+sequence, the symbols $\downarrow_{/j}^+$ ($i \geq 1$) represent a
+mismatch against the $+$ sequence, and the symbol $\Downarrow$ represents
+a mismatch against both. The index $i$ is the match length of the sequence
+that is not mismatched. The symbolic $+$ and $-$ sequences are represented
+below, where an open square stands for a match and a closed square stands
+for a mismatch.}
 \label{fig:dual}
 \end{figure}
 
 Let us assume that for each nucleotide, $a$ is the probability that the
 read matches both sequences, $b$ is the probability that it matches only
 the $+$ sequence, $c$ is the probability that it matches only the $-$
-sequence and $d$ is the probability that it matches neither. Obviously
-$a+b+c+d=1$. These definitions allow us to specify the weighted generating
-function of the symbols and of the segments. To specify the transfer
-matrix, we only have to make sure that we eliminate the combinations that
-create a match of size $\gamma$ or more for any of the two sequences. For
-notational convenience, we define
-\begin{equation*}
+sequence and $d$ is the probability that it matches neither. Since there
+are no other cases, we have $a+b+c+d=1$.
+
+With these definitions, $a$, $b$, $c$ and $d$ are the probabilities of
+occurrence of the symbols $\square$, $\downarrow_{/j}^-$,
+$\downarrow_{/j}^+$ and $\Downarrow$, respectively ($j \geq 1$). The next
+sections clarify how this is used to compute the weighted gerating
+functions of interest.
+
+
+\subsection{Segments following $\Downarrow$}
+
+After a $\Downarrow$ terminator, the match counter for both sequences is
+reset; the following segment can thus have up to $\gamma-1$ matches for
+any of the two sequences. Each match corresponds to the $\square$ symbol
+with weighted generating function $az$. The terminators $\Downarrow$ and
+$|$ have respective generating function $dz$ and $1$ (recall that the tail
+symbol has size 0), so if the next terminator is $\Downarrow$ or $|$, the
+segments have weighted generating functions $(1 + az + \ldots +
+(az)^{\gamma-1})dz$ or $1 + az + \ldots + (az)^{\gamma-1}$, respectively.
+
+If the next terminator is $\downarrow_{/i}^+$, there is a match of size
+$i$ for the $-$ sequence, so the segment contains $i-1$ symbols
+$\square$ (one of the matches is accounted for by the terminator). The
+weighted generating function is thus $(az)^{i-1}cz$. Likewise, if the next
+terminator is $\downarrow_{/i}^-$, the weighted generating function of the
+segment is $(az)^{i-1}bz$. The terminators $\downarrow_{/i}^+$ and
+$\downarrow_{/i}^-$ are disallowed for $j \geq \gamma$ because this would
+create a match of size $\gamma$ or greater for one of the sequences.
+
+\subsection{Segments following $\downarrow_{/j}^+$}
+
+At a $\downarrow_{/j}^+$ terminator, the match length of the $+$ sequence
+is 0 and the match length of the $-$ sequence is $j$. The next segment can
+thus have up to $\gamma-1$ matches for the $+$ sequence, but only
+$\gamma-j-1$ matches for the $-$ sequence, lowering the maximum size of
+the segment. If the next terminator is $\Downarrow$ or $|$, the segments
+have weighted generating functions $(1 + az + \ldots +
+(az)^{\gamma-j-1})dz$ and $1 + az + \ldots + (az)^{\gamma-j-1}$,
+respectively.
+
+If the next terminator is $\downarrow_{/i}^-$, the weighted generating
+function is $(az)^{i-1}bz$ as in the previous section. The difference is
+that the terminators $\downarrow_{/i}^-$ are allowed only for $1 \leq i
+\leq \gamma-j$, otherwise this would create a match of size $\gamma$ or
+greater for the $-$ sequence.
+
+If the next terminator is $\downarrow_{/i}^+$, the situation is slightly
+more complicated, because this imposes $j < i \leq \gamma-1$. Indeed,
+there were already $j$ matches for the $-$ sequence at the terminator
+$\downarrow_{/j}^+$, and there will be more at the end of the segment
+because it has no mismatch for the $-$ sequence. Taking this into account,
+we see that the weighted generating function of those segments is
+$(az)^{i-j-1}cz$.
+
+\subsection{Segments following $\downarrow_{/j}^-$}
+
+We can find the weighted generating functions by just reversing the $+$
+and $-$ signs in the previous section. This way, we see that the weighted
+generating function of the segments terminated by $\Downarrow$ or $|$ are
+$(1 + az + \ldots + (az)^{\gamma-j-1})dz$ and $1 + az + \ldots +
+(az)^{\gamma-j-1}$, respectively.
+
+Likewise, the weighted generating function of the segments terminated by
+$\downarrow_{/i}^+$ is $(az)^{i-1}cz$, where $1 \leq i \leq \gamma-j$; and
+the weighted generating function of the segments terminated by
+$\downarrow_{/i}^-$ is $(az)^{i-j-1}bz$, where $j < i \leq \gamma-1$.
+
+\subsection{Transfer matrix}
+
+We now have all the elements to specify the transfer matrix or reads with
+no seed for either sequence. Recall that $a$ is the probability of a
+double match, $b$ is the probability of a mismatch only against the $-$
+sequence, $c$ is the probability of a mismatch only against the $+$
+sequence and $d$ is the probability of a double mismatch. For notational
+convenience, we define
+\begin{equation}
+% These expressions are not needed for reference in the text, but
+% they are still numbered so that the code can reference to it.
 \begin{gathered}
 r_i^+(z) = (az)^i cz, \\
 r_i^-(z) = (az)^i bz, \\
 R_i(z) = \big( 1 + az + \ldots + (az)^i \big) dz, \\
-F_i(z) = 1 + az + \ldots + (az)^i,
+F_i(z) = 1 + az + \ldots + (az)^i.
 \end{gathered}
-\end{equation*}
-and we can verify that the expression of the transfer matrix
-$\tilde{M}_0(z)$ is
+\end{equation}
+
+With these notations, the information from the previous sections can be
+summarized in the transfer matrix $\tilde{M}_0(z)$ equal to
 \begin{equation*}
 \begin{blockarray}{ccccccccc}
    & \scriptstyle{\Downarrow} & \scriptstyle{\downarrow_{/1}^+} & 
@@ -1234,7 +1310,7 @@ that are defined as
 
 As before, the term of interest is the top right entry of
 $\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. To see why, observe that
-every read can be prepended by $\Downarrow$ segments and only by those
+every read can be prepended by $\Downarrow$-segments and only by those
 (every other terminator would imply that one of the two sequences has a
 nonzero match size at the start of the read). Thus reads are precisely the
 sequences of segments that can follow the symbol $\Downarrow$ and that are
@@ -1242,8 +1318,8 @@ terminated by a tail, the weighted generating function of which is located
 in the top right entry of the matrix.
 
 $\tilde{M}_0(z)$ is too complex to compute a closed expression of
-$\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. It is actually easier to
-proceed as in section~\ref{sec:example_skip} and to compute the powers of
+$\tilde{M}_0(z)\cdot(I-\tilde{M}_0(z))^{-1}$. It is easier to proceed as
+in section~\ref{sec:example_skip} and to compute the powers of
 $\tilde{M}_0(z)$ up to a finite value. This is done once again using the
 arithmetic of truncated polynomials. Since each segment except the tail
 contains a mismatch against at least one sequence, we define $\tilde{p}$
@@ -1275,47 +1351,39 @@ which gives an accurate estimate of $P(\overline{S}_0 \cap
 
 We illustrate the strategy delineated above for reads of size $k=50$
 sequenced with an instrument with error rate $p=0.01$, when using exact
-seeds of size $\gamma=17$.
+seeds of size $\gamma=19$.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.65]{curves_exact.pdf}
-\caption{\textbf{Off target seeding probabilities (exact seeds).}
-The curves show the probability that seeding is off target for exact seeds
-of size $\gamma=17$ in reads of size $k=50$ nucleotides sequenced with an
-error rate $p=0.01$. Each line shows a different number of duplicate
-sequences $N$ from 1 to 10 and the x-axis shows the divergence rate $\mu$,
-defined as the probability that a given duplicate differs from the target
-at any given position.}
+\caption{\textbf{Off-target seeding probabilities (exact seeds).}
+The surfaces show the probability that seeding is off target for exact seeds
+of size $\gamma=19$ in reads of size $k=50$ nucleotides sequenced with an
+error rate $p=0.01$. The divergence rate $\mu$, defined as the probability
+that a given duplicate differs from the target at any given position. Note
+the factor 1000 in the scale of the z-axis.}
 \label{fig:curves_exact}
 \end{figure}
 
 Figure~\ref{fig:curves_exact} shows the result for a number of duplicates
 $N$ from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The first
 observation is that the probability that seeding is off target increases
-with $N$. This is clearly visible from expression (\ref{eq:Poff}). This
-can also be understood intuitively because the probability of null seeding
+with $N$. This is also clearly from expression (\ref{eq:Poff}). This can
+also be understood intuitively because the probability of null seeding
 decreases when there are more potential candidates, and since the
 probability of on-target seeding does not change, the probability of
 off-target seeding must increase.
 
 The second observation is that there exists a ``worst'' value of $\mu$
-situated around 0.08. When $\mu$ is much smaller, the sequences of the
-duplicates are close to that of the target so it is unlikely that the
-candidate set contains one but not the other. When $\mu$ is much larger,
-the sequences of the duplicates are far from that of the target and they
-are unlikely to be in the candidate set. In expression (\ref{eq:Poff}),
-the only term that depends on $\mu$ is $P(\overline{S}_0 \cap
-\overline{S}_1)$, and it is obvious that the minimum of expression
-(\ref{eq:Poff}) corresponds to the maximum of $P(\overline{S}_0 \cap
-\overline{S}_1)$. This is why the worst value of $\mu$ is the same for
-every $N$.
-
-For comparison purposes, it is important to notice the order of magnitude
-of the probabilities. Up to $N=3$ duplicates, off-target seeding has
-probability lower than $10^{-4}$ and for $N=10$ duplicates the upper bound
-is $3\cdot10^{-4}$. This sets a baseline to compare with more elaborate
-seeding methods.
+situated around 0.07. When $\mu$ is much smaller, the duplicates tend to
+be exactly identical to the target, making it impossible that there is a
+seed for a duplicate but no seed for the target. When $\mu$ is much
+larger, the duplicates are far from the target and they are unlikely to be
+in the candidate set. In expression (\ref{eq:Poff}), the only term that
+depends on $\mu$ is $P(\overline{S}_0 \cap \overline{S}_1)$, and it is
+clear that the minimum of expression (\ref{eq:Poff}) corresponds to the
+maximum of $P(\overline{S}_0 \cap \overline{S}_1)$. This is why the worst
+value of $\mu$ is the same for every $N$.
 
 
 \section{Off-target skip seeds}
@@ -1325,8 +1393,8 @@ using skip seeds, we observe that the logic of section~\ref{sec:offexact}
 can be transposed with few modifications. In particular, the probability
 can be computed through expression (\ref{eq:Poff}), where $S_0$ is the
 event that the read has a \emph{skip} seed for the target (instead of an
-exact seed) and $S_1$ is the event that it has a \emph{skip} seed for the
-first duplicate (instead of an exact seed).
+exact seed) and $S_1$ is the event that the read has a \emph{skip} seed
+for the first duplicate (instead of an exact seed).
 
 We have already seen how to compute $P(\overline{S}_0)$ in
 section~\ref{sec:example_skip}, we now need to find a way to compute
@@ -1334,40 +1402,75 @@ $P(\overline{S}_0 \cap \overline{S}_1)$ when using skip seeds.
 
 \subsection{The skip dual encoding}
 
-Once again, we start by recoding the reads in a specialized alphabet. We
-define the skip-$n$ dual alphabet $\tilde{\mathcal{A}}_n = \{\square, |,
+Again we recode the reads in a specialized alphabet. We define the
+skip-$n$ dual alphabet as $\tilde{\mathcal{A}}_n = \{\square, *, |,
 \Downarrow_0, \Downarrow_1, \Downarrow_2, \ldots, \Downarrow_n,
 \downarrow^-_{/1}, \downarrow^-_{/2}, \ldots, \downarrow^+_{/1},
 \downarrow^+_{/2}, \ldots\}$. The symbols $\square$, $|$,
-$\downarrow^-_{/i}$ and $\downarrow^+_{/i}$ ($i \geq 1$) have the same
+$\downarrow^-_{/j}$ and $\downarrow^+_{/j}$ ($j \geq 1$) have the same
 meaning as in the dual alphabet of section~\ref{sec:dual}. The symbols
-$\Downarrow_i$ ($0 \leq i \leq n$) indicate that both sequences have match
-length 0 and that the next non-skipped position is $i$ nucleotides
-downstream.
+$\Downarrow_j$ ($0 \leq j \leq n$) indicate that both sequences have match
+length 0 and that the next non-skipped position is $j$ nucleotides
+further. The new symbol $*$ indicates that the nature of the nucleotide
+does not matter, as we will explain below.
  
 Figure~\ref{fig:skip_dual} shows the read from Figure~\ref{fig:dual}
 represented in the skip-3 dual encoding. It is important to note several
 differences with Figure~\ref{fig:dual}. The first is that the symbols
-$\Downarrow_i$ are not always associated with double mismatches. For
-instance, the symbol $\Downarrow_0$ on the right side of the read
-corresponds to a mismatch for the $+$ sequence only. This happens whenever
-the $+$ and the $-$ sequences are mismatched in the same interval between
-non-skipped positions (the mismatches do not need to be on the same
-nucleotide).
+$\Downarrow_j$ ($0 \leq j \leq n$) are not always associated with double
+mismatches. For instance, the symbol $\Downarrow_0$ on the right side of
+the read corresponds to a mismatch for the $+$ sequence only. This happens
+whenever the $+$ and the $-$ sequences are mismatched in the same interval
+between non-skipped positions (the mismatches do not need to be on the
+same nucleotide).
+
+Also observe that the symbol $\Downarrow_1$ is followed by a $*$ to
+indicate that this nucleotide has no influence on the presence of a seed,
+regardless 
+. The reason is that there
+is a double mismatch at the $\Downarrow_1$ symbol so there can be no seed.
+But since the next potential seed starts only at the next tick mark,
+\textit{i.e.} one nucleotide further downstream, 
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.85]{sketch_skip_dual.pdf}
-\caption{\textbf{Example skip dual encoding.}
+\caption{\textbf{Example of skip dual encoding.}
 The read of Figure~\ref{fig:dual} is represented in the skip dual alphabet.
 The vertical bars above the read indicate non-skipped positions. The
-symbols $\downarrow_{/i}^-$ and $\downarrow_{/i}^+$ have the same meaning
-as in the dual alphabet. The symbols $\Downarrow_i$ indicate that both
-sequences have match length 0 and that the next non-skipped position is
-located $i$ nucleotides downstream. Other features are as in
+symbols $\downarrow_{/j}^-$ and $\downarrow_{/j}^+$ ($j \geq 1$) have the
+same meaning as in the dual alphabet. The symbols $\Downarrow_j$ indicate
+that both sequences have match length 0 and that the next non-skipped
+position is located $j$ nucleotides downstream. Other features are as in
 Figure~\ref{fig:dual}.}
 \label{fig:skip_dual}
 \end{figure}
+
+As in the previous section, let $a$, $b$, $c$ and $d$ denote the
+probabilities of a double match, a mismatch against $-$, a mismatch
+against $+$ and a double mismatch, respectively. This also corresponds to
+the probabilities of occurrence of the symbols $\square$,
+$\downarrow_{/j}^+$, $\downarrow_{/j}^-$ ($j \geq 1$) and $\Downarrow_j$
+($0 \leq j \leq n$), respectively. With this information, we compute the
+weighted generating functions of interest in the sections below.
+
+\subsection{Segments following $\Downarrow_j$ ($1 \leq j \leq n)$}
+
+After a $\Downarrow_j$ terminator, the match counter for both sequences is
+at zero and the next potential seed starts only $j \geq 1$ nucleotides
+further downstream. This means that the next $j$ nucleotides are just
+filler so it does not matter which sequence they match or mismatch.
+
+There are only two scenarios to consider: if the end of the read is within
+the next $j$ nucleotides, then 
+
+
+
+\subsection{Segments following $\Downarrow_0$}
+
+Hello world!
+
+\subsection{Transfer matrix}
 
 As in the case of the skip encoding, a fair amount of bookkeeping is
 required to specify the weighted generating functions of interest.
@@ -1568,19 +1671,19 @@ $\tilde{B}_n(z)$ and $\tilde{C}_n(z)$.
 \label{sec:illskipdual}
 
 We illustrate the strategy delineated above Using the same settings as in
-section~\ref{sec:illdual} ($k=50$, $p=0.01$ and $\gamma=17$), except that
+section~\ref{sec:illdual} ($k=50$, $p=0.01$ and $\gamma=19$), except that
 we use skip-9 seeds instead of exact seeds.
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.65]{curves_skip.pdf}
-\caption{\textbf{Off target seeding probabilities (skip seeds).}
-The curves show the probability that seeding is off target for skip-9
-seeds of size $\gamma=17$. Read size and error rate are the same as in
-Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each line
-shows a different number of duplicate sequences $N$ from 1 to 10 and the
-x-axis shows the divergence rate $\mu$, defined as the probability that a
-given duplicate differs from the target at any given position.}
+\includegraphics[scale=0.47]{curves_skip.pdf}
+\caption{\textbf{Off-target seeding probabilities (skip seeds).}
+The surfaces show the probability that seeding is off target for skip-9
+seeds of size $\gamma=19$. Read size and error rate are the same as in
+Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. The
+divergence rate $\mu$, defined as the probability that a given duplicate
+differs from the target at any given position. Note the factor 1000 in
+the scale of the z-axis.}
 \label{fig:curves_skip}
 \end{figure}
 
@@ -2247,18 +2350,18 @@ duplicates.
 
 We illustrate the strategy delineated above 
 using the same settings as in section~\ref{sec:illdual} ($k=50$, $p=0.01$
-and $\gamma=17$), except that we replace exact seed by MEM seeds.
+and $\gamma=19$), except that we replace exact seed by MEM seeds.
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.65]{curves_mem.pdf}
-\caption{\textbf{Off target seeding probabilities (MEM seeds).}
-The curves show the probability that seeding is off target for MEM
-seeds of minimum size $\gamma=17$. Read size and error rate are the same
-as in Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. Each
-line shows a different number of duplicate sequences $N$ from 1 to 10 and
-the x-axis shows the divergence rate $\mu$, defined as the probability
-that a given duplicate differs from the target at any given position.}
+\includegraphics[scale=.48]{curves_mem.pdf}
+\caption{\textbf{Off-target seeding probabilities (MEM seeds).}
+The surfaces show the probability that seeding is off target for MEM seeds
+of indicated minimum size $\gamma$. Read size and error rate are the same
+as in Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$.
+The divergence rate $\mu$ is the probability that a given duplicate
+differs from the target at any given position. Note the factor 1000 in the
+scale of the z-axis.}
 \label{fig:curves_mem}
 \end{figure}
 
@@ -2474,7 +2577,7 @@ expression (\ref{eq:bayes}) is approximately $1 +
 4.3\cdot10^{-18}(1-\beta)/\beta$. So unless $\beta < 10^{-17}$, the
 support for the hypothesis that the hit is random is overwhelming.
 Conversely, if the hit is not random, there is a 99.99\% chance that 4 or
-fewer nucleotides are mismathes. In this case, the denominator is
+fewer nucleotides are mismatches. In this case, the denominator is
 approximately $1+6.8\cdot10^9(1-\beta)/\beta$, so unless $1-\beta <
 10^{-9}$, the support for the hypothesis that the hit is not random is
 overwhelming. If $p$ is small, we do not need to worry about the value of
@@ -2483,7 +2586,7 @@ $(1-\beta)/\beta$ disappears from expression (\ref{eq:bayes}).
 
 Since the probability that the best candidate is a random sequence is
 either very small or very large, it has no influence in the first case,
-or it dominates the probability of a false positive in the secondi case.
+or it dominates the probability of a false positive in the second case.
 For every read, we can use as confidence score the maximum of this
 probability and of the estimated probability that seeding is off target.
 
