@@ -741,11 +741,12 @@ $M_0(z)$ is thus
 \big) pz  & 1+qz+\ldots+(qz)^{\gamma-1} \\
 \scriptstyle{|} & 0 & 0 \\
 \end{block}
-\end{blockarray}.
+\end{blockarray},
 \end{equation*}
-
-In the representation above, the different types of segments are
-identified by their terminator, indicated in the margins for clarity.
+where $p$ is the error rate of the sequencer, $q=1-p$ and $\gamma$ is the
+minimum seed length. In the representation above, the different types of
+segments are identified by their terminator, indicated in the margins for
+clarity.
 
 We can compute the matrix $M_0(z) + M_0(z)^2 + \ldots = M_0(z) \cdot
 (I-M_0(z))^{-1}$ and extract the entry of interest, which is the top right
@@ -888,17 +889,18 @@ Those segments follow a $\Downarrow_i$-segment, so they start $i$
 nucleotides in front of the next non-skipped position. The shortest
 following segment that ends $j$ nucleotides before a non-skipped position
 has length $\ell_0 = i-j$ if $i > j$, and $n+1-j+i$ otherwise. This is
-equivalent to defining $x$ as the number of $\square$ symbols of the
-shortest $\Downarrow_j$-segment, with $x = i-j-1 \modulo{n+1}$ and $\ell_0
-= x+1$.
+equivalent to defining $\ell_0$ as $x+1$ where $x$ is the number of
+$\square$ symbols of the shortest $\Downarrow_j$-segment, \textit{i.e.} $x
+= i-j-1 \modulo{n+1}$.
 
-The shortest $\Downarrow_j$-segment consists of $x$ symbols $\square$
-followed by the $\Downarrow_j$ terminator, so it has weighted generating
-function $(qz)^xpz$. The other segments have a multiple of $n+1$
-additional $\square$ symbols so their weighted generating functions are
-$(qz)^{x+(n+1)}pz, (qz)^{x+2(n+1)}pz, \ldots, (qz)^{x+m(n+1)}pz$. Summing
-over those cases, we finally obtain
+With these notations, he shortest $\Downarrow_j$-segment consists of $x$
+symbols $\square$ followed by the $\Downarrow_j$ terminator, so it has
+weighted generating function $(qz)^xpz$. The other segments have a
+multiple of $n+1$ extra $\square$ symbols so their weighted
+generating functions are $(qz)^{x+(n+1)}pz, (qz)^{x+2(n+1)}pz, \ldots,
+(qz)^{x+m(n+1)}pz$. Summing over those cases, we finally obtain
 \begin{eqnarray}
+\label{eq_H}
 H_{i,j}(z) &=& (qz)^xpz \cdot \big( 1 + (qz)^{n+1} +
   \ldots + (qz)^{m(n+1)} \big), \\
 \notag
@@ -907,15 +909,16 @@ H_{i,j}(z) &=& (qz)^xpz \cdot \big( 1 + (qz)^{n+1} +
   \frac{\gamma+i-1-x}{n+1} \right\rfloor.
 \end{eqnarray}
 
-Denote $J_i(z)$ the weighted generating function of tails that can follow
-a $\Downarrow_i$-segment. There are $\gamma+i$ of them, each consisting of
-0 to $\gamma+i-1$ symbols $\square$ followed by the special $|$
-terminator for the end of the read. The $|$ has size 0 so its weighted
+Denote $J_i(z)$ the weighted generating function of tail segments that can
+follow a $\Downarrow_i$-segment. There are $\gamma+i$ such tails, each
+consisting of 0 to $\gamma+i-1$ symbols $\square$ followed by the special
+$|$ terminator for the end of the read. The $|$ has size 0 so its weighted
 generating function is 1. Once again summing over the different cases, we
 obtain
-\begin{eqnarray}
-J_i(z) &=& 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
-\end{eqnarray}
+\begin{equation}
+\label{eq_J}
+J_i(z) = 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma+i-1}.
+\end{equation}
 
 Finally, the expression of $M_n(z)$ the transfer matrix of reads in the
 skip-$n$ alphabet is
@@ -930,8 +933,17 @@ skip-$n$ alphabet is
 \Dn{n} & H_{n,0}(z) & H_{n,1}(z) & \ldots & H_{n,n}(z) & J_n(z) \\
 \nd & 0 & 0 & \ldots & 0 & 0 \\
 \end{block}
-\end{blockarray}.
+\end{blockarray},
 \end{equation}
+where $p$ is the error rate of the sequencer, $q=1-p$, $n$ is the number of
+skipped nucleotides between potential seeds, $\gamma$ is the minimum seed
+length, and polynomials $H_{i,j}(z)$ and $J_i(z)$ are defined in
+expressions (\ref{eq_H}) and (\ref{eq_J}).
+
+In appendix~\ref{app_Mn}, we present a transfer matrix with a simpler
+expression that will prove useful in section~\ref{sec_offskip}. The
+version of appendix~\ref{app_Mn} is simpler, but the expression above has
+some advantages that will be explained below.
 
 The weighted generating function of interest is the top right entry of the
 matrix $M_n(z) + M_n(z)^2 + \ldots = M_n(z)\cdot(I-M_n(z))^{-1}$. To see
@@ -962,11 +974,14 @@ polynomials of order $k$, \textit{i.e.} we discard the coefficients of
 order $k+1$ or greater when multiplying two polynomials.
 
 But we can do even better: a read with $s+1$ segments contains $s$ errors,
-so all the entries of $M_n(z)^{s+1}$ are dominated by $p^s$ and they
-rapidly converge to $0$ as $s$ increases. Instead of computing the matrix
-$M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$, we can interrupt the
-summation after a certain power of $M_n(z)$ because the terms become
-negligible.
+so the top right entry of $M_n(z)^{s+1}$ is the weighted generating
+function of reads with $s$ errors that have no seed of minimum size
+$\gamma$. Computing the partial sum $M_n(z) + M_n(z)^2 + \ldots +
+M_n(z)^s$ instead of $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{k+1}$
+corresponds to neglecting reads with $s$ or more errors. For $s$
+sufficiently large, such reads are exceedingly rare so we can obtain
+accurate estimates without computing all the powers of $M_n(z)$ up to
+order $k$.
 
 The number of errors $X$ in a read of size $k$ has a Binomial
 distribution $X \sim B(k,p)$. From~\cite{arratia1989tutorial} we can bound
@@ -987,6 +1002,15 @@ fraction $\varepsilon$ of the current value of $a_k$, we stop the
 computations. Typically $\varepsilon = 0.01$ so this method ensures that
 the probabilities that a read of size $k$ has no on-target skip seed are
 accurate to within 1\%.
+
+If we used $M_n^*(z)$the transfer matrix of appendix~\ref{app_Mn}, the top
+right entry of $M_n(z)^{s+1}$ is not the weighted generating function of
+reads with $s$ errors, so (\ref{eq:bound}) is not an upper bound for the
+neglected terms of the sum. As a consequence, one would have to compute
+more terms in the partial sum $M_n(z) + M_n(z)^2 + \ldots + M_n(z)^{s+1}$
+to reach the same accuracy. The transfer matrix shown in expression
+(\ref{eq_matrix_Mn}) is not the simplest, but it has the benefit of
+requiring fewer iterations.
 
 \begin{remark}
 Observe that when $n=0$ the matrix $M_n(z)$ is identical to the matrix
@@ -1345,7 +1369,6 @@ which gives an accurate estimate of $P(\overline{S}_0 \cap
 \overline{S}_1)$.
 
 
-
 \subsection{Illustration}
 \label{sec:illdual}
 
@@ -1356,13 +1379,12 @@ seeds of size $\gamma=19$.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.65]{curves_exact.pdf}
-\caption{\textbf{Off-target seeding probabilities (exact seeds).}
-The surfaces show the probability that seeding is off target for exact seeds
+\caption{\textbf{Off-target seeding probabilities (exact seeds).} The
+surfaces show the probability that seeding is off target for exact seeds
 of size $\gamma=19$ in reads of size $k=50$ nucleotides sequenced with an
 error rate $p=0.01$. The divergence rate $\mu$, defined as the probability
 that a given duplicate differs from the target at any given position. Note
-the factor 1000 in the scale of the z-axis.}
-\label{fig:curves_exact}
+the factor 1000 in the scale of the z-axis.} \label{fig:curves_exact}
 \end{figure}
 
 Figure~\ref{fig:curves_exact} shows the result for a number of duplicates
@@ -1387,6 +1409,7 @@ value of $\mu$ is the same for every $N$.
 
 
 \section{Off-target skip seeds}
+\label{sec_offskip}
 
 To compute the probability that the seeding process is off target when
 using skip seeds, we observe that the logic of section~\ref{sec:offexact}
@@ -1476,7 +1499,8 @@ As in the case of the skip encoding, a fair amount of bookkeeping is
 required to specify the weighted generating functions of interest.
 We reuse the quantities $a+b+c+d=1$ and give them the same meaning as in
 section~\ref{sec:dual}. For notational convenience, we define
-\begin{eqnarray*}
+\begin{eqnarray}
+\label{eq_N}
 N_i(z) &=& 1+z+\ldots+z^i, \\
 W_j(z) &=& dz \cdot (az)^x \cdot \big( 1 + (az)^{n+1} + \ldots +
   (az)^{(n+1)m} \big), \\
@@ -1501,7 +1525,7 @@ V_{i,j}(z) &=& dz \cdot (az)^x \cdot
 \end{cases} \\
   &\quad& \text{ where } x = -i-j-1 \modulo{n+1},
   m = \left\lfloor \frac{\gamma-1-i-x}{n+1} \right\rfloor.
-\end{eqnarray*}
+\end{eqnarray}
 
 With these definitions, one can check that the expression of the transfer
 matrix $\tilde{M}_n(z)$ is
@@ -3019,6 +3043,111 @@ a_k =
 a_{k-1} -pq^\gamma \cdot a_{k-\gamma-1} &\quad\text{otherwise.}
 \end{cases}
 \end{equation}
+
+\subsection{An alternative construction of $M_n(z)$}
+\label{app_Mn}
+
+The alphabets described here are constructed so that there is exactly one
+way to decompose reads in symbols or in segments. For a given alphabet
+there exists only one transfer matrix that describes the reads that have
+no seed of minimum size $\gamma$. However, if we choose a different
+alphabet, we can obtain a different transfer matrix describing exactly the
+same reads.
+
+In section~\ref{sec:example_skip}, we decomposed the reads in
+the so-called skip-$n$ alphabet $\mathcal{A}_n = \{\square, |,
+\Downarrow_0, \Downarrow_1, \ldots, \Downarrow_n \}$, from which we
+derived the transfer matrix $M_n(z)$ shown in expression
+(\ref{eq_matrix_Mn}). We now introduce the alternative skip-$n$ alphabet
+$\mathcal{A}^*_n = \{\square, *, |, \Downarrow_0, \Downarrow_1, \ldots,
+\Downarrow_n \}$, where we add the symbol $*$.
+
+The $*$ symbol stands for the nucleotides between a $\Downarrow_j$
+terminator ($0 \leq j \leq n)$ and the following non-skipped position.
+Recall that seed can only start at non-skipped positions occurring every
+$n+1$ nucleotides, and that the $\Downarrow_j$ indicates a sequencing
+error $j$ nucleotides before a non-skipped position.
+Figure~\ref{fig_alt_skip} shows the read of Figure~\ref{fig:skip} in the
+alternative skip-3 alphabet. The $*$ symbols appear after the
+$\Downarrow_1$ and $\Downarrow_3$ terminators. They are not found after a
+$\Downarrow_0$ terminator because there are no nucleotides between this
+terminator and the following non-skipped position.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.85]{alternative_sketch_skip.pdf}
+\caption{\textbf{The alternative skip encoding.}
+The read of Figure~\ref{fig:skip} is represented in the alternative skip-3
+alphabet. The only difference is that the nucleotides between a
+$\Downarrow_j$ terminator ($0 \leq j \leq n$) and the following
+non-skipped position are replaced by the $*$ symbol.}
+\label{fig_alt_skip}
+\end{figure}
+
+The match status of the $*$ nucleotides is irrelevant. Indeed, after a
+$\Downarrow_j$ symbol one has to ``wait''until the next potential seed can
+start, $j$ nucleotides further down. The weighted generating function of a
+$*$ nucleotide is thus $z$, as it stands of any nucleotide.
+
+A sequence of $*$ symbols can end in only two ways: either with the end of
+the read (as in the case of Figure~\ref{fig_alt_skip}), or with a
+non-skipped position. If the end of the read comes first, the sequence of
+$*$ symbols is terminated by the usual $|$ terminator. Otherwise, the
+sequence has no terminator but it puts the read in exactly the same state
+as after a $\Downarrow_0$ terminator.
+
+This means that in the alternative transfer matrix, the entries associated
+to $\Downarrow_j$ ($1 \leq j \leq n)$ simply ``fast forward'' to the
+entries associated with $\Downarrow_0$ and $|$. It takes exactly $j$
+nucleotides of any kind to go from a $\Downarrow_j$ symbol to the next
+non-skipped position, with weighted generating function $z^j$. If the end
+of the read occurs before the next non-skipped position, the
+$\Downarrow_j$ will be followed by a tail segment of up to $j-1$ symbols
+$*$, with weighted generating expression $1 + z + \ldots + z^{j-1}$. The
+segments following the $\Downarrow_0$ terminator are unchanged compared to
+the original expression of the transfer matrix.
+
+Finally, the expression of  the transfer matrix $M_n^*(z)$ in the
+alternative skip-$n$ alphabet is
+\begin{equation}
+\label{eq_alt_Mn}
+\begin{blockarray}{cccccc}
+   & \Dn{0} & \Dn{1} & \ldots & \Dn{n} & \nd \\
+\begin{block}{c[ccccc]}
+\Dn{0} & H_{0,0}(z) & H_{0,1}(z) & \ldots & H_{0,n}(z) & J_0(z) \\
+\Dn{1} & z & 0 & \ldots & 0 & N_0(z) \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\Dn{n} & z^n & 0 & \ldots & 0 & N_{n-1}(z) \\
+\nd & 0 & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray},
+\end{equation}
+where $p$ is the error rate of the sequencer, $q=1-p$, where $n$ is the
+number of skipped nucleotides between potential seeds, where $\gamma$ is
+the minimum seed length, and where
+\begin{gather}
+\tag{\ref{eq_H}}
+H_{0,j}(z) = (qz)^xpz \cdot \big( 1 + (qz)^{n+1} +
+  \ldots + (qz)^{m(n+1)} \big), \\
+\notag
+  \text{with } x = n-j \modulo{n+1},
+  \text{ and } m = \left\lfloor
+  \frac{\gamma-1-x}{n+1} \right\rfloor, \\
+\tag{\ref{eq_J}}
+J_0(z) = 1 + qz + (qz)^2 + \ldots + (qz)^{\gamma-1}, \\
+\tag{\ref{eq_N}}
+N_i(z) = 1+z+\ldots+z^i.
+\end{gather}
+
+Observe that this expression is simpler than (\ref{eq_matrix_Mn}). It
+could have been used in section \ref{sec:example_skip} because it is also
+easier to derive, but the burden of computations with expression
+(\ref{eq_alt_Mn}) is heavier. The reason is that the top right entry of
+$M^*_n(z)^{s+1}$ is not the weighted generating function of reads with $s$
+sequencing errors ($s \geq 1$), so we cannot use the probability that the
+reads contains more than $s$ errors as a bound on the neglected terms. As
+a consequence, we would need to perform more iterations in order to
+ascertain that the estimates are accurate to within chosen $\varepsilon$.
 
 \subsection{Proof that $a_k$ is independent of $M_n(z)^m$ for $m > k+1$}
 \label{app_skip}
