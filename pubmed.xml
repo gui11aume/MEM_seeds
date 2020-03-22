@@ -4079,4 +4079,2610 @@
     </PubmedData>
 </PubmedArticle>
 
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">19461883</PMID>
+        <DateCompleted>
+            <Year>2009</Year>
+            <Month>07</Month>
+            <Day>14</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>11</Month>
+            <Day>13</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1553-7358</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>5</Volume>
+                    <Issue>5</Issue>
+                    <PubDate>
+                        <Year>2009</Year>
+                        <Month>May</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>PLoS computational biology</Title>
+                <ISOAbbreviation>PLoS Comput. Biol.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>SHRiMP: accurate mapping of short color-space reads.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>e1000386</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1371/journal.pcbi.1000386</ELocationID>
+            <Abstract>
+                <AbstractText>The development of Next Generation Sequencing technologies, capable of sequencing hundreds of millions of short reads (25-70 bp each) in a single run, is opening the door to population genomic studies of non-model species. In this paper we present SHRiMP - the SHort Read Mapping Package: a set of algorithms and methods to map short reads to a genome, even in the presence of a large amount of polymorphism. Our method is based upon a fast read mapping technique, separate thorough alignment methods for regular letter-space as well as AB SOLiD (color-space) reads, and a statistical model for false positive hits. We use SHRiMP to map reads from a newly sequenced Ciona savignyi individual to the reference genome. We demonstrate that SHRiMP can accurately map reads to this highly polymorphic genome, while confirming high heterozygosity of C. savignyi in this second individual. SHRiMP is freely available at http://compbio.cs.toronto.edu/shrimp.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Rumble</LastName>
+                    <ForeName>Stephen M</ForeName>
+                    <Initials>SM</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Computer Science, University of Toronto, Toronto, Ontario, Canada.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Lacroute</LastName>
+                    <ForeName>Phil</ForeName>
+                    <Initials>P</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Dalca</LastName>
+                    <ForeName>Adrian V</ForeName>
+                    <Initials>AV</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Fiume</LastName>
+                    <ForeName>Marc</ForeName>
+                    <Initials>M</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Sidow</LastName>
+                    <ForeName>Arend</ForeName>
+                    <Initials>A</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Brudno</LastName>
+                    <ForeName>Michael</ForeName>
+                    <Initials>M</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2009</Year>
+                <Month>05</Month>
+                <Day>22</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>PLoS Comput Biol</MedlineTA>
+            <NlmUniqueID>101238922</NlmUniqueID>
+            <ISSNLinking>1553-734X</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="N">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D000818" MajorTopicYN="N">Animals</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D002874" MajorTopicYN="N">Chromosome Mapping</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D003198" MajorTopicYN="N">Computer Simulation</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D015233" MajorTopicYN="N">Models, Statistical</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D015203" MajorTopicYN="N">Reproducibility of Results</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016415" MajorTopicYN="N">Sequence Alignment</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017422" MajorTopicYN="N">Sequence Analysis, DNA</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012984" MajorTopicYN="Y">Software</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D014561" MajorTopicYN="N">Urochordata</DescriptorName>
+                <QualifierName UI="Q000235" MajorTopicYN="N">genetics</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2009</Year>
+                <Month>01</Month>
+                <Day>08</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2009</Year>
+                <Month>04</Month>
+                <Day>09</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2009</Year>
+                <Month>5</Month>
+                <Day>23</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2009</Year>
+                <Month>5</Month>
+                <Day>23</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2009</Year>
+                <Month>7</Month>
+                <Day>15</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">19461883</ArticleId>
+            <ArticleId IdType="doi">10.1371/journal.pcbi.1000386</ArticleId>
+            <ArticleId IdType="pmc">PMC2678294</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Bioinformatics. 2000 Aug;16(8):699-706</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11099256</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Dec 1;24(23):2776-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18842598</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2002;9(2):225-42</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">12015879</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2004 Sep;2(3):417-39</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15359419</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Mol Biol. 1981 Mar 25;147(1):195-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">7265238</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Proc Natl Acad Sci U S A. 1990 Mar;87(6):2264-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">2315319</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Comput Appl Biosci. 1997 Apr;13(2):145-50</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">9146961</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2006 Mar;13(2):296-308</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16597241</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2007 Jan 15;23(2):156-61</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17110365</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Proc Natl Acad Sci U S A. 2007 Mar 27;104(13):5698-703</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17372217</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Biol. 2007;8(3):R41</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17374142</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Mar 1;24(5):713-4</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18227114</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Nov 1;24(21):2431-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18684737</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2008 Nov 6;456(7218):53-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18987734</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2008 Nov 6;456(7218):60-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18987735</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2008 Nov 6;456(7218):66-72</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18987736</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2002 Mar;18(3):440-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11934743</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">19675096</PMID>
+        <DateCompleted>
+            <Year>2010</Year>
+            <Month>01</Month>
+            <Day>18</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>11</Month>
+            <Day>13</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1367-4811</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>25</Volume>
+                    <Issue>19</Issue>
+                    <PubDate>
+                        <Year>2009</Year>
+                        <Month>Oct</Month>
+                        <Day>01</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Bioinformatics (Oxford, England)</Title>
+                <ISOAbbreviation>Bioinformatics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>PerM: efficient mapping of short sequencing reads with periodic full sensitive spaced seeds.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>2514-21</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1093/bioinformatics/btp486</ELocationID>
+            <Abstract>
+                <AbstractText Label="MOTIVATION" NlmCategory="BACKGROUND">The explosion of next-generation sequencing data has spawned the design of new algorithms and software tools to provide efficient mapping for different read lengths and sequencing technologies. In particular, ABI's sequencer (SOLiD system) poses a big computational challenge with its capacity to produce very large amounts of data, and its unique strategy of encoding sequence data into color signals.</AbstractText>
+                <AbstractText Label="RESULTS" NlmCategory="RESULTS">We present the mapping software, named PerM (Periodic Seed Mapping) that uses periodic spaced seeds to significantly improve mapping efficiency for large reference genomes when compared with state-of-the-art programs. The data structure in PerM requires only 4.5 bytes per base to index the human genome, allowing entire genomes to be loaded to memory, while multiple processors simultaneously map reads to the reference. Weight maximized periodic seeds offer full sensitivity for up to three mismatches and high sensitivity for four and five mismatches while minimizing the number random hits per query, significantly speeding up the running time. Such sensitivity makes PerM a valuable mapping tool for SOLiD and Solexa reads.</AbstractText>
+                <AbstractText Label="AVAILABILITY" NlmCategory="BACKGROUND">http://code.google.com/p/perm/</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Chen</LastName>
+                    <ForeName>Yangho</ForeName>
+                    <Initials>Y</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Program in Computational Biology and Bioinformatics, University of Southern California, 1050 Childs Way, Los Angeles, CA 90089-2910, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Souaiaia</LastName>
+                    <ForeName>Tade</ForeName>
+                    <Initials>T</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Chen</LastName>
+                    <ForeName>Ting</ForeName>
+                    <Initials>T</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2009</Year>
+                <Month>08</Month>
+                <Day>12</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Bioinformatics</MedlineTA>
+            <NlmUniqueID>9808944</NlmUniqueID>
+            <ISSNLinking>1367-4803</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="N">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D001483" MajorTopicYN="N">Base Sequence</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D019295" MajorTopicYN="N">Computational Biology</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D008969" MajorTopicYN="N">Molecular Sequence Data</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017422" MajorTopicYN="N">Sequence Analysis, DNA</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012984" MajorTopicYN="Y">Software</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2009</Year>
+                <Month>8</Month>
+                <Day>14</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2009</Year>
+                <Month>8</Month>
+                <Day>14</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2010</Year>
+                <Month>1</Month>
+                <Day>19</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">19675096</ArticleId>
+            <ArticleId IdType="pii">btp486</ArticleId>
+            <ArticleId IdType="doi">10.1093/bioinformatics/btp486</ArticleId>
+            <ArticleId IdType="pmc">PMC2752623</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Genome Res. 2002 Apr;12(4):656-64</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11932250</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Jul 15;25(14):1754-60</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19451168</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Pharmacogenomics. 2004 Jun;5(4):433-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15165179</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2004 Sep;2(3):417-39</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15359419</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Mol Biol. 1990 Oct 5;215(3):403-10</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">2231712</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Science. 1998 Jul 17;281(5375):363, 365</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">9705713</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2004 Oct 14;5:149</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15485572</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2005 Jul-Aug;12(6):847-61</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16108721</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2006 Sep;13(7):1355-68</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17037963</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>IEEE/ACM Trans Comput Biol Bioinform. 2005 Jan-Mar;2(1):51-61</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17044164</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Methods. 2007 Aug;4(8):613-4</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17664943</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Methods. 2008 Feb;5(2):179-81</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18193056</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Mar 1;24(5):713-4</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18227114</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2008;9:128</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18307793</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2008 Sep;18(9):1509-17</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18550803</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Oct 15;24(20):2395-6</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18697769</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Biotechnol. 2008 Oct;26(10):1135-45</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18846087</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Nov 1;24(21):2431-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18684737</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2008 Nov;18(11):1851-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18714091</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Dec 1;24(23):2776-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18842598</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Apr 1;25(7):967-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19218350</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Apr 1;25(7):969-70</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19228804</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Jun 1;25(11):1424-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19351619</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>PLoS Comput Biol. 2009 May;5(5):e1000386</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19461883</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Biol. 2009;10(3):R25</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19261174</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2002 Mar;18(3):440-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11934743</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+        <PMID Version="1">20936175</PMID>
+        <DateCompleted>
+            <Year>2011</Year>
+            <Month>07</Month>
+            <Day>14</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>11</Month>
+            <Day>13</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1687-8035</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <PubDate>
+                        <Year>2010</Year>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Advances in bioinformatics</Title>
+                <ISOAbbreviation>Adv Bioinformatics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Designing Efficient Spaced Seeds for SOLiD Read Mapping.</ArticleTitle>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1155/2010/708501</ELocationID>
+            <ELocationID EIdType="pii" ValidYN="Y">708501</ELocationID>
+            <Abstract>
+                <AbstractText>The advent of high-throughput sequencing technologies constituted a major advance in genomic studies, offering new prospects in a wide range of applications.We propose a rigorous and flexible algorithmic solution to mapping SOLiD color-space reads to a reference genome. The solution relies on an advanced method of seed design that uses a faithful probabilistic model of read matches and, on the other hand, a novel seeding principle especially adapted to read mapping. Our method can handle both lossy and lossless frameworks and is able to distinguish, at the level of seed design, between SNPs and reading errors. We illustrate our approach by several seed designs and demonstrate their efficiency.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Noé</LastName>
+                    <ForeName>Laurent</ForeName>
+                    <Initials>L</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>INRIA Lille-Nord Europe, LIFL/CNRS, Université Lille 1, 59655 Villeneuve d'Ascq, France.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Gîrdea</LastName>
+                    <ForeName>Marta</ForeName>
+                    <Initials>M</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Kucherov</LastName>
+                    <ForeName>Gregory</ForeName>
+                    <Initials>G</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2010</Year>
+                <Month>09</Month>
+                <Day>16</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>Egypt</Country>
+            <MedlineTA>Adv Bioinformatics</MedlineTA>
+            <NlmUniqueID>101515444</NlmUniqueID>
+            <ISSNLinking>1687-8027</ISSNLinking>
+        </MedlineJournalInfo>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2009</Year>
+                <Month>11</Month>
+                <Day>17</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="revised">
+                <Year>2010</Year>
+                <Month>03</Month>
+                <Day>28</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2010</Year>
+                <Month>07</Month>
+                <Day>05</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2010</Year>
+                <Month>10</Month>
+                <Day>12</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2010</Year>
+                <Month>10</Month>
+                <Day>12</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2010</Year>
+                <Month>10</Month>
+                <Day>12</Day>
+                <Hour>6</Hour>
+                <Minute>1</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">20936175</ArticleId>
+            <ArticleId IdType="doi">10.1155/2010/708501</ArticleId>
+            <ArticleId IdType="pmc">PMC2945724</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Jul 1;24(13):1530-1</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18467344</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Aug 1;25(15):1966-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19497933</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>IEEE/ACM Trans Comput Biol Bioinform. 2005 Jan-Mar;2(1):51-61</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17044164</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2008 Nov;18(11):1851-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18714091</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Nov 1;24(21):2431-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18684737</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Mol Biol. 1982 Dec 15;162(3):705-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">7166760</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Apr 1;25(7):967-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19218350</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2009 Sep;19(9):1646-54</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19592482</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 1998 Mar;8(3):186-94</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">9521922</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nucleic Acids Res. 2005 Jul 1;33(Web Server issue):W540-3</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15980530</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2005 Jul-Aug;12(6):847-61</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16108721</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2002 Mar;18(3):440-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11934743</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>PLoS One. 2009 Nov 11;4(11):e7767</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19907642</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Oct 1;25(19):2514-21</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19675096</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>PLoS Comput Biol. 2009 Sep;5(9):e1000502</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19750212</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2006 Apr;4(2):553-69</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16819802</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2008 Dec;15(10):1295-313</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19040365</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>PLoS Comput Biol. 2009 May;5(5):e1000386</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19461883</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2004 Sep;2(3):417-39</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15359419</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Biol. 2009;10(3):R25</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19261174</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2006 Jul 15;22(14):e341-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16873491</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Jul 15;25(14):1754-60</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19451168</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Dec 1;24(23):2776-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18842598</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2008 Nov 6;456(7218):53-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18987734</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2008 Jan 23;9:36</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18215286</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">2945724</PMID>
+        <DateCompleted>
+            <Year>1986</Year>
+            <Month>12</Month>
+            <Day>09</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2019</Year>
+            <Month>08</Month>
+            <Day>24</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0302-2838</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>12 Suppl 1</Volume>
+                    <PubDate>
+                        <Year>1986</Year>
+                    </PubDate>
+                </JournalIssue>
+                <Title>European urology</Title>
+                <ISOAbbreviation>Eur. Urol.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Integral laser-photodynamic treatment of multifocal bladder carcinoma photosensitized by hematoporphyrin derivative.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>43-6</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>Intravenously administered hematoporphyrin derivative photosensitizes tumorous bladder tissue which can then be destroyed selectively by irradiation with red laser light (630 nm). After experimentally developing a concept since 1978 (light diffusion medium, special bladder catheter) to expose the bladder to the therapeutically effective red laser light, the integral photodynamic therapy is meanwhile performed clinically. The experience gained so far demonstrates that especially the multifocal carcinoma in situ up till now difficult to be detected endoscopically represents a new domain for the integral photodynamic therapy.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Jocham</LastName>
+                    <ForeName>D</ForeName>
+                    <Initials>D</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Schmiedt</LastName>
+                    <ForeName>E</ForeName>
+                    <Initials>E</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Baumgartner</LastName>
+                    <ForeName>R</ForeName>
+                    <Initials>R</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Unsöld</LastName>
+                    <ForeName>E</ForeName>
+                    <Initials>E</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>Switzerland</Country>
+            <MedlineTA>Eur Urol</MedlineTA>
+            <NlmUniqueID>7512719</NlmUniqueID>
+            <ISSNLinking>0302-2838</ISSNLinking>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance UI="D006415">Hematoporphyrins</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance UI="D011838">Radiation-Sensitizing Agents</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>68335-15-9</RegistryNumber>
+                <NameOfSubstance UI="D017324">Hematoporphyrin Derivative</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D002278" MajorTopicYN="N">Carcinoma in Situ</DescriptorName>
+                <QualifierName UI="Q000188" MajorTopicYN="N">drug therapy</QualifierName>
+                <QualifierName UI="Q000601" MajorTopicYN="N">surgery</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017324" MajorTopicYN="N">Hematoporphyrin Derivative</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006415" MajorTopicYN="N">Hematoporphyrins</DescriptorName>
+                <QualifierName UI="Q000627" MajorTopicYN="Y">therapeutic use</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D053685" MajorTopicYN="Y">Laser Therapy</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D011838" MajorTopicYN="N">Radiation-Sensitizing Agents</DescriptorName>
+                <QualifierName UI="Q000627" MajorTopicYN="Y">therapeutic use</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D001749" MajorTopicYN="N">Urinary Bladder Neoplasms</DescriptorName>
+                <QualifierName UI="Q000188" MajorTopicYN="N">drug therapy</QualifierName>
+                <QualifierName UI="Q000601" MajorTopicYN="Y">surgery</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>1986</Year>
+                <Month>1</Month>
+                <Day>1</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>1986</Year>
+                <Month>1</Month>
+                <Day>1</Day>
+                <Hour>0</Hour>
+                <Minute>1</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>1986</Year>
+                <Month>1</Month>
+                <Day>1</Day>
+                <Hour>0</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">2945724</ArticleId>
+            <ArticleId IdType="doi">10.1159/000472699</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">21209072</PMID>
+        <DateCompleted>
+            <Year>2011</Year>
+            <Month>06</Month>
+            <Day>24</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>11</Month>
+            <Day>13</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1549-5469</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>21</Volume>
+                    <Issue>3</Issue>
+                    <PubDate>
+                        <Year>2011</Year>
+                        <Month>Mar</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Genome research</Title>
+                <ISOAbbreviation>Genome Res.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Adaptive seeds tame genomic sequence comparison.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>487-93</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1101/gr.113985.110</ELocationID>
+            <Abstract>
+                <AbstractText>The main way of analyzing biological sequences is by comparing and aligning them to each other. It remains difficult, however, to compare modern multi-billionbase DNA data sets. The difficulty is caused by the nonuniform (oligo)nucleotide composition of these sequences, rather than their size per se. To solve this problem, we modified the standard seed-and-extend approach (e.g., BLAST) to use adaptive seeds. Adaptive seeds are matches that are chosen based on their rareness, instead of using fixed-length matches. This method guarantees that the number of matches, and thus the running time, increases linearly, instead of quadratically, with sequence length. LAST, our open source implementation of adaptive seeds, enables fast and sensitive comparison of large sequences with arbitrarily nonuniform composition.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Kiełbasa</LastName>
+                    <ForeName>Szymon M</ForeName>
+                    <Initials>SM</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Computational Biology, Max Planck Institute for Molecular Genetics, Berlin D-14195, Germany.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Wan</LastName>
+                    <ForeName>Raymond</ForeName>
+                    <Initials>R</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Sato</LastName>
+                    <ForeName>Kengo</ForeName>
+                    <Initials>K</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Horton</LastName>
+                    <ForeName>Paul</ForeName>
+                    <Initials>P</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Frith</LastName>
+                    <ForeName>Martin C</ForeName>
+                    <Initials>MC</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2011</Year>
+                <Month>01</Month>
+                <Day>05</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>Genome Res</MedlineTA>
+            <NlmUniqueID>9518021</NlmUniqueID>
+            <ISSNLinking>1088-9051</ISSNLinking>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>9007-49-2</RegistryNumber>
+                <NameOfSubstance UI="D004247">DNA</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="N">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D001483" MajorTopicYN="N">Base Sequence</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D019295" MajorTopicYN="N">Computational Biology</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D004247" MajorTopicYN="N">DNA</DescriptorName>
+                <QualifierName UI="Q000737" MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016678" MajorTopicYN="N">Genome</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D008969" MajorTopicYN="N">Molecular Sequence Data</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016415" MajorTopicYN="N">Sequence Alignment</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017422" MajorTopicYN="N">Sequence Analysis, DNA</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012984" MajorTopicYN="N">Software</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2011</Year>
+                <Month>1</Month>
+                <Day>7</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2011</Year>
+                <Month>1</Month>
+                <Day>7</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2011</Year>
+                <Month>6</Month>
+                <Day>28</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">21209072</ArticleId>
+            <ArticleId IdType="pii">gr.113985.110</ArticleId>
+            <ArticleId IdType="doi">10.1101/gr.113985.110</ArticleId>
+            <ArticleId IdType="pmc">PMC3044862</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nucleic Acids Res. 1999 Jan 15;27(2):573-80</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">9862982</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nucleic Acids Res. 1997 Sep 1;25(17):3389-402</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">9254694</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nucleic Acids Res. 2006 Jan 1;34(Database issue):D82-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16381980</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2006 Jan 15;22(2):134-41</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16287941</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2006 Apr;4(2):553-69</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16819802</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2008 May;15(4):357-77</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18361760</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2008 Aug 15;24(16):1757-64</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18567917</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Genet. 2009 May;41(5):563-71</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19377475</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Biotechnol. 2009 May;27(5):455-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19430453</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>IEEE/ACM Trans Comput Biol Bioinform. 2009 Jul-Sep;6(3):483-94</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19644175</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Rev Genet. 2010 Jan;11(1):31-46</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19997069</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2010 Jan 28;463(7280):536-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20072128</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2010;11:80</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20144198</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nucleic Acids Res. 2010 Apr;38(7):e100</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20110255</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Brief Bioinform. 2010 Sep;11(5):473-83</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20460430</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2000 Aug;10(8):1115-25</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">10958630</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Biol Chem. 2001 Jul 13;276(28):26724-31</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11371568</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2002 Apr;12(4):656-64</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11932250</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2002 Mar;18(3):440-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11934743</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Rev Genet. 2002 May;3(5):370-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11988762</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2003 Jan;13(1):103-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">12529312</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Biol. 2004;5(2):R12</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">14759262</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2004 Jun 28;5:83</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15222903</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Curr Issues Mol Biol. 2005 Jan;7(1):23-37</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15580778</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+        <PMID Version="1">26539459</PMID>
+        <DateCompleted>
+            <Year>2015</Year>
+            <Month>11</Month>
+            <Day>05</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>11</Month>
+            <Day>13</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Print">2314-436X</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>2015</Volume>
+                    <PubDate>
+                        <Year>2015</Year>
+                    </PubDate>
+                </JournalIssue>
+                <Title>International journal of genomics</Title>
+                <ISOAbbreviation>Int J Genomics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Spaced Seed Data Structures for De Novo Assembly.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>196591</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1155/2015/196591</ELocationID>
+            <Abstract>
+                <AbstractText>De novo assembly of the genome of a species is essential in the absence of a reference genome sequence. Many scalable assembly algorithms use the de Bruijn graph (DBG) paradigm to reconstruct genomes, where a table of subsequences of a certain length is derived from the reads, and their overlaps are analyzed to assemble sequences. Despite longer subsequences unlocking longer genomic features for assembly, associated increase in compute resources limits the practicability of DBG over other assembly archetypes already designed for longer reads. Here, we revisit the DBG paradigm to adapt it to the changing sequencing technology landscape and introduce three data structure designs for spaced seeds in the form of paired subsequences. These data structures address memory and run time constraints imposed by longer reads. We observe that when a fixed distance separates seed pairs, it provides increased sequence specificity with increased gap length. Further, we note that Bloom filters would be suitable to implicitly store spaced seeds and be tolerant to sequencing errors. Building on this concept, we describe a data structure for tracking the frequencies of observed spaced seeds. These data structure designs will have applications in genome, transcriptome and metagenome assemblies, and read error correction. </AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Birol</LastName>
+                    <ForeName>Inanç</ForeName>
+                    <Initials>I</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Chu</LastName>
+                    <ForeName>Justin</ForeName>
+                    <Initials>J</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Mohamadi</LastName>
+                    <ForeName>Hamid</ForeName>
+                    <Initials>H</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Jackman</LastName>
+                    <ForeName>Shaun D</ForeName>
+                    <Initials>SD</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Raghavan</LastName>
+                    <ForeName>Karthika</ForeName>
+                    <Initials>K</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Vandervalk</LastName>
+                    <ForeName>Benjamin P</ForeName>
+                    <Initials>BP</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Raymond</LastName>
+                    <ForeName>Anthony</ForeName>
+                    <Initials>A</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Warren</LastName>
+                    <ForeName>René L</ForeName>
+                    <Initials>RL</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Canada's Michael Smith Genome Sciences Centre, British Columbia Cancer Agency, Vancouver, BC, Canada V5Z 4S6.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <GrantList CompleteYN="Y">
+                <Grant>
+                    <GrantID>R01 HG007182</GrantID>
+                    <Acronym>HG</Acronym>
+                    <Agency>NHGRI NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+            </GrantList>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2015</Year>
+                <Month>10</Month>
+                <Day>11</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>Int J Genomics</MedlineTA>
+            <NlmUniqueID>101605206</NlmUniqueID>
+            <ISSNLinking>2314-436X</ISSNLinking>
+        </MedlineJournalInfo>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2015</Year>
+                <Month>02</Month>
+                <Day>06</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2015</Year>
+                <Month>03</Month>
+                <Day>30</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2015</Year>
+                <Month>11</Month>
+                <Day>6</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2015</Year>
+                <Month>11</Month>
+                <Day>6</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2015</Year>
+                <Month>11</Month>
+                <Day>6</Day>
+                <Hour>6</Hour>
+                <Minute>1</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">26539459</ArticleId>
+            <ArticleId IdType="doi">10.1155/2015/196591</ArticleId>
+            <ArticleId IdType="pmc">PMC4619942</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Methods. 2010 Nov;7(11):909-12</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20935650</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2008 Nov;18(11):1851-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18714091</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2009 Sep;19(9):1665-74</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19602640</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2012 Mar;19(3):279-92</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22175250</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Methods. 2012 Mar 04;9(4):357-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22388286</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2012 Apr 15;28(8):1086-92</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22368243</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2008 May;18(5):821-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18349386</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2010 Sep;20(9):1297-303</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20644199</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Biol. 2010;11(12):R128</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">21194472</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2012 Mar;22(3):549-56</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22156294</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>PLoS Comput Biol. 2011 May;7(5):e1001138</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">21625565</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Biotechnol. 2011 May 15;29(7):644-52</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">21572440</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2012 Jul 15;28(14):1838-44</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22569178</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Riv Clin Pediatr. 1951 Mar;49(3):171-86</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">14845539</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2012 Jul 15;28(14):1923-4</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22563071</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2009 Jun;19(6):1117-23</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19251739</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Comput Biol. 2013 Apr;20(4):359-71</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22803627</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Genet. 2013 Mar;45(3):279-84</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">23334666</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Methods. 2008 Feb;5(2):183-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18204455</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Methods. 2010 Aug;7(8):576-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20676076</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2012 Apr 04;486(7403):395-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22495314</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Algorithms Mol Biol. 2013 Sep 16;8(1):22</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">24040893</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Rev Paul Med. 1954 Aug;45(2):251-64</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">13225134</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2001;17 Suppl 1:S225-33</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11473013</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Nov 1;25(21):2872-7</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19528083</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Jul 15;25(14):1754-60</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19451168</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nat Methods. 2009 Sep;6(9):677-81</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19668202</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Clin Chem. 2010 Mar;56(3):336-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20040615</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Cancer Cell. 2012 Aug 14;22(2):153-66</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22897847</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2011 Sep 1;27(17):2433-4</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">21690104</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2011 Jun;21(6):961-73</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20980555</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 1999 Sep;9(9):868-77</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">10508846</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Pathol. 2012 Jan;226(1):7-16</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22072542</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2011 Jul 27;476(7360):298-303</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">21796119</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" IndexingMethod="Curated" Owner="NLM">
+        <PMID Version="1">26209798</PMID>
+        <DateCompleted>
+            <Year>2016</Year>
+            <Month>06</Month>
+            <Day>06</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>12</Month>
+            <Day>02</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1367-4811</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>31</Volume>
+                    <Issue>22</Issue>
+                    <PubDate>
+                        <Year>2015</Year>
+                        <Month>Nov</Month>
+                        <Day>15</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Bioinformatics (Oxford, England)</Title>
+                <ISOAbbreviation>Bioinformatics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Spaced seeds improve k-mer-based metagenomic classification.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>3584-92</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1093/bioinformatics/btv419</ELocationID>
+            <Abstract>
+                <AbstractText Label="MOTIVATION" NlmCategory="BACKGROUND">Metagenomics is a powerful approach to study genetic content of environmental samples, which has been strongly promoted by next-generation sequencing technologies. To cope with massive data involved in modern metagenomic projects, recent tools rely on the analysis of k-mers shared between the read to be classified and sampled reference genomes.</AbstractText>
+                <AbstractText Label="RESULTS" NlmCategory="RESULTS">Within this general framework, we show that spaced seeds provide a significant improvement of classification accuracy, as opposed to traditional contiguous k-mers. We support this thesis through a series of different computational experiments, including simulations of large-scale metagenomic projects.Availability and implementation, Supplementary information: Scripts and programs used in this study, as well as supplementary material, are available from http://github.com/gregorykucherov/spaced-seeds-for-metagenomics.</AbstractText>
+                <AbstractText Label="CONTACT" NlmCategory="BACKGROUND">gregory.kucherov@univ-mlv.fr.</AbstractText>
+                <CopyrightInformation>© The Author 2015. Published by Oxford University Press. All rights reserved. For Permissions, please e-mail: journals.permissions@oup.com.</CopyrightInformation>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Břinda</LastName>
+                    <ForeName>Karel</ForeName>
+                    <Initials>K</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>LIGM/CNRS, Université Paris-Est, 77454 Marne-la-Vallée, France.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Sykulski</LastName>
+                    <ForeName>Maciej</ForeName>
+                    <Initials>M</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>LIGM/CNRS, Université Paris-Est, 77454 Marne-la-Vallée, France.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Kucherov</LastName>
+                    <ForeName>Gregory</ForeName>
+                    <Initials>G</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>LIGM/CNRS, Université Paris-Est, 77454 Marne-la-Vallée, France.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2015</Year>
+                <Month>07</Month>
+                <Day>25</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Bioinformatics</MedlineTA>
+            <NlmUniqueID>9808944</NlmUniqueID>
+            <ISSNLinking>1367-4803</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="Y">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D001407" MajorTopicYN="N">Bacillus</DescriptorName>
+                <QualifierName UI="Q000235" MajorTopicYN="N">genetics</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D030541" MajorTopicYN="N">Databases, Genetic</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016680" MajorTopicYN="N">Genome, Bacterial</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D056186" MajorTopicYN="N">Metagenomics</DescriptorName>
+                <QualifierName UI="Q000145" MajorTopicYN="Y">classification</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D009161" MajorTopicYN="N">Mycobacterium</DescriptorName>
+                <QualifierName UI="Q000235" MajorTopicYN="N">genetics</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D011336" MajorTopicYN="N">Probability</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016415" MajorTopicYN="N">Sequence Alignment</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D018709" MajorTopicYN="N">Statistics, Nonparametric</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2015</Year>
+                <Month>04</Month>
+                <Day>01</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2015</Year>
+                <Month>07</Month>
+                <Day>14</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2015</Year>
+                <Month>7</Month>
+                <Day>26</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2015</Year>
+                <Month>7</Month>
+                <Day>26</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2016</Year>
+                <Month>6</Month>
+                <Day>9</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">26209798</ArticleId>
+            <ArticleId IdType="pii">btv419</ArticleId>
+            <ArticleId IdType="doi">10.1093/bioinformatics/btv419</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" IndexingMethod="Curated" Owner="NLM">
+        <PMID Version="1">27540266</PMID>
+        <DateCompleted>
+            <Year>2017</Year>
+            <Month>08</Month>
+            <Day>07</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2018</Year>
+            <Month>12</Month>
+            <Day>02</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1367-4811</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>32</Volume>
+                    <Issue>24</Issue>
+                    <PubDate>
+                        <Year>2016</Year>
+                        <Month>12</Month>
+                        <Day>15</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Bioinformatics (Oxford, England)</Title>
+                <ISOAbbreviation>Bioinformatics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Higher classification sensitivity of short metagenomic reads with CLARK-S.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>3823-3825</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>The growing number of metagenomic studies in medicine and environmental sciences is creating increasing demands on the computational infrastructure designed to analyze these very large datasets. Often, the construction of ultra-fast and precise taxonomic classifiers can compromise on their sensitivity (i.e. the number of reads correctly classified). Here we introduce CLARK-S, a new software tool that can classify short reads with high precision, high sensitivity and high speed.</AbstractText>
+                <AbstractText Label="AVAILABILITY AND IMPLEMENTATION">CLARK-S is freely available at http://clark.cs.ucr.edu/ CONTACT: stelo@cs.ucr.eduSupplementary information: Supplementary data are available at Bioinformatics online.</AbstractText>
+                <CopyrightInformation>© The Author 2016. Published by Oxford University Press. All rights reserved. For Permissions, please e-mail: journals.permissions@oup.com.</CopyrightInformation>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Ounit</LastName>
+                    <ForeName>Rachid</ForeName>
+                    <Initials>R</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Computer Science and Engineering, University of California, Riverside, CA 92521, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Lonardi</LastName>
+                    <ForeName>Stefano</ForeName>
+                    <Initials>S</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Computer Science and Engineering, University of California, Riverside, CA 92521, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2016</Year>
+                <Month>08</Month>
+                <Day>18</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Bioinformatics</MedlineTA>
+            <NlmUniqueID>9808944</NlmUniqueID>
+            <ISSNLinking>1367-4803</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="N">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017753" MajorTopicYN="N">Ecosystem</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D056186" MajorTopicYN="Y">Metagenomics</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012984" MajorTopicYN="Y">Software</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2016</Year>
+                <Month>04</Month>
+                <Day>07</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="revised">
+                <Year>2016</Year>
+                <Month>08</Month>
+                <Day>04</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2016</Year>
+                <Month>08</Month>
+                <Day>10</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2016</Year>
+                <Month>8</Month>
+                <Day>20</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2017</Year>
+                <Month>8</Month>
+                <Day>8</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2016</Year>
+                <Month>8</Month>
+                <Day>20</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">27540266</ArticleId>
+            <ArticleId IdType="pii">btw542</ArticleId>
+            <ArticleId IdType="doi">10.1093/bioinformatics/btw542</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">27079541</PMID>
+        <DateCompleted>
+            <Year>2016</Year>
+            <Month>09</Month>
+            <Day>06</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2020</Year>
+            <Month>03</Month>
+            <Day>06</Day>
+        </DateRevised>
+        <Article PubModel="Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">2041-1723</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>7</Volume>
+                    <PubDate>
+                        <Year>2016</Year>
+                        <Month>Apr</Month>
+                        <Day>15</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Nature communications</Title>
+                <ISOAbbreviation>Nat Commun</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Fast and sensitive mapping of nanopore sequencing reads with GraphMap.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>11307</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1038/ncomms11307</ELocationID>
+            <Abstract>
+                <AbstractText>Realizing the democratic promise of nanopore sequencing requires the development of new bioinformatics approaches to deal with its specific error characteristics. Here we present GraphMap, a mapping algorithm designed to analyse nanopore sequencing reads, which progressively refines candidate alignments to robustly handle potentially high-error rates and a fast graph traversal to align long reads with speed and high precision (&gt;95%). Evaluation on MinION sequencing data sets against short- and long-read mappers indicates that GraphMap increases mapping sensitivity by 10-80% and maps &gt;95% of bases. GraphMap alignments enabled single-nucleotide variant calling on the human genome with increased sensitivity (15%) over the next best mapper, precise detection of structural variants from length 100 bp to 4 kbp, and species and strain-specific identification of pathogens using MinION reads. GraphMap is available open source under the MIT license at https://github.com/isovic/graphmap. </AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Sović</LastName>
+                    <ForeName>Ivan</ForeName>
+                    <Initials>I</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Computational &amp;Systems Biology, Genome Institute of Singapore, 60 Biopolis Street, #02-01 Genome, Singapore 138672, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                    <AffiliationInfo>
+                        <Affiliation>Centre for Informatics and Computing, Ruđer Bošković Institute, Bijenička 54, 10000 Zagreb, Croatia.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Šikić</LastName>
+                    <ForeName>Mile</ForeName>
+                    <Initials>M</Initials>
+                    <Identifier Source="ORCID">http://orcid.org/0000-0002-8370-0891</Identifier>
+                    <AffiliationInfo>
+                        <Affiliation>Faculty of Electrical Engineering and Computing, Department of Electronic Systems and Information Processing, University of Zagreb, Unska 3, 10000 Zagreb, Croatia.</Affiliation>
+                    </AffiliationInfo>
+                    <AffiliationInfo>
+                        <Affiliation>Bioinformatics Institute, Singapore 138671, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Wilm</LastName>
+                    <ForeName>Andreas</ForeName>
+                    <Initials>A</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Computational &amp;Systems Biology, Genome Institute of Singapore, 60 Biopolis Street, #02-01 Genome, Singapore 138672, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Fenlon</LastName>
+                    <ForeName>Shannon Nicole</ForeName>
+                    <Initials>SN</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Computational &amp;Systems Biology, Genome Institute of Singapore, 60 Biopolis Street, #02-01 Genome, Singapore 138672, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                    <AffiliationInfo>
+                        <Affiliation>Faculty of Medicine and Institute for Life Sciences, University of Southampton, Southampton SO16 6YD, UK.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Chen</LastName>
+                    <ForeName>Swaine</ForeName>
+                    <Initials>S</Initials>
+                    <Identifier Source="ORCID">http://orcid.org/0000-0002-0107-2861</Identifier>
+                    <AffiliationInfo>
+                        <Affiliation>Computational &amp;Systems Biology, Genome Institute of Singapore, 60 Biopolis Street, #02-01 Genome, Singapore 138672, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Diseases, Department of Medicine, Yong Loo Lin School of Medicine, National University of Singapore, Singapore 119074, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Nagarajan</LastName>
+                    <ForeName>Niranjan</ForeName>
+                    <Initials>N</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Computational &amp;Systems Biology, Genome Institute of Singapore, 60 Biopolis Street, #02-01 Genome, Singapore 138672, Singapore.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2016</Year>
+                <Month>04</Month>
+                <Day>15</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Nat Commun</MedlineTA>
+            <NlmUniqueID>101528555</NlmUniqueID>
+            <ISSNLinking>2041-1723</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="Y">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D019295" MajorTopicYN="N">Computational Biology</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D015894" MajorTopicYN="N">Genome, Human</DescriptorName>
+                <QualifierName UI="Q000235" MajorTopicYN="Y">genetics</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D023281" MajorTopicYN="N">Genomics</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D059014" MajorTopicYN="N">High-Throughput Nucleotide Sequencing</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D058608" MajorTopicYN="N">Nanopores</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D020641" MajorTopicYN="N">Polymorphism, Single Nucleotide</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D015203" MajorTopicYN="N">Reproducibility of Results</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016415" MajorTopicYN="N">Sequence Alignment</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2015</Year>
+                <Month>12</Month>
+                <Day>30</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2016</Year>
+                <Month>03</Month>
+                <Day>11</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2016</Year>
+                <Month>4</Month>
+                <Day>16</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2016</Year>
+                <Month>4</Month>
+                <Day>16</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2016</Year>
+                <Month>9</Month>
+                <Day>7</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>epublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">27079541</ArticleId>
+            <ArticleId IdType="pii">ncomms11307</ArticleId>
+            <ArticleId IdType="doi">10.1038/ncomms11307</ArticleId>
+            <ArticleId IdType="pmc">PMC4835549</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Jul 15;25(14):1754-60</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19451168</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Gigascience. 2015 Dec 04;4:60</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26640692</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Bioinformatics. 2013 Jan 1;29(1):119-21</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">23129296</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Methods. 2015 Apr;12(4):351-6</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25686389</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Genome Res. 2011 Mar;21(3):487-93</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">21209072</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Genome Res. 2015 Nov;25(11):1750-6</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26447147</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Methods. 2012 Mar 04;9(4):357-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22388286</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nucleic Acids Res. 2012 Dec;40(22):11189-201</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">23066108</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Curr Protoc Bioinformatics. 2003 Feb;Chapter 10:Unit 10.3</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18428693</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Biotechnol. 2015 Oct;33(10):1087-91</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26352647</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Biotechnol. 2015 Mar;33(3):296-300</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25485618</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Gigascience. 2014 Oct 20;3:22</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25386338</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Biotechnol. 2015 Jun;33(6):623-30</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26006009</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Genome Inform. 2003;14:164-75</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15706531</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Biotechnol. 2014 Mar;32(3):246-51</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">24531798</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Biomol Detect Quantif. 2015 Mar;3:1-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26753127</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Bioinformatics. 2002 Mar;18(3):440-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11934743</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Genome Biol. 2014 Jun 26;15(6):R84</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">24970577</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Bioinformatics. 2012 Feb 15;28(4):593-4</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22199392</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Front Genet. 2015 Jan 07;5:449</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25610451</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>BMC Genomics. 2015 Apr 20;16:327</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25927464</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Genome Res. 2014 Feb;24(2):318-28</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">24307551</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Mol Ecol Resour. 2014 Nov;14(6):1097-102</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25187008</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>J Mol Biol. 1982 Dec 15;162(3):705-8</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">7166760</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2012 Sep 19;13:238</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22988817</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>F1000Res. 2015 Oct 15;4:1075</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26834992</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nat Methods. 2015 Aug;12(8):733-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">26076426</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>F1000Res. 2015 Jan 21;4:17</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">25901276</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Brief Bioinform. 2013 Mar;14(2):178-92</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">22517427</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+        <ReferenceList>
+            <Reference>
+                <Citation>J Mol Biol. 1990 Oct 5;215(3):403-10</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">2231712</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">16819802</PMID>
+        <DateCompleted>
+            <Year>2006</Year>
+            <Month>09</Month>
+            <Day>15</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2019</Year>
+            <Month>11</Month>
+            <Day>10</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0219-7200</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>4</Volume>
+                    <Issue>2</Issue>
+                    <PubDate>
+                        <Year>2006</Year>
+                        <Month>Apr</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Journal of bioinformatics and computational biology</Title>
+                <ISOAbbreviation>J Bioinform Comput Biol</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>A unifying framework for seed sensitivity and its application to subset seeds.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>553-69</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>We propose a general approach to compute the seed sensitivity, that can be applied to different definitions of seeds. It treats separately three components of the seed sensitivity problem--a set of target alignments, an associated probability distribution, and a seed model--that are specified by distinct finite automata. The approach is then applied to a new concept of subset seeds for which we propose an efficient automaton construction. Experimental results confirm that sensitive subset seeds can be efficiently designed using our approach, and can then be used in similarity search producing better results than ordinary spaced seeds.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Kucherov</LastName>
+                    <ForeName>Gregory</ForeName>
+                    <Initials>G</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>LIFL/CNRS, Bât. M3, 59655 Villeneuve d'Ascq, France. Gregory.Kucherov@lifl.fr</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Noé</LastName>
+                    <ForeName>Laurent</ForeName>
+                    <Initials>L</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Roytberg</LastName>
+                    <ForeName>Mikhail</ForeName>
+                    <Initials>M</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>Singapore</Country>
+            <MedlineTA>J Bioinform Comput Biol</MedlineTA>
+            <NlmUniqueID>101187344</NlmUniqueID>
+            <ISSNLinking>0219-7200</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000465" MajorTopicYN="Y">Algorithms</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D001185" MajorTopicYN="Y">Artificial Intelligence</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D001483" MajorTopicYN="N">Base Sequence</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D008969" MajorTopicYN="N">Molecular Sequence Data</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D010363" MajorTopicYN="N">Pattern Recognition, Automated</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D015203" MajorTopicYN="N">Reproducibility of Results</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012680" MajorTopicYN="N">Sensitivity and Specificity</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D016415" MajorTopicYN="N">Sequence Alignment</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017422" MajorTopicYN="N">Sequence Analysis, DNA</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+        <OtherID Source="NLM">HALMS94528</OtherID>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2005</Year>
+                <Month>10</Month>
+                <Day>11</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2005</Year>
+                <Month>11</Month>
+                <Day>02</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2006</Year>
+                <Month>7</Month>
+                <Day>5</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2006</Year>
+                <Month>9</Month>
+                <Day>16</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2006</Year>
+                <Month>7</Month>
+                <Day>5</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">16819802</ArticleId>
+            <ArticleId IdType="pii">S0219720006001977</ArticleId>
+            <ArticleId IdType="pmc">PMC2824148</ArticleId>
+            <ArticleId IdType="mid">HALMS94528</ArticleId>
+            <ArticleId IdType="doi">10.1142/s0219720006001977</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2004 Sep;2(3):417-39</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15359419</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Biosystems. 1993;30(1-3):1-19</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">7690608</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nucleic Acids Res. 1997 Sep 1;25(17):3389-402</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">9254694</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2002 Mar;18(3):440-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11934743</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Res. 2002 Apr;12(4):656-64</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">11932250</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>J Bioinform Comput Biol. 2004 Jan;1(4):595-610</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15290755</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2004 May 1;20(7):1053-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">14764573</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>BMC Bioinformatics. 2004 Oct 14;5:149</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15485572</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Genome Inform. 2003;14:176-85</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">15706532</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>IEEE/ACM Trans Comput Biol Bioinform. 2005 Jan-Mar;2(1):29-38</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17044162</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>IEEE/ACM Trans Comput Biol Bioinform. 2005 Jan-Mar;2(1):51-61</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17044164</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
 </PubmedArticleSet>

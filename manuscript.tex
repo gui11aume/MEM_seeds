@@ -65,7 +65,7 @@
 
 %---------------------------------------------------------------
 
-\title{Calibrating seed-based alignment heuristics with Sesame}
+\title{Calibrating seed-based mapping heuristics with Sesame}
 
 \author[1,2,3]{Guillaume J. Filion}
 \author[1]{Ruggero Cortini}
@@ -154,6 +154,7 @@ terms ``targets'' and ``duplicates'' a meaning that will facilitate the
 exposition of the theory.
 
 \begin{definition}
+\label{def_dup}
 The target is the DNA fragment that was actually sequenced. Duplicates are
 sequences of the genome that share homology with the target (in genetics
 they are often referred to as paralogs).
@@ -188,12 +189,13 @@ heuristic methods, \textit{i.e.}, algorithms that run faster but may
 return an incorrect result~\cite{Waterman1984}.
 
 The most popular heuristic for mapping DNA sequences is a filtration
-method called seeding. The principle is to first identify seeds,
-defined as short regions of high similarity between the read and the
-genome, and then use an exact alignment algorithm at the candidate
-locations to identify the optimum. This strategy was first proposed in
-FASTA~\cite{pmid2983426} and BLAST~\cite{pmid2231712} to to search for
-homology in sequence databases.
+method called ``seed and extend''. The principle is to first identify
+seeds, defined as short regions of high similarity between the read and
+the genome, and then use an exact alignment algorithm at the seeded
+locations to evaluate the candidates and identify the optimum. This
+strategy was first proposed in FASTA~\cite{pmid2983426} and
+BLAST~\cite{pmid2231712} to to search for homology in sequence databases
+of proteins and DNA.
 
 There are efficient methods to extract seeds, so it is possible to quickly
 hone in on a small set of candidates and to reduce the search space of the
@@ -274,20 +276,27 @@ algorithms~\cite{pmid23872968}, but they focused on the probabilities of
 random hits, recognizing that addressing the problem of incorrect mapping
 requires taking into consideration the repeat structure of the genome.
 
-The rest of this document is organized so as to present the concepts by
-increasing level of complexity, meaning that we sometimes go back and
-forth between different types of seeding strategies. We first provide some
-background knowledge on different types of seeding methods, we then
-introduce the computational strategy based on transfer matrices, and
-finally we delve into each specific seeding method.
+The rest of the article is organized as follows: section~\ref{sec_seeds}
+presents common seeding strategies used in bioinformatics,
+section~\ref{sec:symbolic} presents the basic concepts of analytic
+combinatorics that will be required to compute seeding probabilities,
+sections~\ref{sec:offexact} to \ref{sec_offMEM} treat the cases of exact
+seeds, skip seeds and MEM seeds, three common seeding heuristic used for
+mapping, section~\ref{sec_practical} returns to the mapping problem and
+revisits the assumptions of the model, section~\ref{sec:sesame} presents
+Sesame, a C library implementing the main results of the theory, and
+finally section~\ref{sec_disc} provides some perspectives on the present
+work.
+
 
 \section{Seeds}
+\label{sec_seeds}
 
 The term ``seed'' has different meanings in computational biology. It can
 designate a part of the read, a part of the genome, a particular sequence
 motif, or a structured pattern of matches. Also, a seed does not always
 refer to an exact match. For instance, the algorithm
-PatternHunter~\cite{pmid11934743} uses ``spaced seeds'' that tolerate
+PatternHunter~\cite{pmid11934743} uses spaced seeds that tolerate
 mismatches. To avoid any confusion, we will adopt the convention below.
 
 \begin{definition}
@@ -320,8 +329,8 @@ tables are typically used to index $k$-mers, which makes them useful to
 search for seeds of fixed size $k$ (see~\cite{pmid30346548} for a recent
 benchmark of $k$-mer hashing algorithms). In contrast, some text-indexing
 structures have no set size so they can be used to search for seeds of
-different lengths. For instance, the FM-index is a compact data structure
-based on the suffix array~\cite{manber1993suffix} and on the
+different lengths. This is the case of the FM-index, a compact data
+structure based on the suffix array~\cite{manber1993suffix} and on the
 Burrows-Wheeler transform~\cite{burrows1994block}, emulating a suffix trie
 with a much smaller memory footprint~\cite{ferragina2000opportunistic,
 ferragina2005indexing}.
@@ -334,6 +343,40 @@ pmid23349213, pmid19389736}. Overall, the detail is of little interest for
 the theory. We simply assume that seeds are known at all times without
 ambiguity because this problem has several practical solutions.
 
+It is important to mention the case of spaced seeds. Originally introduced
+in~\cite{califano1993flash} and popularized by
+PatternHunter~\cite{pmid11934743}, spaced seeds feature ``don't-care''
+positions allowing them to detect imperfect matches. Spaced seeds are
+represented by models such as `11011', here indicating that the seeds have
+length 5 and that the middle position is disregarded. At index time, the
+genome is scanned with the model so that nucleotides labelled `1' are
+concatenated and indexed. At search time, the query is scanned with the
+model and the concatenated nucleotides labelled `1' are looked up in the
+index.
+
+Spaced seeds of weight $w$ (the number of 1s in the model) have the same
+memory requirements as continuous seeds of length $w$ but they are more
+sensitive~\cite{li2006superiority}, making them very attractive for
+homology search. They were used in the first generation of short-read
+mappers~\cite{pmid18684737, pmid19461883, pmid19675096, pmid2945724}, but
+nowadays they find more applications in genome
+comparisons~\cite{pmid21209072, healy2016flak},
+metagenomics~\cite{pmid26209798, pmid27540266}, genome
+assembly~\cite{pmid26539459} and long-read mapping~\cite{pmid27079541}.
+
+The success of the mainstream mappers BWA-MEM~\cite{li2013aligning} and
+Bowtie2~\cite{pmid22388286} is due in part to the FM-index, which only
+supports continuous seeds. Some workarounds are
+available~\cite{horton2008dislex, gagie2017compressed} but they increase
+the memory footprint, explaining that short reads are typically mapped
+using continuous seeds. More generally, computing the sensitivity of
+spaced seeds is challenging~\cite{pmid16819802, li2006superiority,
+martin2017faster}. It is theoreticlally possible to do this using the
+tools introduced below, but the complexity becomes prohibitive for seed
+models with several don't-care positions. For these reasons we will not
+treat the case of spaced seeds and we will give more detail in
+section~\ref{sec_disc} bout the kind of difficulties they represent for
+our approach.
 
 \subsection{Exact seeds}
 
@@ -430,7 +473,7 @@ results. To describe MEM seeds, let us first clarify the meaning of
 
 \begin{definition}
 A Maximal Exact Match (MEM) is a subsequence of the read that is present
-in the reference genome and that cannot be extended --- either because the
+in the reference genome and that cannot be extended---either because the
 read ends or because the extended subsequence is not in the genome.
 \end{definition}
 
@@ -492,7 +535,7 @@ The second counter-intuitive property is that shortening a read can
 sometimes generate a MEM seed for the target. Figure~\ref{fig:short_vs_long}
 shows an example of this case. There is no MEM seed for the target, but
 there would be if the read were two nucleotides shorter on the right
-side. Indeed, in this case there would be a shared MEM seed matching the
+side. Indeed, in this case there would be a shared MEM seed matching
 the target and the first duplicate (provided $\gamma \leq 12$).
 
 
@@ -813,8 +856,8 @@ positions. For this, we define the skip-$n$ alphabet $\mathcal{A}_n =
 the symbol $\square$ represents a correct nucleotide and the symbol $|$ is
 a terminator added at the end of the read. The symbols $\Downarrow_j$ ($ 0
 \leq j \leq n$) represent sequencing errors and $j$ indicates the number
-of nucleotides till the next non-skipped position (\textit{i.e.} $j=0$ for
-nucleotides immediately before a non-skipped position and $j=n$ for
+of nucleotides until the next non-skipped position (\textit{i.e.} $j=0$
+for nucleotides immediately before a non-skipped position and $j=n$ for
 nucleotides at a non-skipped position).
 
 As per definition~\ref{def:seg}, segments in this alphabet are sequences
@@ -834,7 +877,7 @@ The symbols $\Downarrow_j (j = 1,2,3)$ represent mismatches against the
 target (they are erroneous nucleotides) and the $\square$ symbol
 represents a match (it is a correct nucleotide). The vertical bars
 indicate non-skipped positions (the potential start of a seed). The number
-$j$ in $\Downarrow_j$ indicates the number of nucleotides till the next
+$j$ in $\Downarrow_j$ indicates the number of nucleotidesu until the next
 non-skipped position. For $j=0$ the next nucleotide is not skipped.
 Other features are as in Figure~\ref{fig:simple}.}
 \label{fig:skip}
@@ -886,12 +929,12 @@ the largest number such that $\ell_0+m(n+1) \leq \gamma+i$, so $m =
 the ``floor'' function.
 
 Those segments follow a $\Downarrow_i$-segment, so they start $i$
-nucleotides in front of the next non-skipped position. The shortest
-following segment that ends $j$ nucleotides before a non-skipped position
-has length $\ell_0 = i-j$ if $i > j$, and $n+1-j+i$ otherwise. This is
-equivalent to defining $\ell_0$ as $x+1$ where $x$ is the number of
-$\square$ symbols of the shortest $\Downarrow_j$-segment, \textit{i.e.} $x
-= i-j-1 \modulo{n+1}$.
+nucleotides before the next non-skipped position. The shortest following
+segment that ends $j$ nucleotides before a non-skipped position has length
+$\ell_0 = i-j$ if $i > j$, and $n+1-j+i$ otherwise. This is equivalent to
+defining $\ell_0$ as $x+1$ where $x$ is the number of $\square$ symbols of
+the shortest $\Downarrow_j$-segment, \textit{i.e.} $x = i-j-1
+\modulo{n+1}$.
 
 With these notations, he shortest $\Downarrow_j$-segment consists of $x$
 symbols $\square$ followed by the $\Downarrow_j$ terminator, so it has
@@ -1213,6 +1256,7 @@ the weighted generating function of the segments terminated by
 $\downarrow_{/j}^-$ is $(az)^{j-i-1}bz$ where $i < j \leq \gamma-1$.
 
 \subsection{Transfer matrix}
+\label{sec_transmat_skip}
 
 We now have all the elements to specify the transfer matrix of reads with
 no seed for either sequence. Recall that $a$ is the probability of a
@@ -1349,8 +1393,8 @@ $\tilde{M}_0(z)$ up to a finite value. This is done once again using the
 arithmetic of truncated polynomials. Since each segment except the tail
 contains a mismatch against at least one sequence, the top right entry of
 $\tilde{M}_0(z)^{s+1}$ is the weighted generating function of reads that
-contain $s$ mismatches (against any of the two sequences). We thus define
-$\tilde{p}$ as the upper bound on the probability of a mismatch,
+contain $s$ mismatches (where doule mismatches count as one). We thus
+define $\tilde{p}$ as the upper bound on the probability of a mismatch,
 \textit{i.e.} $\tilde{p} = \max\{b,c,d\}$. The updated formula
 (\ref{eq:bound}) now gives an upper bound of the probability that a read
 of size $k$ contains $s$ or more mismatches as
@@ -1408,7 +1452,7 @@ decreases as $N$ increases. As a result the probability that the candidate
 set contains only invalid candidates increases with $N$.
 
 The second observation is that there exists a ``worst'' value of $\mu$
-situated around 0.07. When $\mu$ is much smaller, the duplicates tend to
+situated around 0.070. When $\mu$ is much smaller, the duplicates tend to
 be exactly identical to the target, making it impossible that there is a
 seed for a duplicate but no seed for the target. When $\mu$ is much
 larger, the duplicates are far from the target and they are unlikely to be
@@ -1555,7 +1599,7 @@ match of length $i$ for the $+$ sequence. If the next segment is a tail,
 we must make sure that the match length for the $+$ sequence does not
 exceed $\gamma-1$. This means that we can have up to $\gamma-i-1$ symbols
 $\square$ and thus that the weighted generating function of the tail
-segments is $1 + (qz) + \ldots + (qz)^{\gamma-j-1}$.
+segments is $1 + (qz) + \ldots + (qz)^{\gamma-i-1}$.
 
 If the next terminator is a $\downarrow_{/j}^-$ symbol, we must have $j >
 i$ because there is no mismatch against the $+$ sequence. In this case, we
@@ -1569,21 +1613,24 @@ that in general, a mismatch against $+$ that follows a mismatch against
 $-$ can be represented by either a $\Downarrow_j$ symbol ($0 \leq j \leq
 n$) or a $\downarrow_{/j}^+$ symbol ($j \geq 1$). The terminator is
 $\Downarrow_j$ if the two mismatches are within the same interval between
-non-skipped positions because both sequences have match length 0. If the
-mismatch against $+$ is in another interval, the terminator is
-$\downarrow_{/j}^+$ because the $-$ sequence has a positive match length.
+non-skipped positions because both sequences lovally have match length 0.
+If the mismatch against $+$ is in another interval, the terminator is
+$\downarrow_{/j}^+$ because in that case the $-$ sequence has a positive
+match length. For now, bear in mind that a mismatch against the $+$
+sequence only can produce a $\Downarrow_j$ terminator ($0 \leq j \leq n$),
+this will be important later.
 
-If the next terminator is $\downarrow_{/j}^+$ ($j \geq 1$), then it cannot
-be in the same interval as the preceding $\downarrow_{/i}^-$ terminator,
-which imposes a lower bound on the size of the segment. Since at the
-$\downarrow_{/i}^-$ terminator the match length for $+$ was $i$, there
-must be a non-skipped position $i$ nucleotides before. The number of
-nucleotides from the $\downarrow_{/i}^-$ terminator to the next
-non-skipped position is thus $y = -i \modulo{n+1}$, so the minimum segment
-length is $y+1$ There is also an upper bound on the size of the segment
-because the match length for the $+$ sequence cannot become higher than
-$\gamma-1$, imposing the length to be lower than $\gamma-i$. The shortest
-segment is terminated by $\downarrow_{/1}^+$, and the longest by
+If the next terminator is $\downarrow_{/j}^+$ ($j \geq 1$), then it must
+be separated from the  preceding $\downarrow_{/i}^-$ terminator by a
+non-skipped position, which imposes a lower bound on the size of the
+segment. Since at the $\downarrow_{/i}^-$ terminator the match length for
+$+$ was $i$, there must be a non-skipped position $i$ nucleotides before.
+The number of nucleotides from the $\downarrow_{/i}^-$ terminator to the
+next non-skipped position is thus $y = -i \modulo{n+1}$, so the minimum
+segment length is $y+1$ There is also an upper bound on the size of the
+segment because the match length for the $+$ sequence cannot become higher
+than $\gamma-1$, imposing the length to be lower than $\gamma-i$. The
+shortest segment is terminated by $\downarrow_{/1}^+$, and the longest by
 $\downarrow_{/{\gamma-y-i}}^+$. Finally, the weighted generating function
 of segments terminated by $\downarrow_{/j}^+$ following the
 $\downarrow_{/i}^-$ terminator is $(az)^{y+j-1}cz$ with $1 \leq j \leq
@@ -1591,25 +1638,69 @@ $\downarrow_{/i}^-$ terminator is $(az)^{y+j-1}cz$ with $1 \leq j \leq
 the last inequality.
 
 Finally, if the next terminator is $\Downarrow_j$ ($0 \leq j \leq n$) we
-have to distinguish two cases. The first is that the segment length is $y$
-nucleotides or shorter, where we have seen that a mismatch against $+$ is
-sufficient to produce the $\Downarrow_j$ terminator. The second case is
-that the segment length is above $y$ nucleotides, where a double mismatch
-is necessary to produce the the $\Downarrow_j$ terminator. We have seen
-above that the $\downarrow_{/i}^-$ terminator is located $y$ nucleotides
-before the next non-skipped position, so in the first case, only the
-terminators from $\Downarrow_0$ to $\Downarrow_{y-1}$ are possible (this
-case is impossible if $y=0$). More specifically, short segment terminated
-by $\Downarrow_j$ have $y-j-1$ matches followed by a mismatch for the $+$
-sequence, with weighted generating function $(az)^{y-j-1}bz$.
+have to distinguish two cases, depending on whether the segment ends with
+a double mismatch, or with a single mismatch against the $+$ sequence. For
+the first case we can apply the rationale of
+section~\ref{sec:example_skip}. Recall that the index $j$ indicates the
+number of nucleotides until the next non-skipped position. Let $\ell_0$ be
+the length of the shortest possible segment. The lengths of the other
+segments are of the form $\ell_0 + n+1, \ldots, \ell_0 + m(n+1)$, where
+the integer $m$ must be chosen so that the segment does not create a seed.
+At the $\downarrow_{/i}^-$ terminator, there is a match of length $i$ for
+the $+$ sequence so $m$ is the largest integer such that $i+\ell_0+m(n+1)
+< \gamma$, \textit{i.e.} $m = \lfloor(\gamma-i-\ell_0) / (n+1)\rfloor$.
+
+The $\downarrow_{/i}^-$ terminator is $y = -i \modulo{n+1}$ nucleotides
+before the next non-skipped position so the shortest segment has length
+$\ell_0 = y-j$ if $y > j$, and $n+1-j+y$ otherwise. This is equivalent to
+defining $\ell_0$ as $x+1$ where $x$ is the number of $\square$ symbols in
+the shortest segment, \textit{i.e.} $x=-i-j-1 \modulo{n+1}$. Summing the
+weighted generating functions of the individual segments, we find
+$(az)^x(1+(az)^{n+1} + \ldots + (az)^{m(n+1)})dz$.
+
+The last remaining issue is that a mismatch against the $+$ sequence only
+can produce a $\Downarrow_j$ terminator. This happens when the preceding
+$\downarrow_{/i}^-$ terminator is not separated from the mismatch by a
+non-skipped position (in this case both sequences locally have match
+length 0). The $\downarrow_{/i}^-$ terminator is located $y$ nucleotides
+before the next non-skipped position, so if the terminator is from
+$\Downarrow_0$ to $\Downarrow_{y-1}$ we need to add the term
+$(az)^xbz$ to the previous weighted generating function. In
+conclusion, the weighted generating function of segments terminated by
+$\Downarrow_j$ is $(az)^x(1+(az)^{n+1} + \ldots + (az)^{m(n+1)})dz +
+\delta^+_{i,j}(z)$, where $\delta^+_{i,j}(z) = (az)^xbz$ if $j < y$ and
+$0$ otherwise.
+
+
+\subsection{Segments following $\downarrow_{/i}^+$}
+
+We can find the weighted generating functions by just reversing the $+$
+and $-$ signs in the previous section. This way we can see that the
+weighted generating function of tail segments is $1 + (qz) + \ldots +
+(qz)^{\gamma-i-1}$.
+
+Likewise, the weighted generating function of segments terminated by
+$\downarrow_{/j}^+$ is $(qz)^{i-j-1}bz$ with $i < j \leq \gamma-1$.
+
+The weighted generating function of segments terminated by
+$\downarrow_{/j}^-$ is $(az)^{y+j-1}dz$ with $y = -i \modulo{n+1}$ and $1
+\leq j \leq \gamma-y-i$.
+
+Finally, the weighted generating function of segments terminated by
+$\Downarrow_j$ is $(az)^x(1+(az)^{n+1} + \ldots + (az)^{m(n+1)})dz +
+\delta^-_{i,j}(z)$, where $\delta^-_{i,j}(z) = (az)^xcz$ if $j < y$ and
+$0$ otherwise.
 
 
 \subsection{Transfer matrix}
 
-As in the case of the skip encoding, a fair amount of bookkeeping is
-required to specify the weighted generating functions of interest.
-We reuse the quantities $a+b+c+d=1$ and give them the same meaning as in
-section~\ref{sec:dual}. For notational convenience, we define
+We now have all the elements to specify the transfer matrix of reads with
+no skip-$n$ seed for either sequence. Recall that $n$ is the number of
+skipped nucleotides, $\gamma$ is the minimum seed length, $a$ is the
+probabiliy of a double match, $b$ is the probability of a mismatch against
+the $-$ sequence only, $c$ is the probability of a mismatch against the
+$+$ sequence only and $d$ is the probability of a double mismatch. For
+notational convenience we define
 \begin{eqnarray}
 \label{eq_N}
 N_i(z) &=& 1+z+\ldots+z^i, \\
@@ -1642,8 +1733,8 @@ V_{i,j}(z) &=& (az)^x
   m = \left\lfloor \frac{\gamma-1-i-x}{n+1} \right\rfloor.
 \end{eqnarray}
 
-With these definitions, one can check that the expression of the transfer
-matrix $\tilde{M}_n(z)$ is
+With these notations, the information from the previous sections can be
+summarized in the transfer matrix $\tilde{M}_n(z)$ equal to
 
 \pagebreak
 
@@ -1689,8 +1780,46 @@ $}
 \pagebreak
 
 The matrices $\tilde{A}(z)$ and $\tilde{C}(z)$ in the expression of
-$\tilde{M}_n(z)$ are the same as in section~\ref{sec:dual}. The matrices
-$\tilde{B}_n(z)$ and $\tilde{C}_n(z)$ are defined as
+$\tilde{M}_n(z)$ are the same as in section~\ref{sec:dual}. They are
+reproduced here for convenience.
+\begin{equation*}
+\tilde{A}(z) = 
+\begin{blockarray}{cccccc}
+   & \scriptstyle{\downarrow_{/1}^+} & \scriptstyle{\downarrow_{/2}^+} &
+    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^+} &
+    \scriptstyle{\downarrow_{/\gamma-1}^+} \\
+\begin{block}{c[ccccc]}
+\scriptstyle{\downarrow_{/1}^+} & 0 & r_0^+(z) & \ldots &
+    r_{\gamma-4}^+(z) & r_{\gamma-3}^+(z) \\
+\scriptstyle{\downarrow_{/2}^+} & 0 & 0 & \ldots &
+    r_{\gamma-5}^+(z) & r_{\gamma-4}^+(z) \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-2}^+} & 0 & 0 & \ldots & 0 & r_0^+(z) \\
+\scriptstyle{\downarrow_{/\gamma-1}^+} & 0 & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray},
+\end{equation*}
+\begin{equation*}
+\tilde{C}_0(z) = 
+\begin{blockarray}{cccccc}
+   & \scriptstyle{\downarrow_{/1}^+} & \scriptstyle{\downarrow_{/2}^+} &
+    \ldots & \scriptstyle{\downarrow_{/\gamma-2}^+} &
+    \scriptstyle{\downarrow_{/\gamma-1}^+} \\
+\begin{block}{c[ccccc]}
+\scriptstyle{\downarrow_{/1}^-} & r_0^+(z) & r_1^+(z) & \ldots &
+    r_{\gamma-3}^+(z) & r_{\gamma-2}^+(z) \\
+\scriptstyle{\downarrow_{/2}^-} & r_0^+(z) & r_1^+(z) & \ldots &
+    r_{\gamma-3}^+(z) & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+\scriptstyle{\downarrow_{/\gamma-2}^-} & r_0^+(z) & r_1^+(z) & \ldots &
+    0 & 0 \\
+\scriptstyle{\downarrow_{/\gamma-1}^-} & r_0^+(z) & 0 & \ldots & 0 & 0 \\
+\end{block}
+\end{blockarray}.
+\end{equation*}
+
+
+The matrices $\tilde{B}_n(z)$ and $\tilde{C}_n(z)$ are defined as
 \begin{equation*}
 \tilde{B}_n(z) = 
 \begin{blockarray}{cccccc}
@@ -1744,11 +1873,36 @@ t_{i,j} &=&
   \text{where } y &=& -i \modulo{n+1}, \text{ in both cases.} \\
 \end{eqnarray*}
 
-The computation is performed exactly as described in
-section~\ref{sec:dual}. We compute the successive powers of
-$\tilde{M}_n(z)$ in the arithmetic of truncated polynomials and stop the
-iterations using the same criterion. So there is no change other than the
-definition of the transfer matrix.
+Now returning to the problem of computing $P(\overline{S}_0 \cap
+\overline{S}_1)$, the $+$ sequence is interpreted as the target and the
+$-$ sequence as the duplicate. Based on the assumptions of the error model
+presented in section~\ref{sec:error}, this implies that $a =
+(1-p)(1-\mu)$, $b = (1-p)\mu$, $c = p\mu/3$, and $d = p(1-\mu/3)$.
+
+The computation is performed as described in section~\ref{sec:dual}. We
+compute the successive powers of $\tilde{M}_n(z)$ in the arithmetic of
+truncated polynomials and stop the iterations using the same criterion.
+The only modification is that the top right term of $\tilde{M}_n(z)^{s+1}$
+is not the weighted generating function of reads with $s$ mismatches
+(where double mismatches count as one). The reason is that the sequences
+of $*$ symbols are not terminated by a mismatch. However, that can be at
+most one sequence of $*$ symbols for each mismatch or double mismatch, so
+the reads described by the top right term of $\tilde{M}_n(z)^{s+1}$ have
+at least $\lfloor s/2 \rfloor$ mismatches.
+
+We thus define $\tilde{p}$ as the upper bound on the probability of a
+mismatch, \textit{i.e.} $\tilde{p} = \max\{b,c,d\}$ and use the updated
+formula (\ref{eq:bound}) from section~\ref{sec_transmat_skip}
+\begin{equation*}
+Pr(X \geq s) \leq \exp \left( (s-k)\log \frac{k-s}{k(1-\tilde{p})} -s\log
+\frac{s}{k\tilde{p}} \right).
+\end{equation*}
+
+With this upper bound, we can compute the terms of the matrix partial sums
+$\tilde{M}_0(z) + \tilde{M}_0(z)^2 + \ldots + \tilde{M}_0(z)^{2s+1}$ until
+the neglected terms become negligible, \textit{i.e.} until we can be sure
+that the coefficient of interest $a_k$ is accurate to within chosen
+$\varepsilon$.
 
 \begin{remark}
 Observe that when $n=0$ the matrix $\tilde{M}_n(z)$ is identical to the
@@ -1809,56 +1963,60 @@ $\tilde{B}_n(z)$ and $\tilde{C}_n(z)$.
 \subsection{Illustration}
 \label{sec:illskipdual}
 
-We illustrate the strategy delineated above Using the same settings as in
-section~\ref{sec:illdual} ($k=50$, $p=0.01$ and $\gamma=19$), except that
-we use skip-9 seeds instead of exact seeds.
+We illustrate the strategy delineated above using the same settings as in
+section~\ref{sec:illdual} (reads of length $k=50$, probability of
+sequencing error $p=0.01$ and seeds of minimum size $\gamma=19$), except
+that we replace exact seeds by skip-5 and skip-9 seeds.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.47]{curves_skip.pdf}
 \caption{\textbf{Off-target seeding probabilities (skip seeds).}
-The surfaces show the probability that seeding is off target for skip-9
-seeds of size $\gamma=19$. Read size and error rate are the same as in
-Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and $p=0.01$. The
-divergence rate $\mu$, defined as the probability that a given duplicate
-differs from the target at any given position. Note the factor 1000 in
-the scale of the z-axis.}
+The surfaces show the probability that seeding is off target for skip-5
+and skip-9 seeds of size $\gamma=19$. Read size and error rate are the
+same as in Figure~\ref{fig:curves_exact}, \textit{i.e.} $k=50$ and
+$p=0.01$. The divergence rate $\mu$, defined as the probability that a
+given duplicate differs from the target at any given position. Note the
+factor 1000 in the scale of the z-axis.}
 \label{fig:curves_skip}
 \end{figure}
 
 Figure~\ref{fig:curves_skip} shows the result for a number of duplicates $N$
-from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The curves
-have the same general aspect as those of Figure~\ref{fig:curves_exact}. The
-probability that seeding is off target increases with $N$. There is again
-a  worst value of $\mu$, because the maximum of $P(\overline{S}_0 \cap
-\overline{S}_1)$ minimizes expression (\ref{eq:Poff}) for every value of
-$N$. But the value is different from that of Figure~\ref{fig:curves_exact}
-because $P(\overline{S}_0 \cap \overline{S}_1)$ is computed for skip-9
-seeds instead of exact seeds (here the worst value of $\mu$ is
-approximately 0.07).
+from 1 to 10 and for a divergence rate $\mu$ from 0 to 0.20. The surfaces
+have the same general aspect as in Figure~\ref{fig:curves_exact}. The
+probability that seeding is off target increases with $N$ and there is
+again a  worst value of $\mu$, because the maximum of $P(\overline{S}_0
+\cap \overline{S}_1)$ minimizes expression (\ref{eq:Poff}) for every value
+of $N$. However, those values of $\mu$ are not constant (they are
+approximately 0.065 and 0.060 for skip-5 and skip-9 seeds, respectively).
 
-Importantly, Figure~\ref{fig:curves_skip} reveals that skipping 9
+Importantly, Figure~\ref{fig:curves_skip} reveals that skipping 5
 nucleotides increases the chances that seeding is off target by a factor
-approximately 4 (compare with Figure~\ref{fig:curves_exact}). It is not
-obvious why this should be the case: skip seeds reduce the probability of
-on-target seeding (skipping positions implies fewer on-target seeds) but
-increase the probability of null seeding (skipping positions implies fewer
-seeds overall). So the net effect on off-target seeding is not intuitive.
+approximately 1.5, and skipping 9 nucleotides by a factor approximately
+1.8 (compare with Figure~\ref{fig:curves_exact}). Skipping nucleotides
+seems to have little effect, but this is not a general conclusion. Indeed,
+skipping nucleotides decreases the probability of on-target seeding
+(skipping positions implies fewer on-target seeds) but increases the
+probability of null seeding (skipping positions implies fewer seeds
+overall), so the effects must be evaluated on a case-by-case basis.
+Skipping nucleotides can even decrease the probability that seeding is
+off target. Concretely, for exact seeds of size $\gamma=19$ in reads of
+size $k=50$ with $N=10$ duplicates at divergence $\mu=0.1$ with a
+sequencing error $p=0.1$, the probability of off-target seeding is
+approximately 0.178 with exact seeds and 0.035 with skip-9 seeds, showing
+skipping nucleotides can have different effects.
 
-And indeed, there are cases that skip seeds are \emph{less} prone to
-off-target seeding than exact seeds. This is the case for instance when
-$p=0.1$, where the ranking is inverted for the whole range of values
-considered in Figure~\ref{fig:curves_skip}.
-
-This information is critical for choosing the best seeding strategy. The
-off-target seeding probability is not the only criterion, though. Equally
-important considerations are the probability of on-target seeding and the
-computational resources required to implement a particular seeding
-strategy. The benefit of a theory to compute seeding probabilities is to
-have access to this knowledge.
+This kind of information is critical for choosing the best seeding
+strategy. Yet, the off-target seeding probability is not the only
+criterion. Equally important considerations are the probability of
+on-target seeding, the computational resources required to implement a
+particular seeding strategy and other sources existing of mapping errors
+(see discussion in section~\ref{sec:truevsbest}). The benefit of a theory
+to compute seeding probabilities is to have access to this knowledge.
 
 
 \section{Off-target MEM seeds}
+\label{sec_offMEM}
 
 MEM seeds are substantially more complex than exact seeds and skip seeds
 because we need to take into account all the duplicates in the
@@ -1921,17 +2079,18 @@ alphabet called the MEM alphabet $\mathring{\mathcal{A}} = \{\square, |,
 \uparrow_{/1}, \uparrow_{/2}, \uparrow_{/3} \ldots, \downarrow_{/0},
 \downarrow_{/1}, \downarrow_{/2}, \ldots\}$.
 
-The symbols $\downarrow_{/m}$ indicate that the nucleotide is a sequencing
-error and $m \geq 0$ is the number of duplicates that \emph{match} the
-nucleotide. Since a sequencing error is always a mismatch against the
+The symbols $\downarrow_{/m}$ ($m \geq 0$) indicate that the nucleotide is
+a sequencing error and $m$ is the number of duplicates that \emph{match}
+the nucleotide. Since a sequencing error is always a mismatch against the
 target, the symbol $\downarrow_{/0}$ indicates that the nucleotide is a
 mismatch against \emph{every} sequence. The symbols $\uparrow_{/i}$
 indicate a change in masking status: the nucleotide is not masked but the
-previous is --- this happens when all the duplicates fail to extend beyond
+previous is---this happens when all the duplicates fail to extend beyond
 this position. The index $i \geq 1$ is the number of nucleotides since the
 last mismatch or since the beginning of the read. All the other
-nucleotides are represented by the symbol $\square$ and the symbol $|$ is
-appended to the end of the read as usual.
+nucleotides are represented by the symbol $\square$, implying that
+$\square$ symbols are never sequencing errors and always match the
+target. The symbol $|$ is appended to the end of the read as before.
 
 Note that in the symbols $\downarrow_{/m}$ and $\uparrow_{/i}$, the
 numbers $m$ and $i$ have different meanings. In the symbol
@@ -1996,8 +2155,9 @@ $\downarrow_{/m}$ symbol or by the tail terminator $|$.
 The following definition will simplify the notations.
 
 \begin{definition}
-The probability that a symbol is $\downarrow_{/m}$ given that the
-nucleotide is a read error is
+Given the divergence rate $\mu$ and the number of duplicates $N$, the
+probability that a symbol is $\downarrow_{/m}$ given that the nucleotide
+is a read error is
 \begin{equation}
 \label{eq:omega}
 \omega_m = {N \choose m} \big(1 - \mu/3\big)^{N-m} \big(\mu/3\big)^m.
@@ -2039,8 +2199,8 @@ cases based on the terminator of the segment.
 \subsubsection*{Case 1: the terminator is $\uparrow_{/j}$}
 
 \begin{definition}
-The probability that a given duplicate contains a mismatch in a sequence
-of $j$ error-free nucleotides is
+Given the divergence rate $\mu$, the probability that a given duplicate
+contains a mismatch in a sequence of $j$ error-free nucleotides is
 \begin{equation}
 \label{eq:xi}
 \xi_j = 1-(1-\mu)^j.
@@ -2157,8 +2317,9 @@ terminator, we see that the associated weighted generating function is
 Condition $ii)$ is more convoluted, so we introduce some further
 notations to solve this sub-case.
 \begin{definition}
-The probability that a given duplicate sequence contains a mismatch in a
-sequence of $j$ error-free nucleotides followed by an error is
+Given the divergence rate $\mu$, the probability that a duplicate sequence
+contains a mismatch in a sequence of $j$ error-free nucleotides followed
+by an error is
 \begin{equation}
 \label{eq:eta}
 \eta_j = 1-(1-\mu)^j\mu/3.
@@ -2202,14 +2363,14 @@ Let us start with the $m$ hard masks. The probability that each of them
 matches the terminator is simply $\mu/3$.
 
 The case of the $N-m-r$ soft masks is more complicated because they can
-vanish precisely on the terminator --- recall that in case $ii$) all the
+vanish precisely on the terminator---recall that in case $ii$) all the
 hard masks are assumed to vanish before. If the soft mask failed within
 the first $j$ nucleotides, then the $j+1$-th nucleotide can be anything
 and it will match the terminator with probability $\mu/3$. But if the soft
 mask survived the first $j$ nucleotides, then it \emph{must} fail on the
 $j+1$-th and it cannot match the terminator. From expressions
 (\ref{eq:xi}) and (\ref{eq:eta}), the probability that a given soft mask
-fails within the first $j$ nucleotides is $\xi_j/\eta_j$ --- this is the
+fails within the first $j$ nucleotides is $\xi_j/\eta_j$---this is the
 conditional probability that it fails within the first $j$ nucleotides
 given that it fails within the segment. Finally the probability that such
 a soft mask matches the terminator is $\mu/3 \cdot \xi_j / \eta_j$.
@@ -2529,6 +2690,7 @@ rate. The methods presented here are thus very useful to balance the
 risk when using MEM seeds.
 
 \section{Practical considerations}
+\label{sec_practical}
 
 \subsection{True versus best location}
 \label{sec:truevsbest}
@@ -2898,6 +3060,7 @@ described in a separate work.
 
 
 \section{Discussion}
+\label{sec_disc}
 
 We have devised a set of methods to compute the probability that seeding
 heuristics fail and commit the mapping process to an error. We have also
@@ -3065,6 +3228,114 @@ the EMBL partnership.
 %----------------------------------------------------------------
 
 \appendix
+
+\section{Definitions}
+\setcounter{definition}{0}
+
+For convenience we reproduce here the definitions introduced in the text.
+
+\begin{definition}
+The target is the DNA fragment that was actually sequenced. Duplicates are
+sequences of the genome that share homology with the target (in genetics
+they are often referred to as paralogs).
+\end{definition}
+
+\begin{definition}
+The candidate set obtained at the seeding step is said to be
+\begin{enumerate}[i)]
+\item ``on target'' if it contains the target,
+\item ``off target'' if it contains a duplicate but not the target, 
+\item ``null'' if it contains neither.
+\end{enumerate}
+\end{definition}
+
+\begin{definition}
+A seed is a subsequence of the read that has size at least $\gamma$
+(defined by the context of the problem) and that has at least one perfect
+match in the reference genome.
+\end{definition}
+
+\begin{definition}
+A Maximal Exact Match (MEM) is a subsequence of the read that is present
+in the reference genome and that cannot be extended---either because the
+read ends or because the extended subsequence is not in the genome.
+\end{definition}
+
+\begin{definition}
+A \emph{strict} MEM seed has a single match in the genome.
+A \emph{shared} MEM seed has several matches in the genome.
+\end{definition}
+
+\begin{definition}
+Let $\mathcal{A}$ be a set of combinatorial objects such that $a \in
+\mathcal{A}$ has a size $|a| \in \mathbb{N}$ and a weight $w(a) \in
+\mathbb{R}^+$. The weighted generating function of $\mathcal{A}$ is
+defined as
+
+\begin{equation}
+\tag{\ref{eq:GF1}}
+A(z) = \sum_{a \in \mathcal{A}} w(a) z^{|a|},
+\end{equation}
+Expression (\ref{eq:GF1}) also defines a sequence $(a_k)_{k \geq 0}$ such
+that 
+
+\begin{equation*}
+A(z) = \sum_{k=0}^\infty a_k z^k.
+\end{equation*}
+
+By definition $a_k = \sum_{a \in A_k}w(a)$, where $A_k$ is the class of
+objects of size $k$ in $\mathcal{A}$. The number $a_k$ is the
+total weight of objects of size $k$.
+\end{definition}
+
+\begin{definition}
+\label{def:seg}
+A terminator is any symbol that is different from the symbol $\square$. A
+segment is a sequence of 0 or more $\square$ symbols followed by a
+terminator. The tail is the last segment of the read, where the terminator
+is always the special symbol $|$.
+\end{definition}
+
+\begin{definition}
+At a given position of the read, a duplicate is a \emph{hard mask} if its
+match length on the left side is strictly longer than the match length
+of the target. A duplicate is a \emph{soft mask} if it has the same match
+length as the target.
+\end{definition}
+
+\begin{definition}
+Given the divergence rate $\mu$ and the number of duplicates $N$, the
+probability that a symbol is $\downarrow_{/m}$ given that the nucleotide
+is a read error is
+\begin{equation}
+\tag{\ref{eq:omega}}
+\omega_m = {N \choose m} \big(1 - \mu/3\big)^{N-m} \big(\mu/3\big)^m.
+\end{equation}
+\end{definition}
+
+\begin{definition}
+Given the divergence rate $\mu$, the probability that a given duplicate
+contains a mismatch in a sequence of $j$ error-free nucleotides is
+\begin{equation}
+\tag{\ref{eq:xi}}
+\xi_j = 1-(1-\mu)^j.
+\end{equation}
+This is the probability that a hard or soft mask vanishes within $j$
+correct nucleotides.
+\end{definition}
+
+\begin{definition}
+Given the divergence rate $\mu$, the probability that a duplicate sequence
+contains a mismatch in a sequence of $j$ error-free nucleotides followed
+by an error is
+\begin{equation}
+\tag{\ref{eq:eta}}
+\eta_j = 1-(1-\mu)^j\mu/3.
+\end{equation}
+This is the probability that a hard or soft mask vanishes within $j$
+correct nucleotides followed by a sequencing error.
+\end{definition}
+
 \section{Appendix}
 \subsection{Derivation of expression~(\ref{eq:F})}
 \label{app_ex1}
