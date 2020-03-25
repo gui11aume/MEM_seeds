@@ -70,6 +70,7 @@
 \newlabel{def:GF}{{6}{10}}
 \newlabel{eq:GF1}{{1}{10}}
 \citation{sedgewick2013introduction}
+\citation{regnier2000unified,nicodeme2002motif,sedgewick2013introduction}
 \citation{filion2017analytic}
 \citation{filion2018analytic}
 \citation{filion2017analytic,filion2018analytic}
@@ -158,34 +159,38 @@
 \newlabel{sec:illmem}{{6.8}{43}}
 \@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces \textbf  {Off-target seeding probabilities (MEM seeds).} The surfaces show the probability that seeding is off target for MEM seeds of indicated minimum size $\gamma $. Read size and error rate are the same as in Figure~\ref  {fig:curves_exact}, \textit  {i.e.} $k=50$ and $p=0.01$. The divergence rate $\mu $ is the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{44}}
 \newlabel{fig:curves_mem}{{14}{44}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Numerical simulating of mapping errors with MEM seeds. Reads are mapped incorrectly if either the true location is not in the candidate set (not seeded) or it is in the candidate set but is not the best location (seeded, not best). Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{45}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Numerical simulation of mapping errors with MEM seeds. Reads are mapped incorrectly if either the true location is not in the candidate set (not seeded) or it is in the candidate set but is not the best location (seeded, not best). Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using MEM seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{45}}
 \newlabel{table_mem}{{1}{45}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Practical considerations}{45}}
 \newlabel{sec_practical}{{7}{45}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.1}True versus best location}{45}}
 \newlabel{sec:truevsbest}{{7.1}{45}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces My least favorite table.\relax }}{46}}
-\newlabel{table_exact}{{2}{46}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces My not so favorite table.\relax }}{46}}
-\newlabel{table_skip}{{3}{46}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Non-specific seeds}{47}}
-\newlabel{sec:random_seeds}{{7.2}{47}}
-\newlabel{eq:bayes}{{28}{47}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Realistic error patterns}{48}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}The Sesame library}{48}}
-\newlabel{sec:sesame}{{8}{48}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Main features of Sesame}{48}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Numerical simulation of mapping errors with skip-9 seeds. Reads are mapped incorrectly if either the true location is not in the candidate set (not seeded) or it is in the candidate set but is not the best location (seeded, not best). Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{46}}
+\newlabel{table_skip}{{2}{46}}
+\citation{pmid22199392}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Numerical simulation of ``seeding'' errors with MEM seeds. Realistic reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{47}}
+\newlabel{table_MEM_Illumina}{{3}{47}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}More realistic error models}{47}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Numerical simulation of ``seeding'' errors with skip-9 seeds. Realistic reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{48}}
+\newlabel{table_skip_Illumina}{{4}{48}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Non-specific seeds}{48}}
+\newlabel{sec:random_seeds}{{7.3}{48}}
+\newlabel{eq:bayes}{{28}{49}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}The Sesame library}{49}}
+\newlabel{sec:sesame}{{8}{49}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Main features of Sesame}{49}}
 \citation{li2013aligning}
 \citation{pmid22388286}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Using Sesame to compare seeding strategies}{49}}
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces \textbf  {Comparing seeding strategies with Sesame.} Left: MEM seeds with $\gamma =19$ and $\mu =0.06$. Right: skip-9 seeds with $\gamma =16$ and $\mu =0.06$. The probabilities that seeding is off target were computed using Sesame. Each curve represents the probability for a given number of duplicates ($N$). Estimates using iterative methods (skip seeds and MEM sees where $N \leq 20$) were computed to within 1\% accuracy. Estimates using Monte Carlo sampling (MEM seeds where $N > 20$) were computed as the average of 500 million simulations. \relax }}{50}}
-\newlabel{fig_mortal_kombat}{{15}{50}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Key insights about MEM seeds}{50}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Using Sesame to compare seeding strategies}{50}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces \textbf  {Comparing seeding strategies with Sesame.} Left: MEM seeds with $\gamma =19$ and $\mu =0.06$. Right: skip-9 seeds with $\gamma =16$ and $\mu =0.06$. The probabilities that seeding is off target were computed using Sesame. Each curve represents the probability for a given number of duplicates ($N$). Estimates using iterative methods (skip seeds and MEM sees where $N \leq 20$) were computed to within 1\% accuracy. Estimates using Monte Carlo sampling (MEM seeds where $N > 20$) were computed as the average of 500 million simulations. \relax }}{51}}
+\newlabel{fig_mortal_kombat}{{15}{51}}
 \citation{flajolet2009analytic,sedgewick2013introduction}
 \citation{fu1994distribution}
 \citation{ferragina2005indexing}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Discussion}{51}}
-\newlabel{sec_disc}{{9}{51}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Key insights about MEM seeds}{52}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Discussion}{52}}
+\newlabel{sec_disc}{{9}{52}}
+\citation{kucherov2005multiseed,buhler2005designing}
 \citation{lee2014mosaik}
 \bibdata{references,pubmed}
 \bibcite{pmid7265238}{1}
@@ -236,23 +241,27 @@
 \bibcite{martin2017faster}{46}
 \bibcite{pmid21576222}{47}
 \bibcite{sedgewick2013introduction}{48}
-\bibcite{flajolet2009analytic}{49}
-\bibcite{arratia1989tutorial}{50}
-\bibcite{kachitvichyanukul1988binomial}{51}
-\bibcite{fu1994distribution}{52}
-\bibcite{lee2014mosaik}{53}
+\bibcite{regnier2000unified}{49}
+\bibcite{nicodeme2002motif}{50}
+\bibcite{flajolet2009analytic}{51}
+\bibcite{arratia1989tutorial}{52}
+\bibcite{kachitvichyanukul1988binomial}{53}
+\bibcite{pmid22199392}{54}
+\bibcite{fu1994distribution}{55}
+\bibcite{buhler2005designing}{56}
+\bibcite{lee2014mosaik}{57}
 \bibstyle{unsrt}
-\@writefile{toc}{\contentsline {section}{\numberline {A}Definitions}{58}}
-\newlabel{def:seg}{{7}{59}}
-\@writefile{toc}{\contentsline {section}{\numberline {B}Appendix}{59}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Derivation of expression~(\ref  {eq:F})}{59}}
-\newlabel{app_ex1}{{B.1}{59}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.2}Derivation of expression~(\ref  {eq:recur})}{60}}
-\newlabel{app_rec}{{B.2}{60}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.3}An alternative construction of $M_n(z)$}{61}}
-\newlabel{app_Mn}{{B.3}{61}}
-\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces \textbf  {The alternative skip encoding.} The read of Figure~\ref  {fig:skip} is represented in the alternative skip-3 alphabet. The only difference is that the nucleotides between a $\delimiter "322B37F _j$ terminator ($0 \leq j \leq n$) and the following non-skipped position are replaced by the $*$ symbol.\relax }}{61}}
-\newlabel{fig_alt_skip}{{16}{61}}
-\newlabel{eq_alt_Mn}{{29}{62}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.4}Proof that $a_k$ is independent of $M_n(z)^m$ for $m > k+1$}{62}}
-\newlabel{app_skip}{{B.4}{62}}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Definitions}{60}}
+\newlabel{def:seg}{{7}{60}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Appendix}{61}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Derivation of expression~(\ref  {eq:F})}{61}}
+\newlabel{app_ex1}{{B.1}{61}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.2}Derivation of expression~(\ref  {eq:recur})}{62}}
+\newlabel{app_rec}{{B.2}{62}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.3}An alternative construction of $M_n(z)$}{62}}
+\newlabel{app_Mn}{{B.3}{62}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces \textbf  {The alternative skip encoding.} The read of Figure~\ref  {fig:skip} is represented in the alternative skip-3 alphabet. The only difference is that the nucleotides between a $\delimiter "322B37F _j$ terminator ($0 \leq j \leq n$) and the following non-skipped position are replaced by the $*$ symbol.\relax }}{63}}
+\newlabel{fig_alt_skip}{{16}{63}}
+\newlabel{eq_alt_Mn}{{29}{63}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.4}Proof that $a_k$ is independent of $M_n(z)^m$ for $m > k+1$}{64}}
+\newlabel{app_skip}{{B.4}{64}}

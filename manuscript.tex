@@ -355,7 +355,7 @@ model and the concatenated nucleotides labelled `1' are looked up in the
 index.
 
 Spaced seeds of weight $w$ (the number of 1s in the model) have the same
-memory requirements as continuous seeds of length $w$ but they are more
+memory requirements as contiguous seeds of length $w$ but they are more
 sensitive~\cite{li2006superiority}, making them very attractive for
 homology search. They were used in the first generation of short-read
 mappers~\cite{pmid18684737, pmid19461883, pmid19675096, pmid2945724}, but
@@ -366,10 +366,10 @@ assembly~\cite{pmid26539459} and long-read mapping~\cite{pmid27079541}.
 
 The success of the mainstream mappers BWA-MEM~\cite{li2013aligning} and
 Bowtie2~\cite{pmid22388286} is due in part to the FM-index, which only
-supports continuous seeds. Some workarounds are
+supports contiguous seeds. Some workarounds are
 available~\cite{horton2008dislex, gagie2017compressed} but they increase
 the memory footprint, explaining that short reads are typically mapped
-using continuous seeds. More generally, computing the sensitivity of
+using contiguous seeds. More generally, computing the sensitivity of
 spaced seeds is challenging~\cite{pmid16819802, li2006superiority,
 martin2017faster}. It is theoreticlally possible to do this using the
 tools introduced below, but the complexity becomes prohibitive for seed
@@ -676,15 +676,16 @@ to combine simple objects into more complex objects. Each combinatorial
 operation on the objects corresponds to a mathematical operation on their
 weighted generating functions. One can thus obtain the weighted generating
 function of complex objects, whose coefficients $a_k$ are the
-probabilities of interest.
+probabilities of interest~\cite{regnier2000unified, nicodeme2002motif,
+sedgewick2013introduction}.
 
 As explained in~\cite{filion2017analytic} and~\cite{filion2018analytic},
 we recode the reads in alphabets of custom symbols and we specify a
-construction plan of the reads using a \emph{transfer matrix} $M(z)$. The
-transfer matrix specifies which types of segments can follow each other in
-the reads of interest: the entry at coordinates $(i,j)$ is the weighted
-generating function of segments of type $j$ that can be appended to
-segments of type $i$.
+construction plan of the reads using a so-called \emph{transfer matrix}
+$M(z)$. The transfer matrix specifies which types of segments can follow
+each other in the reads of interest: the entry at coordinates $(i,j)$ is
+the weighted generating function of segments of type $j$ that can be
+appended to segments of type $i$.
 
 $M(z)$ contains the weighted generating functions of all the reads that
 consist of a single fragment. From the basic operations on weighted
@@ -2733,21 +2734,22 @@ contradiction.
 \begin{tabular}{ccccc}
 k & N & Not seeded & Seeded, not best & \% seed failure \\
 \hline
-50  &  1  & $7.8 \cdot 10^{-4}$ & $9.5 \cdot 10^{-5}$ & $89.1\%$ \\
-50  & 10  & $7.8 \cdot 10^{-3}$ & $9.1 \cdot 10^{-4}$ & $89.6\%$ \\
-50  & 100 & $7.6 \cdot 10^{-2}$ & $5.7 \cdot 10^{-3}$ & $93.0\%$ \\
-100 &  1  & $2.1 \cdot 10^{-5}$ & $7.6 \cdot 10^{-6}$ & $73.7\%$ \\
-100 & 10  & $2.6 \cdot 10^{-4}$ & $7.1 \cdot 10^{-5}$ & $78.1\%$ \\
-100 & 100 & $5.3 \cdot 10^{-3}$ & $5.9 \cdot 10^{-4}$ & $90.1\%$
+50  &  1  & $9.2 \cdot 10^{-4}$ & $8.4 \cdot 10^{-5}$ & $91.7\%$ \\
+50  & 10  & $9.0 \cdot 10^{-3}$ & $7.9 \cdot 10^{-4}$ & $92.0\%$ \\
+50  & 100 & $8.1 \cdot 10^{-2}$ & $5.1 \cdot 10^{-3}$ & $94.1\%$ \\
+100 &  1  & $2.4 \cdot 10^{-5}$ & $7.3 \cdot 10^{-6}$ & $76.7\%$ \\
+100 & 10  & $2.9 \cdot 10^{-4}$ & $6.9 \cdot 10^{-5}$ & $80.1\%$ \\
+100 & 100 & $5.5 \cdot 10^{-3}$ & $5.7 \cdot 10^{-4}$ & $90.7\%$
 \end{tabular}
-\caption{Numerical simulating of mapping errors with MEM seeds. Reads are
+\caption{Numerical simulation of mapping errors with MEM seeds. Reads are
 mapped incorrectly if either the true location is not in the candidate set
 (not seeded) or it is in the candidate set but is not the best location
 (seeded, not best). Ideal reads were randomly generated 1,000,000 times
 with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$,
 varying the read size $k$ and number $N$ of duplicates as indicated in the
-table. Mapping errors of both types were recorded, and the fraction of the
-first to the total was computed.}
+table and using MEM seed of minimum size $\gamma = 19$. Mapping errors of
+both types were recorded, and the fraction of the first to the total was
+computed.}
 \label{table_mem}
 \end{table}
 
@@ -2773,38 +2775,28 @@ be due to seeding errors), but because these reads are rare, the mapping
 errors are in general not due to failures of the seeding heuristic.
 
 \begin{table}
-% Exact seeds.
-\renewcommand{\arraystretch}{1.1}
-\centering
-\begin{tabular}{ccccc}
-k & N & Prob. seeding error & Prob. other error & \% seeding \\
-\hline
-50  &  1  & $3.3 \cdot 10^{-5}$  & $5.1 \cdot 10^{-4}$ & $6.0\%$ \\
-50  & 10  & $2.9 \cdot 10^{-4}$  & $5.0 \cdot 10^{-3}$ & $5.4\%$ \\
-50  & 100 & $1.0 \cdot 10^{-3}$  & $4.6 \cdot 10^{-2}$ & $2.2\%$ \\
-100 &  1  & $1.5 \cdot 10^{-10}$ & $2.3 \cdot 10^{-5}$ & $< 0.1\%$ \\
-100 & 10  & $1.2 \cdot 10^{-9}$  & $2.3 \cdot 10^{-4}$ & $< 0.1\%$ \\
-100 & 100 & $2.6 \cdot 10^{-9}$  & $2.3 \cdot 10^{-3}$ & $< 0.1\%$
-\end{tabular}
-\caption{My least favorite table.}
-\label{table_exact}
-\end{table}
-
-\begin{table}
 % Skip-9 seeds.
 \renewcommand{\arraystretch}{1.1}
 \centering
 \begin{tabular}{ccccc}
 k & N & Prob. seeding error & Prob. other error & \% seeding \\
 \hline
-50  &  1  & $1.3 \cdot 10^{-4}$ & $4.9 \cdot 10^{-4}$ & $20.1\%$ \\
-50  & 10  & $1.2 \cdot 10^{-3}$ & $4.8 \cdot 10^{-3}$ & $19.7\%$ \\
-50  & 100 & $5.5 \cdot 10^{-3}$ & $4.5 \cdot 10^{-2}$ & $10.9\%$ \\
-100 &  1  & $2.0 \cdot 10^{-8}$ & $2.3 \cdot 10^{-5}$ & $< 0.1\%$ \\
-100 & 10  & $1.5 \cdot 10^{-7}$ & $2.3 \cdot 10^{-4}$ & $< 0.1\%$ \\
-100 & 100 & $3.9 \cdot 10^{-7}$ & $2.3 \cdot 10^{-3}$ & $< 0.1\%$
+50  &  1  & $1.7 \cdot 10^{-4}$ & $4.9 \cdot 10^{-4}$ & $25.4\%$ \\
+50  & 10  & $1.6 \cdot 10^{-3}$ & $4.7 \cdot 10^{-3}$ & $24.9\%$ \\
+50  & 100 & $7.9 \cdot 10^{-3}$ & $4.4 \cdot 10^{-2}$ & $15.2\%$ \\
+100 &  1  & $4.4 \cdot 10^{-8}$ & $2.3 \cdot 10^{-5}$ & $0.2\%$ \\
+100 & 10  & $3.5 \cdot 10^{-7}$ & $2.3 \cdot 10^{-4}$ & $0.2\%$ \\
+100 & 100 & $1.0 \cdot 10^{-6}$ & $2.3 \cdot 10^{-3}$ & $< 0.1\%$
 \end{tabular}
-\caption{My not so favorite table.}
+\caption{Numerical simulation of mapping errors with skip-9 seeds. Reads
+are mapped incorrectly if either the true location is not in the candidate
+set (not seeded) or it is in the candidate set but is not the best
+location (seeded, not best). Ideal reads were randomly generated 1,000,000
+times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$,
+varying the read size $k$ and number $N$ of duplicates as indicated in the
+table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors
+of both types were recorded, and the fraction of the first to the total
+was computed.}
 \label{table_skip}
 \end{table}
 
@@ -2822,6 +2814,99 @@ In conclusion, the true location problem can be calibrated using the
 methods presented here when using MEM seeds, and by computing the
 probability that the true location is not the best when using exact or
 skip seeds.
+
+
+\subsection{More realistic error models}
+
+In order to make the model tractable, we had to make some simplifying
+assumptions regarding the distribution of errors
+(section~\ref{sec:error}). In particular, we assumed that sequencing
+errors are uniform on the read, which is known to not be the case with
+current instruments. The errors are typically more frequent at the ends of
+the reads, meaning that seeds may be longer than expected, impacting the
+probability that seeding is off target.
+
+To test whether this is the case, we used the ART
+simulator~\cite{pmid22199392} to emulate the error distribution of
+Illumina reads as per technology standards of 2016. We used the settings
+for the Illumina HiSeq 2000 and generated random reads of size 50 and 100
+from the human genome. We estimated the probability that seeding is off
+target from simulations and compared the results to calculations performed
+by Sesame (ART suggests error rates $p=0.0052$ and $p=0.0075$ for reads of
+size 50 and 100, respectively).
+
+Table~\ref{table_MEM_Illumina} shows the results for MEM seeds of minimum
+size $\gamma=19$. The estimates show some discrepancy but Sesame is
+accurate to within 15\% in these conditions.
+Table~\ref{table_skip_Illumina} shows the same type of comparison for
+skip-9 seeds of size $\gamma=19$. The values are substantially lower than
+for MEM seeds because skip-9 seeds are more sensitive. In these
+conditions, Sesame is accurate to within 35\% but it is important to
+highlight that simulations are unreliable for events with very low
+probability.
+
+\begin{table}
+% MEM seeds.
+\renewcommand{\arraystretch}{1.1}
+\centering
+\begin{tabular}{cccc}
+k & N & Simulation & Sesame \\
+\hline
+50  &  1  & $3.8 \cdot 10^{-4}$ & $4.5 \cdot 10^{-4}$ \\
+50  & 10  & $4.4 \cdot 10^{-3}$ & $4.5 \cdot 10^{-3}$ \\
+50  & 100 & $4.2 \cdot 10^{-2}$ & $4.0 \cdot 10^{-2}$ \\
+100 &  1  & $3.5 \cdot 10^{-5}$ & $3.7 \cdot 10^{-5}$ \\
+100 & 10  & $4.1 \cdot 10^{-4}$ & $4.2 \cdot 10^{-4}$ \\
+100 & 100 & $8.6 \cdot 10^{-3}$ & $8.9 \cdot 10^{-3}$ 
+\end{tabular}
+\caption{Numerical simulation of ``seeding'' errors with MEM seeds.
+Realistic reads were randomly generated 1,000,000 times with sequencing
+error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size
+$k$ and number $N$ of duplicates as indicated in the table and using
+skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types
+were recorded, and the fraction of the first to the total was computed.}
+\label{table_MEM_Illumina}
+\end{table}
+
+\begin{table}
+% Skip seeds.
+\renewcommand{\arraystretch}{1.1}
+\centering
+\begin{tabular}{cccc}
+k & N & Simulation & Sesame \\
+\hline
+50  &  1  & $4.5 \cdot 10^{-5}$ & $4.5 \cdot 10^{-5}$ \\
+50  & 10  & $3.9 \cdot 10^{-4}$ & $4.2 \cdot 10^{-4}$ \\
+50  & 100 & $1.9 \cdot 10^{-3}$ & $2.1 \cdot 10^{-3}$ \\
+100 &  1  & $< 10^{-6}$         & $< 10^{-6}$         \\
+100 & 10  & $2 \cdot 10^{-6}$   & $3 \cdot 10^{-5}$ \\
+100 & 100 & $6 \cdot 10^{-6}$   & $8 \cdot 10^{-4}$ 
+\end{tabular}
+\caption{Numerical simulation of ``seeding'' errors with skip-9 seeds.
+Realistic reads were randomly generated 1,000,000 times with sequencing
+error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size
+$k$ and number $N$ of duplicates as indicated in the table and using
+skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types
+were recorded, and the fraction of the first to the total was computed.}
+\label{table_skip_Illumina}
+\end{table}
+
+Overall, these results suggest that the relatively strong assumptions
+regarding the distribution of errors are not a major issue in practice.
+The answer of course depends on the type of sequencer that is used and on
+the particulars of the mapping problem.
+
+In practical applications, it is likely that other factors will be more
+detrimental for the precision of the estimates. For instance, the number
+of duplicates $N$ and their divergence rate $\mu$ are unknown, introducing
+an uncertainty that propagates to the Sesame estimates. Importantly, we
+assumed that duplicates evolve independently of each other and with
+uniform substitutions even in the simulations featured in
+Table~\ref{table_MEM_Illumina} and \ref{table_skip_Illumina} because more
+realistic models are tedious to implement. The burden of this assumption
+on the precision of the estimate in practical settings is difficult to
+gauge. Overall, Sesame estimates should be considered approximate in all
+applications with real biological data.
 
 
 \subsection{Non-specific seeds}
@@ -2895,11 +2980,6 @@ In summary, seeds in random sequences happen relatively frequently, but it
 is possible to minimize their computational burden. Also, they are no
 cause for concern regarding false positives because they can easily be
 detected using Bayes formula, as shown in expression (\ref{eq:bayes}).
-
-
-\subsection{Realistic error patterns}
-
-This section will come later.
 
 
 
@@ -3125,6 +3205,18 @@ The last assumption is that seeds can match only the target or one of its
 duplicates. This does not hold in general but we have shown how to deal
 with this possibility \textit{a posteriori} in
 section~\ref{sec:random_seeds}.
+
+We have not treated the case of spaced seeds here. It is possible to find
+a transfer matrix for reads that contain no match for a given spaced seed,
+but as the number of don't-care positions increases, the dimensions of the
+matrix become prohibitively large. This is a well known difficulty. The
+analytic combinatorics approach presented here is equivalent to defining
+finite automata that recognize seed-containing reads. Automata can be used
+to compute the sensitivity of spaced seeds~\cite{kucherov2005multiseed,
+buhler2005designing}, with the caveat that such automata can contain a
+very large amount of states. Overall, the transfer matrix method does not
+provide any significant advantage over existing alternatives for spaced
+seeds.
 
 Being able to compute seeding probabilities revealed some interesting
 facts (sections~\ref{sec:illdual}, \ref{sec:illskipdual} and

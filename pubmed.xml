@@ -6685,4 +6685,229 @@
     </PubmedData>
 </PubmedArticle>
 
+
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" IndexingMethod="Curated" Owner="NLM">
+        <PMID Version="1">22199392</PMID>
+        <DateCompleted>
+            <Year>2012</Year>
+            <Month>04</Month>
+            <Day>30</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2019</Year>
+            <Month>12</Month>
+            <Day>20</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1367-4811</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>28</Volume>
+                    <Issue>4</Issue>
+                    <PubDate>
+                        <Year>2012</Year>
+                        <Month>Feb</Month>
+                        <Day>15</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Bioinformatics (Oxford, England)</Title>
+                <ISOAbbreviation>Bioinformatics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>ART: a next-generation sequencing read simulator.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>593-4</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1093/bioinformatics/btr708</ELocationID>
+            <Abstract>
+                <AbstractText Label="UNLABELLED">ART is a set of simulation tools that generate synthetic next-generation sequencing reads. This functionality is essential for testing and benchmarking tools for next-generation sequencing data analysis including read alignment, de novo assembly and genetic variation discovery. ART generates simulated sequencing reads by emulating the sequencing process with built-in, technology-specific read error models and base quality value profiles parameterized empirically in large sequencing datasets. We currently support all three major commercial next-generation sequencing platforms: Roche's 454, Illumina's Solexa and Applied Biosystems' SOLiD. ART also allows the flexibility to use customized read error model parameters and quality profiles.</AbstractText>
+                <AbstractText Label="AVAILABILITY" NlmCategory="BACKGROUND">Both source and binary software packages are available at http://www.niehs.nih.gov/research/resources/software/art.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Huang</LastName>
+                    <ForeName>Weichun</ForeName>
+                    <Initials>W</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Biostatistics Branch, National Institute of Environmental Health Sciences, Research Triangle Park, NC 27709, USA. weichun.huang@nih.gov</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Li</LastName>
+                    <ForeName>Leping</ForeName>
+                    <Initials>L</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Myers</LastName>
+                    <ForeName>Jason R</ForeName>
+                    <Initials>JR</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Marth</LastName>
+                    <ForeName>Gabor T</ForeName>
+                    <Initials>GT</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <GrantList CompleteYN="Y">
+                <Grant>
+                    <GrantID>Z01 ES101765</GrantID>
+                    <Agency>Intramural NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+                <Grant>
+                    <GrantID>R01 HG004719</GrantID>
+                    <Acronym>HG</Acronym>
+                    <Agency>NHGRI NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+                <Grant>
+                    <GrantID>U01 HG006513</GrantID>
+                    <Acronym>HG</Acronym>
+                    <Agency>NHGRI NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+                <Grant>
+                    <GrantID>HG003698</GrantID>
+                    <Acronym>HG</Acronym>
+                    <Agency>NHGRI NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+                <Grant>
+                    <GrantID>ES101765</GrantID>
+                    <Acronym>ES</Acronym>
+                    <Agency>NIEHS NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+                <Grant>
+                    <GrantID>R01 HG003698</GrantID>
+                    <Acronym>HG</Acronym>
+                    <Agency>NHGRI NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+                <Grant>
+                    <GrantID>HG004719</GrantID>
+                    <Acronym>HG</Acronym>
+                    <Agency>NHGRI NIH HHS</Agency>
+                    <Country>United States</Country>
+                </Grant>
+            </GrantList>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D052061">Research Support, N.I.H., Extramural</PublicationType>
+                <PublicationType UI="D052060">Research Support, N.I.H., Intramural</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2011</Year>
+                <Month>12</Month>
+                <Day>23</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Bioinformatics</MedlineTA>
+            <NlmUniqueID>9808944</NlmUniqueID>
+            <ISSNLinking>1367-4803</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D002886" MajorTopicYN="N">Chromosomes, Human, Pair 17</DescriptorName>
+                <QualifierName UI="Q000235" MajorTopicYN="N">genetics</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D014644" MajorTopicYN="N">Genetic Variation</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D059014" MajorTopicYN="Y">High-Throughput Nucleotide Sequencing</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D017422" MajorTopicYN="Y">Sequence Analysis, DNA</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012984" MajorTopicYN="N">Software</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2011</Year>
+                <Month>12</Month>
+                <Day>27</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2011</Year>
+                <Month>12</Month>
+                <Day>27</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2012</Year>
+                <Month>5</Month>
+                <Day>1</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">22199392</ArticleId>
+            <ArticleId IdType="pii">btr708</ArticleId>
+            <ArticleId IdType="doi">10.1093/bioinformatics/btr708</ArticleId>
+            <ArticleId IdType="pmc">PMC3278762</ArticleId>
+        </ArticleIdList>
+        <ReferenceList>
+            <Reference>
+                <Citation>Nature. 2005 Sep 15;437(7057):376-80</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16056220</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2006 Jan 1;22(1):29-34</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">16301203</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Curr Opin Genet Dev. 2006 Dec;16(6):545-52</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">17055251</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Nature. 2010 Oct 28;467(7319):1061-73</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20981092</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2009 Aug 15;25(16):2078-9</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">19505943</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>Bioinformatics. 2010 Sep 15;26(18):i420-5</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">20823302</ArticleId>
+                </ArticleIdList>
+            </Reference>
+            <Reference>
+                <Citation>PLoS One. 2008;3(10):e3373</Citation>
+                <ArticleIdList>
+                    <ArticleId IdType="pubmed">18841204</ArticleId>
+                </ArticleIdList>
+            </Reference>
+        </ReferenceList>
+    </PubmedData>
+</PubmedArticle>
+
 </PubmedArticleSet>
