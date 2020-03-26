@@ -5,8 +5,10 @@
 \@writefile{lot}{\select@language{english}}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Mapping reads to genomes}{1}}
-\citation{pmid7265238,pmid5420325}
+\citation{pmid5420325,pmid7265238}
 \citation{Waterman1984}
+\citation{pmid5420325}
+\citation{pmid7265238}
 \citation{pmid2983426}
 \citation{pmid2231712}
 \newlabel{def_dup}{{1}{2}}
@@ -21,8 +23,6 @@
 \citation{filion2017analytic,filion2018analytic}
 \citation{pmid23872968}
 \citation{pmid11934743}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Seeds}{4}}
-\newlabel{sec_seeds}{{2}{4}}
 \citation{faro2013exact}
 \citation{ferragina2000opportunistic,ferragina2005indexing}
 \citation{pmid30346548}
@@ -33,6 +33,8 @@
 \citation{pmid24336412,pmid25399029,pmid23349213,pmid19389736}
 \citation{califano1993flash}
 \citation{pmid11934743}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Seeds}{5}}
+\newlabel{sec_seeds}{{2}{5}}
 \citation{li2006superiority}
 \citation{pmid18684737,pmid19461883,pmid19675096,pmid2945724}
 \citation{pmid21209072,healy2016flak}
@@ -44,22 +46,22 @@
 \citation{horton2008dislex,gagie2017compressed}
 \citation{pmid16819802,li2006superiority,martin2017faster}
 \citation{pmid2231712}
-\citation{pmid11934743}
-\citation{pmid22388286}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Exact seeds}{6}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \textbf  {Exact seeding.} A sequenced DNA fragment (Read) is shown above the actual molecule (Target), and above three paralogs of the target (Duplicates). Sequencing errors are indicated by stars (all three are \texttt  {A} misread as \texttt  {T}). The mismatches between the genomic sequences and the read are indicated in bold. The exact seeds of size $\gamma = 7$ are indicated as horizontal grey lines above the read. Matching regions in the genomic sequences are shadowed in grey. Several overlapping seeds accumulate at the center of the read, which is typical of exact seeds.\relax }}{6}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{fig:exact_seed_example}{{1}{6}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Skip seeds}{6}}
-\citation{li2013aligning}
+\citation{pmid11934743}
+\citation{pmid22388286}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Skip seeds}{7}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \textbf  {Example of skip seeds.} The sequences and the annotations are the same as in Figure~\ref  {fig:exact_seed_example}, but here we use skip-1 seeds. In other words, seeds can never start at nucleotides 2, 4, 6 \textit  {etc}. To highlight the difference with Figure~\ref  {fig:exact_seed_example}, the missing seeds are represented by dotted lines.\relax }}{7}}
 \newlabel{fig:skip_seed_example}{{2}{7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}MEM seeds}{7}}
+\citation{li2013aligning}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}MEM seeds}{8}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces \textbf  {Example of MEM seeds.} The sequences and the annotations are the same as in Figure~\ref  {fig:exact_seed_example}, but here we use MEM seeds of minimum size $\gamma =7$. The clutter at the center of the read has disappeared and there is at least one seed for each sequence.\relax }}{8}}
 \newlabel{fig:MEM_example}{{3}{8}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces \textbf  {Issues with MEM seeds: inaccessible targets.} The read, the MEM seeds and the sequences are represented as in Figure~\ref  {fig:MEM_example}. The MEM seeds matching the two duplicates at the bottom effectively hide the target, so it cannot be discovered. This can occur even when the true location is the best candidate and when there is a single error on the read.\relax }}{8}}
-\newlabel{fig:full_masking_example}{{4}{8}}
 \citation{pmid21576222}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces \textbf  {Issues with MEM seeds: inaccessible targets.} The read, the MEM seeds and the sequences are represented as in Figure~\ref  {fig:MEM_example}. The MEM seeds matching the two duplicates at the bottom effectively hide the target, so it cannot be discovered. This can occur even when the true location is the best candidate and when there is a single error on the read.\relax }}{9}}
+\newlabel{fig:full_masking_example}{{4}{9}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textbf  {Issues with MEM seeds: too long reads.} The read, the MEM seeds and the sequences are represented as in Figure~\ref  {fig:MEM_example}. There would be a good seed (shared) if the read were two nucleotides shorter. The true location is hidden by the last two nucleotides.\relax }}{9}}
 \newlabel{fig:short_vs_long}{{5}{9}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Model and strategy}{9}}
@@ -73,50 +75,50 @@
 \citation{regnier2000unified,nicodeme2002motif,sedgewick2013introduction}
 \citation{filion2017analytic}
 \citation{filion2018analytic}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Analytic representation}{11}}
 \citation{filion2017analytic,filion2018analytic}
 \citation{flajolet2009analytic,sedgewick2013introduction}
 \citation{filion2017analytic}
 \citation{filion2018analytic}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Analytic representation}{11}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Example 1: on-target exact seeds}{11}}
-\newlabel{sec:example_exact}{{3.4}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Example 1: on-target exact seeds}{12}}
+\newlabel{sec:example_exact}{{3.4}{12}}
 \newlabel{def:seg}{{7}{12}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces \textbf  {The mismatch encoding.} An example read is represented in the mismatch alphabet. The symbol $\delimiter "322B37F $ represents a mismatch against the target (an erroneous nucleotide) and the symbol $\square $ represents a match (a correct nucleotide). The symbol $|$ is appended to the end of the read. The symbolic sequence of the target is represented below, where an open square stands for a match and a closed square stands for a mismatch.\relax }}{12}}
-\newlabel{fig:simple}{{6}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces \textbf  {The mismatch encoding.} An example read is represented in the mismatch alphabet. The symbol $\delimiter "322B37F $ represents a mismatch against the target (an erroneous nucleotide) and the symbol $\square $ represents a match (a correct nucleotide). The symbol $|$ is appended to the end of the read. The symbolic sequence of the target is represented below, where an open square stands for a match and a closed square stands for a mismatch.\relax }}{13}}
+\newlabel{fig:simple}{{6}{13}}
 \newlabel{eq:F}{{2}{13}}
-\newlabel{eq:recur}{{3}{13}}
+\newlabel{eq:recur}{{3}{14}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Example 2: on-target skip seeds}{14}}
 \newlabel{sec:example_skip}{{3.5}{14}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces \textbf  {The skip encoding.} The read of Figure~\ref  {fig:simple} is represented in the skip-3 alphabet. The symbols $\delimiter "322B37F _j (j = 1,2,3)$ represent mismatches against the target (they are erroneous nucleotides) and the $\square $ symbol represents a match (it is a correct nucleotide). The vertical bars indicate non-skipped positions (the potential start of a seed). The number $j$ in $\delimiter "322B37F _j$ indicates the number of nucleotidesu until the next non-skipped position. For $j=0$ the next nucleotide is not skipped. Other features are as in Figure~\ref  {fig:simple}.\relax }}{14}}
-\newlabel{fig:skip}{{7}{14}}
-\newlabel{eq_H}{{4}{15}}
-\newlabel{eq_J}{{5}{15}}
-\citation{arratia1989tutorial}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces \textbf  {The skip encoding.} The read of Figure~\ref  {fig:simple} is represented in the skip-3 alphabet. The symbols $\delimiter "322B37F _j (j = 1,2,3)$ represent mismatches against the target (they are erroneous nucleotides) and the $\square $ symbol represents a match (it is a correct nucleotide). The vertical bars indicate non-skipped positions (the potential start of a seed). The number $j$ in $\delimiter "322B37F _j$ indicates the number of nucleotides until the next non-skipped position. For $j=0$ the next nucleotide is not skipped. Other features are as in Figure~\ref  {fig:simple}.\relax }}{15}}
+\newlabel{fig:skip}{{7}{15}}
+\newlabel{eq_H}{{4}{16}}
+\newlabel{eq_J}{{5}{16}}
 \newlabel{eq_matrix_Mn}{{6}{16}}
+\citation{arratia1989tutorial}
 \newlabel{eq:bound}{{7}{17}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Off-target exact seeds}{17}}
 \newlabel{sec:offexact}{{4}{17}}
-\newlabel{eq:pcomp}{{8}{17}}
-\newlabel{eq:Pnull}{{9}{17}}
+\newlabel{eq:pcomp}{{8}{18}}
+\newlabel{eq:Pnull}{{9}{18}}
 \newlabel{eq:Poff}{{10}{18}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}The dual encoding}{18}}
 \newlabel{sec:dual}{{4.1}{18}}
 \@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces \textbf  {Example of dual encoding.} An example of read is represented in the dual alphabet. The symbols $\delimiter "3223379 _{/j}^-$ ($j \geq 1$) represent a mismatch against the $-$ sequence, the symbols $\delimiter "3223379 _{/j}^+$ ($j \geq 1$) represent a mismatch against the $+$ sequence, and the symbol $\delimiter "322B37F $ represents a mismatch against both. The index $i$ is the match length of the sequence that is not mismatched. The symbolic $+$ and $-$ sequences are represented below, where an open square stands for a match and a closed square stands for a mismatch.\relax }}{19}}
 \newlabel{fig:dual}{{8}{19}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Segments following $\delimiter "322B37F $}{19}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Segments following $\delimiter "3223379 _{/i}^+$}{19}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Segments following $\delimiter "3223379 _{/i}^+$}{20}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Segments following $\delimiter "3223379 _{/i}^-$}{20}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Transfer matrix}{20}}
 \newlabel{sec_transmat_skip}{{4.5}{20}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Illustration}{22}}
-\newlabel{sec:illdual}{{4.6}{22}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces \textbf  {Off-target seeding probabilities (exact seeds).} The surfaces show the probability that seeding is off target as a function of the divergence rate $\mu $ and of the number $N$ of duplicates. The results are shown for exact seeds of size $\gamma =19$ and for reads of size $k=50$ nucleotides sequenced with an error rate $p=0.01$. The divergence rate $\mu $ is defined as the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{23}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Illustration}{23}}
+\newlabel{sec:illdual}{{4.6}{23}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces \textbf  {Off-target seeding probabilities (exact seeds).} The surfaces show the probability that seeding is off-target as a function of the divergence rate $\mu $ and of the number $N$ of duplicates. The results are shown for exact seeds of size $\gamma =19$ and for reads of size $k=50$ nucleotides sequenced with an error rate $p=0.01$. The divergence rate $\mu $ is defined as the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{23}}
 \newlabel{fig:curves_exact}{{9}{23}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Off-target skip seeds}{24}}
 \newlabel{sec_offskip}{{5}{24}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}The skip dual encoding}{24}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces \textbf  {Example of skip dual encoding.} The read of Figure~\ref  {fig:dual} is represented in the skip dual alphabet. The vertical bars above the read indicate non-skipped positions. The symbols $\delimiter "3223379 _{/j}^-$ and $\delimiter "3223379 _{/j}^+$ ($j \geq 1$) have the same meaning as in the dual alphabet. The symbols $\delimiter "322B37F _j$ indicate that both sequences have match length 0 and that the next non-skipped position is located $j$ nucleotides downstream. Other features are as in Figure~\ref  {fig:dual}.\relax }}{24}}
-\newlabel{fig:skip_dual}{{10}{24}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces \textbf  {Example of skip dual encoding.} The read of Figure~\ref  {fig:dual} is represented in the skip dual alphabet. The vertical bars above the read indicate non-skipped positions. The symbols $\delimiter "3223379 _{/j}^-$ and $\delimiter "3223379 _{/j}^+$ ($j \geq 1$) have the same meaning as in the dual alphabet. The symbols $\delimiter "322B37F _j$ indicate that both sequences have match length 0 and that the next non-skipped position is located $j$ nucleotides downstream. Other features are as in Figure~\ref  {fig:dual}.\relax }}{25}}
+\newlabel{fig:skip_dual}{{10}{25}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Segments following $\delimiter "322B37F _i$ ($1 \leq i \leq n$)}{25}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Segments following $\delimiter "322B37F _0$}{25}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Segments following $\delimiter "3223379 _{/i}^-$}{26}}
@@ -125,11 +127,12 @@
 \newlabel{eq_N}{{12}{28}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Illustration}{31}}
 \newlabel{sec:illskipdual}{{5.7}{31}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces \textbf  {Off-target seeding probabilities (skip seeds).} The surfaces show the probability that seeding is off target for skip-5 and skip-9 seeds of size $\gamma =19$. Read size and error rate are the same as in Figure~\ref  {fig:curves_exact}, \textit  {i.e.} $k=50$ and $p=0.01$. The divergence rate $\mu $, defined as the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{32}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces \textbf  {Off-target seeding probabilities (skip seeds).} The surfaces show the probability that seeding is off-target for skip-5 and skip-9 seeds of size $\gamma =19$. Read size and error rate are the same as in Figure~\ref  {fig:curves_exact}, \textit  {i.e.} $k=50$ and $p=0.01$. The divergence rate $\mu $, defined as the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{32}}
 \newlabel{fig:curves_skip}{{11}{32}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Off-target MEM seeds}{32}}
 \newlabel{sec_offMEM}{{6}{32}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Hard and soft masking}{32}}
+\newlabel{def_mask}{{8}{33}}
 \@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces \textbf  {Example of hard and soft masks.} Genomic sequences are shown below a read where open squares represent nucleotides. In the sequences, the open squares represent matches and the closed squares represent mismatches. The nucleotides contributing to the match length are represented as grey boxes. At the focus position, the match length of the target is 7. The first duplicate is a hard mask because its match length is $13>7$. The second duplicate is a soft mask because its match length is 7, as the target. The third duplicate is not a mask because its match length is $2<7$.\relax }}{33}}
 \newlabel{fig:hard_vs_soft_masks}{{12}{33}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.2}The MEM alphabet}{33}}
@@ -157,44 +160,48 @@
 \newlabel{alg:mcmc}{{1}{43}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.8}Illustration}{43}}
 \newlabel{sec:illmem}{{6.8}{43}}
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces \textbf  {Off-target seeding probabilities (MEM seeds).} The surfaces show the probability that seeding is off target for MEM seeds of indicated minimum size $\gamma $. Read size and error rate are the same as in Figure~\ref  {fig:curves_exact}, \textit  {i.e.} $k=50$ and $p=0.01$. The divergence rate $\mu $ is the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{44}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces \textbf  {Off-target seeding probabilities (MEM seeds).} The surfaces show the probability that seeding is off-target for MEM seeds of indicated minimum size $\gamma $. Read size and error rate are the same as in Figure~\ref  {fig:curves_exact}, \textit  {i.e.} $k=50$ and $p=0.01$. The divergence rate $\mu $ is the probability that a given duplicate differs from the target at any given position. Note the factor 1000 in the scale of the z-axis.\relax }}{44}}
 \newlabel{fig:curves_mem}{{14}{44}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Numerical simulation of mapping errors with MEM seeds. Reads are mapped incorrectly if either the true location is not in the candidate set (not seeded) or it is in the candidate set but is not the best location (seeded, not best). Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using MEM seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{45}}
-\newlabel{table_mem}{{1}{45}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Practical considerations}{45}}
-\newlabel{sec_practical}{{7}{45}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}True versus best location}{45}}
-\newlabel{sec:truevsbest}{{7.1}{45}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Numerical simulation of mapping errors with skip-9 seeds. Reads are mapped incorrectly if either the true location is not in the candidate set (not seeded) or it is in the candidate set but is not the best location (seeded, not best). Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{46}}
-\newlabel{table_skip}{{2}{46}}
-\citation{pmid22199392}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Numerical simulation of ``seeding'' errors with MEM seeds. Realistic reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{47}}
-\newlabel{table_MEM_Illumina}{{3}{47}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}More realistic error models}{47}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Numerical simulation of ``seeding'' errors with skip-9 seeds. Realistic reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated in the table and using skip-9 seed of minimum size $\gamma = 19$. Mapping errors of both types were recorded, and the fraction of the first to the total was computed.\relax }}{48}}
-\newlabel{table_skip_Illumina}{{4}{48}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Non-specific seeds}{48}}
-\newlabel{sec:random_seeds}{{7.3}{48}}
-\newlabel{eq:bayes}{{28}{49}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}The Sesame library}{49}}
-\newlabel{sec:sesame}{{8}{49}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Main features of Sesame}{49}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}The Sesame library}{45}}
+\newlabel{sec:sesame}{{7}{45}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Main features of Sesame}{45}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Using Sesame to compare seeding strategies}{45}}
 \citation{li2013aligning}
 \citation{pmid22388286}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Using Sesame to compare seeding strategies}{50}}
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces \textbf  {Comparing seeding strategies with Sesame.} Left: MEM seeds with $\gamma =19$ and $\mu =0.06$. Right: skip-9 seeds with $\gamma =16$ and $\mu =0.06$. The probabilities that seeding is off target were computed using Sesame. Each curve represents the probability for a given number of duplicates ($N$). Estimates using iterative methods (skip seeds and MEM sees where $N \leq 20$) were computed to within 1\% accuracy. Estimates using Monte Carlo sampling (MEM seeds where $N > 20$) were computed as the average of 500 million simulations. \relax }}{51}}
-\newlabel{fig_mortal_kombat}{{15}{51}}
-\citation{flajolet2009analytic,sedgewick2013introduction}
-\citation{fu1994distribution}
-\citation{ferragina2005indexing}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Key insights about MEM seeds}{52}}
+\citation{pmid21576222}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces \textbf  {Comparing seeding strategies with Sesame.} Left: MEM seeds with $\gamma =19$ and $\mu =0.06$. Right: skip-9 seeds with $\gamma =16$ and $\mu =0.06$. The probabilities that seeding is off-target were computed using Sesame. Each curve represents the probability for a given number of duplicates ($N$). Estimates using iterative methods (skip seeds and MEM seeds where $N \leq 20$) were computed to within 1\% accuracy. Estimates using Monte Carlo sampling (MEM seeds where $N > 20$) were computed as the average of 500 million simulations. \relax }}{46}}
+\newlabel{fig_mortal_kombat}{{15}{46}}
+\citation{zorita2020mapping}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Key insights about MEM seeds}{47}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Practical considerations}{48}}
+\newlabel{sec_practical}{{8}{48}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}True versus best location}{48}}
+\newlabel{sec:truevsbest}{{8.1}{48}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Simulations of mapping errors with MEM seeds. Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated, using MEM seeds of minimum size $\gamma = 19$. \textit  {Not seeded} shows how often the read had no seed for the target, \textit  {Seeded, not best} shows how often the read had a seed for the target but the target was not the best candidate, and \textit  {Relative error} shows the factor between the probability that the read is not mapped to the true location and the probability that seeding is off-target.\relax }}{49}}
+\newlabel{table_mem}{{1}{49}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Simulations of mapping errors with MEM seeds. Ideal reads were randomly generated 1,000,000 times with sequencing error rate $p = 0.01$, divergence rate $\mu = 0.06$, varying the read size $k$ and number $N$ of duplicates as indicated, using skip-9 seeds of size $\gamma = 19$. The meanings of the columns are the same as in Table~\ref  {table_mem}.\relax }}{49}}
+\newlabel{table_skip}{{2}{49}}
+\citation{pmid21576222}
+\citation{pmid22199392}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Simulations of seeding errors with MEM seeds. Realistic Illumina HiSeq 2000 reads were randomly generated 1,000,000 times varying the read size $k$ and number $N$ of duplicates as indicated, and fixing the divergence rate to $\mu = 0.06$ and using MEM seeds of minimum size $\gamma =19$. \textit  {Sesame} shows the probability that seeding is off-target as computed with Sesame, \textit  {Simulation} shows this probability estimated by the simulation, and \textit  {Ratio} shows their ratio.\relax }}{50}}
+\newlabel{table_MEM_Illumina}{{3}{50}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Realistic sequencing errors}{50}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Simulations of seeding errors with skip-9 seeds. Realistic Illumina HiSeq 2000 reads were randomly generated 1,000,000 times varying the read size $k$ and number $N$ of duplicates as indicated, and fixing the divergence rate to $\mu = 0.06$ and using MEM seeds of minimum size $\gamma =19$. The meanings of the columns are the same as in Table~\ref  {table_MEM_Illumina}.\relax }}{51}}
+\newlabel{table_skip_Illumina}{{4}{51}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Spurious random hits}{51}}
+\newlabel{sec:random_seeds}{{8.3}{51}}
+\citation{flajolet2009analytic,sedgewick2013introduction,regnier2000unified,nicodeme2002motif}
+\newlabel{eq:bayes}{{28}{52}}
 \@writefile{toc}{\contentsline {section}{\numberline {9}Discussion}{52}}
 \newlabel{sec_disc}{{9}{52}}
+\citation{fu1994distribution}
+\citation{ferragina2005indexing}
+\citation{zorita2020mapping}
 \citation{kucherov2005multiseed,buhler2005designing}
 \citation{lee2014mosaik}
 \bibdata{references,pubmed}
-\bibcite{pmid7265238}{1}
-\bibcite{pmid5420325}{2}
+\bibcite{pmid5420325}{1}
+\bibcite{pmid7265238}{2}
 \bibcite{Waterman1984}{3}
 \bibcite{pmid2983426}{4}
 \bibcite{pmid2231712}{5}
@@ -246,22 +253,25 @@
 \bibcite{flajolet2009analytic}{51}
 \bibcite{arratia1989tutorial}{52}
 \bibcite{kachitvichyanukul1988binomial}{53}
-\bibcite{pmid22199392}{54}
-\bibcite{fu1994distribution}{55}
-\bibcite{buhler2005designing}{56}
-\bibcite{lee2014mosaik}{57}
+\bibcite{zorita2020mapping}{54}
+\bibcite{pmid22199392}{55}
+\bibcite{fu1994distribution}{56}
+\bibcite{buhler2005designing}{57}
+\bibcite{lee2014mosaik}{58}
 \bibstyle{unsrt}
 \@writefile{toc}{\contentsline {section}{\numberline {A}Definitions}{60}}
-\newlabel{def:seg}{{7}{60}}
-\@writefile{toc}{\contentsline {section}{\numberline {B}Appendix}{61}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Derivation of expression~(\ref  {eq:F})}{61}}
-\newlabel{app_ex1}{{B.1}{61}}
+\newlabel{app_def}{{A}{60}}
+\newlabel{def:seg}{{7}{61}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Appendix}{62}}
+\newlabel{app_extra}{{B}{62}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.1}Derivation of expression~(\ref  {eq:F})}{62}}
+\newlabel{app_ex1}{{B.1}{62}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.2}Derivation of expression~(\ref  {eq:recur})}{62}}
 \newlabel{app_rec}{{B.2}{62}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.3}An alternative construction of $M_n(z)$}{62}}
-\newlabel{app_Mn}{{B.3}{62}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.3}An alternative construction of $M_n(z)$}{63}}
+\newlabel{app_Mn}{{B.3}{63}}
 \@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces \textbf  {The alternative skip encoding.} The read of Figure~\ref  {fig:skip} is represented in the alternative skip-3 alphabet. The only difference is that the nucleotides between a $\delimiter "322B37F _j$ terminator ($0 \leq j \leq n$) and the following non-skipped position are replaced by the $*$ symbol.\relax }}{63}}
 \newlabel{fig_alt_skip}{{16}{63}}
-\newlabel{eq_alt_Mn}{{29}{63}}
+\newlabel{eq_alt_Mn}{{29}{64}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.4}Proof that $a_k$ is independent of $M_n(z)^m$ for $m > k+1$}{64}}
 \newlabel{app_skip}{{B.4}{64}}
