@@ -1,8 +1,8 @@
 all: pubmed.bib
-	pdflatex MEM.tex
-	bibtex MEM.aux
-	pdflatex MEM.tex
-	pdflatex MEM.tex
+	pdflatex manuscript.tex
+	bibtex manuscript.aux
+	pdflatex manuscript.tex
+	pdflatex manuscript.tex
 
 pubmed.bib: pubmed.lst
 	python getref.py pubmed.lst > pubmed.xml
